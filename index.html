@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#0b2b22" />
+    <meta
+      name="description"
+      content="Catch Every Cup. Beat Every Level. A bilingual (Arabic / English) arcade game by Youssef Ayman."
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Cup Catcher" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>Starbucks Cup Catcher</title>
+    <script>
+      // Apply the saved language direction before first paint so Arabic never flashes LTR.
+      try {
+        var saved = JSON.parse(localStorage.getItem('scc:v1:settings') || 'null')
+        var lang = saved && saved.state && saved.state.language
+        if (lang === 'ar' || lang === 'en') {
+          document.documentElement.lang = lang
+          document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+        }
+      } catch (e) {
+        /* storage unavailable: keep defaults */
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <p style="padding: 24px; font-family: system-ui; color: #f2f0eb; background: #0b2b22">
+        Starbucks Cup Catcher needs JavaScript to run. · تحتاج اللعبة إلى تفعيل JavaScript.
+      </p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
