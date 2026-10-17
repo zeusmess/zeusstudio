@@ -130,3 +130,8 @@ a {
   scrollbar-width: thin;
   scrollbar-color: rgb(242 240 235 / 0.25) transparent;
 }
+
+/* Direction-aware mirroring for arrows and chevrons (see components/Icon.tsx). */
+:root[dir='rtl'] {
+  --dir-flip: -1;
+}

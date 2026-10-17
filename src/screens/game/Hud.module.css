@@ -1,0 +1,222 @@
+.hud {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: var(--z-hud);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-inline: auto;
+  max-width: 560px;
+  padding-block-start: calc(var(--safe-top) + var(--space-2));
+  padding-inline: calc(var(--safe-left) + var(--space-3)) calc(var(--safe-right) + var(--space-3));
+  pointer-events: none;
+}
+
+.hud button {
+  pointer-events: auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.spacer {
+  width: var(--control-md);
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+
+.level {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: rgb(4 32 26 / 0.55);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-heavy);
+  color: var(--cream-100);
+}
+
+.clock {
+  margin-block-start: 2px;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-black);
+  color: var(--gold-200);
+}
+
+.lives {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: rgb(4 32 26 / 0.55);
+}
+
+.lifeOn {
+  fill: var(--cream-100);
+  filter: drop-shadow(0 0 4px rgb(242 240 235 / 0.45));
+}
+
+.lifeOff {
+  fill: none;
+  stroke: rgb(242 240 235 / 0.35);
+  stroke-width: 1.6;
+}
+
+.livesCount {
+  margin-inline-start: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-black);
+}
+
+.shake {
+  animation: shake 420ms var(--ease-out);
+  background: rgb(216 67 78 / 0.55);
+}
+
+.scoreRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.scoreBlock {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.label {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-heavy);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--gold-300);
+}
+
+.scoreLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.score {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-black);
+  color: var(--white);
+  text-shadow: 0 2px 10px rgb(0 0 0 / 0.45);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.bump {
+  transform: scale(1.08);
+}
+
+.target {
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-muted);
+}
+
+.badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+}
+
+.combo,
+.streak {
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-black);
+  white-space: nowrap;
+}
+
+.combo {
+  background: var(--green-500);
+  color: var(--white);
+  box-shadow: var(--glow-green);
+  animation: pulse 900ms var(--ease-in-out) infinite;
+}
+
+.streak {
+  background: rgb(4 32 26 / 0.6);
+  color: var(--gold-200);
+}
+
+.opponent {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: rgb(4 32 26 / 0.6);
+  border: 1px solid var(--color-border);
+}
+
+.opponentName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.opponentScore {
+  font-weight: var(--weight-black);
+  color: var(--cream-100);
+}
+
+.opponentBar {
+  grid-column: 1 / -1;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.online {
+  background: var(--green-300);
+  box-shadow: 0 0 8px var(--green-300);
+}
+
+.offline {
+  background: var(--red-400);
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@media (max-height: 640px) {
+  .score {
+    font-size: var(--text-2xl);
+  }
+}

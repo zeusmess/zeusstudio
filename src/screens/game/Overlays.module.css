@@ -1,0 +1,169 @@
+.bannerRegion {
+  position: absolute;
+  inset-inline: 0;
+  top: 32%;
+  z-index: var(--z-hud);
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--space-4);
+  pointer-events: none;
+}
+
+.banner {
+  max-width: 92%;
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-pill);
+  background: rgb(4 32 26 / 0.72);
+  border: 1px solid rgb(227 200 138 / 0.45);
+  box-shadow: var(--shadow-3);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 6vw, 1.9rem);
+  font-weight: var(--weight-black);
+  text-align: center;
+  color: var(--cream-50);
+  letter-spacing: var(--tracking-caps);
+  animation: bannerIn 1500ms var(--ease-out) both;
+}
+
+.finalWave,
+.goldenRush,
+.milestone {
+  color: var(--green-950);
+  background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
+  border-color: var(--gold-200);
+  box-shadow: var(--glow-gold);
+}
+
+.finalWave {
+  font-size: clamp(1.6rem, 9vw, 2.6rem);
+  animation-duration: 2600ms;
+}
+
+.goldenIntro,
+.specialIntro,
+.obstacleIntro {
+  font-family: var(--font-ui);
+  font-size: var(--text-lg);
+  letter-spacing: 0;
+  animation-duration: 2600ms;
+}
+
+.obstacleIntro {
+  border-color: rgb(239 107 107 / 0.6);
+}
+
+.refill {
+  color: var(--green-300);
+}
+
+.tutorial {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 30%;
+  z-index: var(--z-hud);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-6);
+  pointer-events: none;
+  text-align: center;
+  animation: fadeUp var(--dur-slow) var(--ease-out) both;
+}
+
+.tutorial p {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: rgb(4 32 26 / 0.7);
+  font-weight: var(--weight-heavy);
+  box-shadow: var(--shadow-2);
+}
+
+.swipe {
+  width: 120px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-300), transparent);
+  animation: swipe 1.4s var(--ease-in-out) infinite;
+}
+
+.touch {
+  position: absolute;
+  inset-inline: 0;
+  bottom: calc(var(--safe-bottom) + var(--space-4));
+  z-index: var(--z-controls);
+  display: flex;
+  justify-content: space-between;
+  padding-inline: var(--space-4);
+  pointer-events: none;
+}
+
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  background: rgb(4 32 26 / 0.45);
+  color: var(--cream-100);
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.arrow:active {
+  background: rgb(0 117 74 / 0.6);
+}
+
+.rotate {
+  position: absolute;
+  bottom: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-hud);
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: rgb(4 32 26 / 0.8);
+  font-size: var(--text-xs);
+  pointer-events: none;
+}
+
+@keyframes bannerIn {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.85);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(0) scale(1.04);
+  }
+  20% {
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes swipe {
+  0%,
+  100% {
+    transform: translateX(-30px);
+  }
+  50% {
+    transform: translateX(30px);
+  }
+}

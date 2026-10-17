@@ -1,0 +1,21 @@
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-hud);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Drag anywhere to move the basket; nothing on this surface scrolls the page. */
+.surface {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: grab;
+}
+
+.screen[data-state='PLAYING'] .surface:active {
+  cursor: grabbing;
+}

@@ -1,0 +1,20 @@
+.spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2.5px solid rgb(242 240 235 / 0.25);
+  border-top-color: currentColor;
+  animation: spin 0.8s linear infinite;
+}
+
+/* A spinner still has to read as "working" with reduced motion on. */
+:root[data-motion='reduced'] .spinner {
+  animation: spin 1.6s linear infinite !important;
+  animation-iteration-count: infinite !important;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

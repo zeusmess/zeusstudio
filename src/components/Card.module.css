@@ -1,0 +1,43 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.glass {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-2);
+  backdrop-filter: blur(10px);
+}
+
+.cream {
+  background: var(--color-surface-cream);
+  color: var(--color-text-on-cream);
+  box-shadow: var(--shadow-2);
+}
+
+.gold {
+  background: linear-gradient(160deg, rgb(203 162 88 / 0.22), rgb(14 53 41 / 0.9) 60%);
+  border-color: rgb(227 200 138 / 0.4);
+  box-shadow: var(--shadow-2);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-heavy);
+}
+
+.aside {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}

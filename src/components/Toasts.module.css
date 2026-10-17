@@ -1,0 +1,86 @@
+.region {
+  position: fixed;
+  inset-block-start: calc(var(--safe-top) + var(--space-3));
+  inset-inline: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-4);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: min(100%, 380px);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-3);
+  color: var(--color-text);
+  text-align: start;
+  pointer-events: auto;
+  animation: toastIn var(--dur-slow) var(--ease-spring) both;
+}
+
+.achievement {
+  border-color: rgb(227 200 138 / 0.6);
+  box-shadow:
+    var(--shadow-3),
+    var(--glow-gold);
+}
+
+.error {
+  border-color: rgb(239 107 107 / 0.6);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgb(242 240 235 / 0.12);
+}
+
+.achievement .icon {
+  background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
+  color: var(--green-950);
+}
+
+.success .icon {
+  color: var(--green-300);
+}
+
+.error .icon {
+  color: var(--red-400);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: var(--leading-snug);
+}
+
+.title {
+  font-weight: var(--weight-heavy);
+  font-size: var(--text-sm);
+}
+
+.body {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+  }
+}

@@ -1,0 +1,548 @@
+.screen {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ---------- Atmosphere ---------- */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  overflow: hidden;
+  background:
+    radial-gradient(90% 55% at 50% 30%, rgb(0 117 74 / 0.45), transparent 70%),
+    radial-gradient(120% 90% at 50% 0%, var(--green-800), var(--green-900) 55%, var(--green-950));
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.28;
+  mix-blend-mode: luminosity;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(40% 28% at 50% 46%, rgb(227 200 138 / 0.22), transparent 70%),
+    linear-gradient(180deg, transparent 55%, rgb(4 32 26 / 0.85));
+}
+
+.bokeh span {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(241 223 178 / 0.55), transparent 70%);
+  filter: blur(6px);
+  animation: twinkle 6s var(--ease-in-out) infinite;
+}
+
+.bokeh span:nth-child(1) {
+  width: 120px;
+  height: 120px;
+  top: 4%;
+  left: 8%;
+}
+
+.bokeh span:nth-child(2) {
+  width: 70px;
+  height: 70px;
+  top: 12%;
+  right: 12%;
+  animation-delay: -2s;
+}
+
+.bokeh span:nth-child(3) {
+  width: 160px;
+  height: 160px;
+  top: 34%;
+  right: -40px;
+  animation-delay: -4s;
+  opacity: 0.6;
+}
+
+.bokeh span:nth-child(4) {
+  width: 90px;
+  height: 90px;
+  top: 58%;
+  left: -20px;
+  animation-delay: -1s;
+}
+
+.bokeh span:nth-child(5) {
+  width: 50px;
+  height: 50px;
+  top: 22%;
+  left: 46%;
+  animation-delay: -3s;
+}
+
+.fade {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--green-950);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.intro .fade {
+  animation: fadeOut 700ms var(--ease-out) both;
+}
+
+/* ---------- Layout ---------- */
+.layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 100%;
+  max-width: 520px;
+  margin-inline: auto;
+  padding-block-start: calc(var(--safe-top) + var(--space-3));
+  padding-block-end: calc(var(--safe-bottom) + var(--space-5));
+  padding-inline-start: calc(var(--safe-left) + var(--space-4));
+  padding-inline-end: calc(var(--safe-right) + var(--space-4));
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.topEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  margin-block-start: var(--space-2);
+}
+
+.subtitle {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+}
+
+/* ---------- Hero stage: a cup drops into the basket ---------- */
+.stage {
+  position: relative;
+  width: 230px;
+  height: 200px;
+  margin-block-start: var(--space-2);
+}
+
+.basketBack,
+.basketFront {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 210px;
+  height: auto;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+}
+
+.heroCup {
+  position: absolute;
+  bottom: 62px;
+  left: 50%;
+  height: 118px;
+  width: auto;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.35));
+}
+
+.ring {
+  position: absolute;
+  left: 50%;
+  bottom: 70px;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  margin-bottom: -100px;
+  border-radius: 50%;
+  border: 3px solid rgb(227 200 138 / 0.8);
+  opacity: 0;
+  transform: scale(0.2);
+}
+
+.burst {
+  position: absolute;
+  left: 50%;
+  bottom: 82px;
+  width: 0;
+  height: 0;
+}
+
+.burst span {
+  position: absolute;
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 18px;
+  border-radius: 3px;
+  background: linear-gradient(var(--gold-200), var(--gold-500));
+  opacity: 0;
+  transform: rotate(var(--a)) translateY(-30px);
+}
+
+.burst span:nth-child(3n) {
+  background: linear-gradient(var(--green-300), var(--green-500));
+}
+
+.burst span:nth-child(3n + 1) {
+  background: var(--cream-50);
+}
+
+.pop {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+  color: var(--gold-200);
+  text-shadow: 0 2px 10px rgb(0 0 0 / 0.45);
+  opacity: 0;
+}
+
+/* Intro timeline: fade in → title (0.4s) → cup drop (1.2s) → catch (2.1s) → nav (2.6s) */
+.intro .heroCup {
+  animation: drop 900ms cubic-bezier(0.55, 0, 0.9, 0.5) 1.2s both;
+}
+
+.intro .basketBack,
+.intro .basketFront {
+  animation: squash 420ms var(--ease-out) 2.08s both;
+}
+
+.intro .ring {
+  animation: ring 700ms var(--ease-out) 2.1s both;
+}
+
+.intro .burst span {
+  animation: burst 650ms var(--ease-out) 2.1s both;
+}
+
+.intro .pop {
+  animation: pop 1100ms var(--ease-out) 2.12s both;
+}
+
+.intro .subtitle {
+  animation: rise 600ms var(--ease-out) 1.2s both;
+}
+
+.intro .actions,
+.intro .topBar,
+.intro .footer {
+  pointer-events: none;
+}
+
+.intro .actions > *,
+.intro .topBar,
+.intro .footer {
+  animation: rise 520ms var(--ease-out) both;
+}
+
+.intro .topBar {
+  animation-delay: 2.5s;
+}
+
+.intro .actions > :nth-child(1) {
+  animation-delay: 2.6s;
+}
+
+.intro .actions > :nth-child(2) {
+  animation-delay: 2.68s;
+}
+
+.intro .actions > :nth-child(3) {
+  animation-delay: 2.76s;
+}
+
+.intro .actions > :nth-child(4) {
+  animation-delay: 2.84s;
+}
+
+.intro .footer {
+  animation-delay: 2.92s;
+}
+
+/* Idle: the basket floats gently with its cup. */
+.done .stage {
+  animation: float 4.5s var(--ease-in-out) infinite;
+}
+
+/* ---------- Actions ---------- */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 88px;
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  backdrop-filter: blur(8px);
+  color: var(--color-text);
+  font-weight: var(--weight-heavy);
+  font-size: var(--text-sm);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.tile:hover {
+  background: var(--color-surface-strong);
+}
+
+.tile:active {
+  transform: scale(0.97);
+}
+
+.tile svg {
+  color: var(--gold-300);
+  margin-block-end: var(--space-1);
+}
+
+.tile small {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-subtle);
+  line-height: 1.3;
+}
+
+.tileLocked {
+  opacity: 0.72;
+}
+
+.tileLocked svg {
+  color: var(--color-text-subtle);
+}
+
+.identity {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+
+.leaderboardLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-md);
+  border: 0;
+  background: transparent;
+  color: var(--gold-300);
+  font-weight: var(--weight-bold);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  margin-block-start: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.credit {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-heavy);
+  letter-spacing: var(--tracking-wide);
+  color: var(--gold-300);
+}
+
+.disclaimer {
+  max-width: 34ch;
+  font-size: var(--text-2xs);
+  color: var(--color-text-subtle);
+  line-height: 1.4;
+}
+
+.skip {
+  position: fixed;
+  inset-block-end: calc(var(--safe-bottom) + var(--space-5));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-overlay);
+  min-height: var(--control-sm);
+  padding-inline: var(--space-5);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: rgb(4 32 26 / 0.6);
+  color: var(--color-text);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  backdrop-filter: blur(6px);
+}
+
+/* Short screens: keep everything on one screen. */
+@media (max-height: 740px) {
+  .stage {
+    width: 190px;
+    height: 160px;
+  }
+
+  .basketBack,
+  .basketFront {
+    width: 170px;
+  }
+
+  .heroCup {
+    height: 92px;
+    bottom: 50px;
+  }
+
+  .layout {
+    gap: var(--space-4);
+  }
+}
+
+@media (min-width: 768px) {
+  .stage {
+    width: 260px;
+    height: 220px;
+  }
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes drop {
+  from {
+    transform: translate(-50%, -60vh) rotate(-14deg);
+  }
+  to {
+    transform: translate(-50%, 0) rotate(0);
+  }
+}
+
+@keyframes squash {
+  0% {
+    transform: translateX(-50%) scale(1, 1);
+  }
+  35% {
+    transform: translateX(-50%) scale(1.08, 0.86);
+  }
+  70% {
+    transform: translateX(-50%) scale(0.97, 1.04);
+  }
+  100% {
+    transform: translateX(-50%) scale(1, 1);
+  }
+}
+
+@keyframes ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(-26px) scaleY(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-96px) scaleY(1);
+  }
+}
+
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 40px) scale(0.6);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.15);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -14px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -30px) scale(1);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}

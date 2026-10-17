@@ -9,6 +9,10 @@ export default defineConfig({
     // `npm run dev -- --host` exposes the dev server to phones on the same network.
     port: 5173,
   },
+  optimizeDeps: {
+    // Pre-bundle the lazily imported engines so the first game start never triggers a reload.
+    include: ['phaser', 'firebase/app', 'firebase/auth', 'firebase/database'],
+  },
   build: {
     target: 'es2022',
     // Phaser (~1.2 MB minified) is lazy-loaded into its own chunk when gameplay starts.

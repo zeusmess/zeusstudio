@@ -1,0 +1,102 @@
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: calc(var(--safe-top) + var(--space-4)) var(--space-4) calc(var(--safe-bottom) + var(--space-4));
+  background: rgb(4 32 26 / 0.72);
+  backdrop-filter: blur(6px) saturate(0.7);
+  animation: fadeIn var(--dur-slow) var(--ease-out) both;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: min(100%, 420px);
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border-strong);
+  background: linear-gradient(180deg, var(--color-surface-raised), var(--color-surface-strong));
+  box-shadow: var(--shadow-3);
+  text-align: center;
+  animation: popIn var(--dur-slow) var(--ease-spring) both;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-black);
+  line-height: var(--leading-tight);
+  color: var(--cream-50);
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-weight: var(--weight-semibold);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: rgb(242 240 235 / 0.06);
+}
+
+.cell span {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-heavy);
+  color: var(--gold-300);
+}
+
+.cell strong {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-black);
+}
+
+.newBest {
+  justify-self: center;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, var(--gold-200), var(--gold-500));
+  color: var(--green-950);
+  font-weight: var(--weight-black);
+  box-shadow: var(--glow-gold);
+}
+
+.rank {
+  display: flex;
+  justify-content: center;
+  min-height: 24px;
+  color: var(--gold-200);
+  font-weight: var(--weight-bold);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}

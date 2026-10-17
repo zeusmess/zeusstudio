@@ -1,0 +1,16 @@
+.quick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: rgb(0 0 0 / 0.18);
+}
+
+.language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-weight: var(--weight-bold);
+}

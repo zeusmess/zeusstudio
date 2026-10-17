@@ -1,0 +1,8 @@
+.avatar {
+  flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgb(242 240 235 / 0.2),
+    var(--shadow-1);
+  background: var(--green-800);
+}

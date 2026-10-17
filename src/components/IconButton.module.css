@@ -1,0 +1,65 @@
+.iconButton {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.iconButton:not(:disabled):active {
+  transform: scale(0.94);
+}
+
+.md {
+  width: var(--control-md);
+  height: var(--control-md);
+}
+
+.lg {
+  width: var(--control-lg);
+  height: var(--control-lg);
+}
+
+.glass {
+  background: rgb(242 240 235 / 0.1);
+  border-color: var(--color-border);
+  backdrop-filter: blur(8px);
+}
+
+.glass:not(:disabled):hover {
+  background: rgb(242 240 235 / 0.18);
+}
+
+.plain {
+  background: transparent;
+}
+
+.plain:not(:disabled):hover {
+  background: rgb(242 240 235 / 0.1);
+}
+
+.solid {
+  background: var(--color-surface-raised);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-2);
+}
+
+.badge {
+  position: absolute;
+  inset-block-start: -2px;
+  inset-inline-end: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--gold-400);
+  color: var(--color-text-on-gold);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-black);
+  line-height: 18px;
+}

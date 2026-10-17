@@ -45,8 +45,10 @@ export const CUP = {
 
 /** Centre y of a cup at the moment its base reaches the rim (progress = 1). */
 export const CATCH_Y = BASKET.rimY - CUP.height / 2 + CUP.sinkDepth
-/** A cup that has passed the rim is lost once it falls below this line. */
-export const GROUND_Y = FIELD_HEIGHT + CUP.height / 2
+/** Top of the café counter the basket stands on. */
+export const COUNTER_Y = BASKET.y + 37
+/** A cup that slipped past the basket is lost when it hits the counter. */
+export const GROUND_Y = COUNTER_Y - CUP.height / 2 + 12
 /** Horizontal distance (centre to centre) at which a cup lands in the basket. */
 export const CATCH_HALF_WIDTH = 74
 /** Obstacles are slightly smaller targets, which keeps dodging fair. */

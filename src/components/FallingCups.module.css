@@ -1,0 +1,33 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: var(--z-backdrop);
+}
+
+.cup {
+  position: absolute;
+  inset-block-start: 0;
+  left: var(--x);
+  width: auto;
+  height: var(--size);
+  opacity: var(--alpha);
+  filter: blur(var(--blur));
+  transform: translate3d(-50%, -20vh, 0);
+  animation: fall var(--dur) linear var(--delay) infinite;
+  will-change: transform;
+}
+
+@keyframes fall {
+  from {
+    transform: translate3d(-50%, -20vh, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(-50%, 120vh, 0) rotate(var(--spin));
+  }
+}
+
+:root[data-motion='reduced'] .layer {
+  display: none;
+}

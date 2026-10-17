@@ -1,0 +1,82 @@
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  text-align: center;
+  line-height: 1;
+}
+
+.top {
+  font-family: var(--font-wordmark);
+  font-weight: var(--weight-black);
+  font-variation-settings: 'SOFT' 100;
+  letter-spacing: 0.04em;
+  color: var(--cream-50);
+  text-shadow:
+    0 2px 0 rgb(0 0 0 / 0.25),
+    0 10px 30px rgb(0 0 0 / 0.35);
+}
+
+.bottom {
+  font-family: var(--font-ui);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.32em;
+  padding-inline-start: 0.32em;
+  color: var(--gold-300);
+  text-shadow:
+    0 1px 0 var(--gold-600),
+    0 4px 14px rgb(0 0 0 / 0.4);
+}
+
+.hero .top {
+  font-size: var(--text-hero);
+}
+
+.hero .bottom {
+  font-size: clamp(1rem, 4.6vw, 1.6rem);
+}
+
+.compact .top {
+  font-size: var(--text-3xl);
+}
+
+.compact .bottom {
+  font-size: var(--text-sm);
+}
+
+.local {
+  margin-block-start: var(--space-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-heavy);
+  color: var(--cream-100);
+  letter-spacing: 0;
+}
+
+.letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.4em) scale(0.92);
+  animation: letterIn var(--dur-slower) var(--ease-spring) forwards;
+  animation-delay: calc(400ms + var(--i) * 45ms);
+}
+
+.fadeUp {
+  opacity: 0;
+  animation: letterIn var(--dur-slower) var(--ease-out) 1.1s forwards;
+}
+
+@keyframes letterIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:root[data-motion='reduced'] .letter,
+:root[data-motion='reduced'] .fadeUp {
+  opacity: 1;
+  transform: none;
+}

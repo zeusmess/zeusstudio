@@ -1,0 +1,13 @@
+.app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--gold-300);
+}
