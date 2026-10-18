@@ -1,14 +1,17 @@
 name: Android APK
 
-# Builds an installable debug APK of the game on every push.
-# Download it from the run's "Artifacts" section (Actions tab).
+# Builds an installable debug APK of the game on every push. Download it from
+# the run's "Artifacts" section (Actions tab). Builds of the default branch are
+# also published as the "Android test build" release, at a fixed address:
+# https://github.com/<owner>/<repository>/releases/download/android-latest/cup-catcher-debug.apk
 on:
   push:
     paths-ignore: ['**.md']
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # Write access only to publish the APK as a release asset.
+  contents: write
 
 concurrency:
   group: android-${{ github.ref }}
@@ -62,3 +65,16 @@ jobs:
           path: out/*.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish as the "Android test build" release
+        if: github.ref_name == github.event.repository.default_branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp out/*.apk out/cup-catcher-debug.apk
+          gh release delete android-latest --yes --cleanup-tag || true
+          gh release create android-latest out/cup-catcher-debug.apk \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Android test build" \
+            --notes "Debug build of ${GITHUB_SHA::7} (run ${{ github.run_number }}). To install, allow your browser or file manager to install unknown apps."

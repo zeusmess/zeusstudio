@@ -139,7 +139,7 @@ To enable sign-in and online play there, add the `VITE_FIREBASE_*` values as rep
 
 The Android app wraps the same web build in a [Capacitor](https://capacitorjs.com) shell (`android/`, app id `com.youssefayman.cupcatcher`, label *Cup Catcher* / *صيّاد الأكواب*, portrait, the original emblem as icon and splash).
 
-- **Without installing anything:** every push runs `.github/workflows/android.yml`, which builds a debug APK on GitHub's servers. Open the run in the **Actions** tab and download `cup-catcher-android-…` from *Artifacts* (a zip containing the `.apk`).
+- **Without installing anything:** every push runs `.github/workflows/android.yml`, which builds a debug APK on GitHub's servers. Builds of the default branch are published as the *Android test build* release, always at `https://github.com/<owner>/<repository>/releases/download/android-latest/cup-catcher-debug.apk` (sign in to GitHub first while the repository is private). Every run also keeps the APK under *Artifacts* in the **Actions** tab.
 - **Locally** (Android Studio or the Android SDK, JDK 21): `npm run android:apk` → `android/app/build/outputs/apk/debug/app-debug.apk`. `npm run android:sync` copies a fresh web build into the project (e.g. before opening `android/` in Android Studio).
 
 Installing a debug APK on a phone needs *Install unknown apps* allowed for the browser or file manager used to open it. It is signed with a debug key: for Google Play, build a signed release (`./gradlew bundleRelease` with your own keystore) — and note that store listings using Starbucks' name and logo would need Starbucks' permission.
