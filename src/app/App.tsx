@@ -12,6 +12,7 @@ import { OpeningScreen } from '../screens/OpeningScreen'
 import type { AppScreen } from '../types'
 import styles from './App.module.css'
 import { useApp } from './appStore'
+import { bindBackButton } from './backButton'
 import { GAME_STATES } from './stateMachine'
 
 const LoginScreen = lazy(() => import('../screens/LoginScreen'))
@@ -68,6 +69,7 @@ export function App() {
   useEffect(() => {
     void initAuth()
     const unbindAudio = bindAudio()
+    const unbindBack = bindBackButton()
     audio.setMusic('menu')
     const unsubscribe = onAchievementsUnlocked((ids) => {
       const { t } = currentI18n()
@@ -82,6 +84,7 @@ export function App() {
     return () => {
       unsubscribe()
       unbindAudio()
+      unbindBack()
     }
   }, [])
 

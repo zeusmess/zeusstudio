@@ -21,7 +21,8 @@
     "simulate": "tsx scripts/simulate-balance.ts",
     "assets:brand": "python3 scripts/process_brand_assets.py",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
-    "rules:build": "tsx scripts/build-database-rules.ts"
+    "rules:build": "tsx scripts/build-database-rules.ts",
+    "assets:icons": "tsx scripts/build-icons.ts"
   },
   "dependencies": {
     "@fontsource-variable/cairo": "^5.3.0",

@@ -80,6 +80,7 @@ export function Dialog({ open, title, children, actions, onClose, tone = 'defaul
         aria-describedby={description ? descriptionId : undefined}
         className={[styles.dialog, styles[tone]].join(' ')}
         data-testid={testId}
+        data-dismissable={onClose ? 'true' : undefined}
       >
         <h2 id={titleId} className={styles.title}>
           {title}

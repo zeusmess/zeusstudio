@@ -1,0 +1,19 @@
+{
+  "name": "STARBUCKS CUP CATCHER",
+  "short_name": "Cup Catcher",
+  "description": "Catch Every Cup. Beat Every Level. A bilingual arcade game by Youssef Ayman.",
+  "lang": "en",
+  "dir": "auto",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b2b22",
+  "theme_color": "#0b2b22",
+  "categories": ["games"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
