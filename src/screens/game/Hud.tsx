@@ -11,6 +11,8 @@ import styles from './Hud.module.css'
 interface HudProps {
   onPause: () => void
   canPause: boolean
+  /** Online matches cannot be paused; the player may leave (forfeit) instead. */
+  onLeave?: () => void
 }
 
 function formatClock(ms: number): string {
@@ -29,7 +31,7 @@ function LifeCup({ filled }: { filled: boolean }) {
   )
 }
 
-export function Hud({ onPause, canPause }: HudProps) {
+export function Hud({ onPause, canPause, onLeave }: HudProps) {
   const { t, num } = useI18n()
   const hud = useHud()
   const [shake, setShake] = useState(false)
@@ -70,6 +72,10 @@ export function Hud({ onPause, canPause }: HudProps) {
         {canPause ? (
           <IconButton label={t('hud.pause')} onClick={onPause} data-testid="pause-button">
             <Icon name="pause" />
+          </IconButton>
+        ) : onLeave ? (
+          <IconButton label={t('match.leave')} onClick={onLeave} data-testid="leave-match">
+            <Icon name="logout" />
           </IconButton>
         ) : (
           <span className={styles.spacer} />
@@ -149,7 +155,9 @@ export function Hud({ onPause, canPause }: HudProps) {
           <span
             className={[styles.dot, hud.opponent.connected ? styles.online : styles.offline].join(' ')}
             title={hud.opponent.connected ? t('lobby.connected') : t('lobby.disconnected')}
-          />
+          >
+            <span className="visually-hidden">{hud.opponent.connected ? t('lobby.connected') : t('lobby.disconnected')}</span>
+          </span>
           <div className={styles.opponentBar}>
             <ProgressBar
               value={hud.target > 0 ? hud.opponent.score / hud.target : 0}
@@ -158,6 +166,11 @@ export function Hud({ onPause, canPause }: HudProps) {
               size="sm"
             />
           </div>
+          {!hud.opponent.connected && (
+            <p className={styles.opponentStatus} role="status" data-testid="opponent-offline">
+              {t('match.opponentDisconnected')}
+            </p>
+          )}
         </div>
       )}
     </header>

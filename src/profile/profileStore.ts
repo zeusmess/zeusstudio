@@ -109,7 +109,8 @@ interface ProfileState {
   unlock: (ids: readonly AchievementId[]) => AchievementId[]
   recordCampaign: (result: SessionResult) => CampaignSummary
   recordEndless: (result: SessionResult) => EndlessSummary
-  recordMatch: (record: MatchRecord) => AchievementId[]
+  /** Records an online match once (by id); `play` adds the cups caught in it to the totals. */
+  recordMatch: (record: MatchRecord, play?: SessionResult | null) => AchievementId[]
   /** Counts cups from a run the player quit or restarted. */
   recordAbandoned: (result: SessionResult) => void
   resetProgress: () => void
@@ -178,9 +179,16 @@ export const useProfile = create<ProfileState>()((set, get) => {
       return { newBest: outcome.newBest, previousBest: outcome.previousBest, achievements: unlocked }
     },
 
-    recordMatch: (match) => {
-      const withMatch = applyMatchResult(get().record.progress, match)
-      const { progress, unlocked } = unlockAchievements(withMatch, achievementsFromMatch(match.outcome))
+    recordMatch: (match, play) => {
+      const before = get().record.progress
+      if (before.matchHistory.some((m) => m.id === match.id)) return []
+      const withStats = play ? addPlayStats(before, play) : before
+      const withMatch = applyMatchResult(withStats, match)
+      const earned = [
+        ...achievementsFromMatch(match.outcome),
+        ...(play ? achievementsFromResult(play, withMatch) : []),
+      ]
+      const { progress, unlocked } = unlockAchievements(withMatch, earned)
       commitProgress(progress)
       notify(unlocked)
       return unlocked

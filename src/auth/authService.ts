@@ -135,6 +135,8 @@ export async function ensureOnlineUser(): Promise<string> {
   if (!isFirebaseConfigured()) throw new OnlineUnavailableError('unconfigured')
   try {
     const { auth } = await getFirebase()
+    // Wait for a saved sign-in to be restored, so a Google player is never replaced by an anonymous one.
+    await auth.authStateReady()
     if (auth.currentUser) return auth.currentUser.uid
     const { signInAnonymously } = await import('firebase/auth')
     const credential = await signInAnonymously(auth)

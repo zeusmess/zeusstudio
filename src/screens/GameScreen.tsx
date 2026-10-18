@@ -1,10 +1,15 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { playCampaignLevel, playEndless } from '../app/actions'
 import { useApp } from '../app/appStore'
 import { useSettings } from '../app/settings'
 import { useControllerStore } from '../game/controllerStore'
 import { useHud } from '../game/hudStore'
 import { matchElapsed, useMatchClock } from '../multiplayer/matchClock'
+import { useRoom } from '../multiplayer/roomStore'
+import { useI18n } from '../locales/i18n'
+import { Button } from '../components/Button'
+import { Dialog } from '../components/Dialog'
+import { Icon } from '../components/Icon'
 import { Countdown } from './game/Countdown'
 import { GameOverScreen } from './game/GameOverScreen'
 import { Hud } from './game/Hud'
@@ -30,6 +35,9 @@ export default function GameScreen() {
   const pointerDown = useRef(false)
   const preparedRun = useHud((s) => s.run)
   const prepared = preparedRun === runId
+  const awaitingResult = useRoom((s) => s.awaitingResult)
+  const [leaving, setLeaving] = useState(false)
+  const { t } = useI18n()
 
   const versus = play?.mode === 'versus'
   const canPause = !versus && screen === 'PLAYING'
@@ -154,7 +162,11 @@ export default function GameScreen() {
         onPointerLeave={onPointerLeave}
         data-testid="game-surface"
       />
-      <Hud onPause={() => go('PAUSED')} canPause={canPause} />
+      <Hud
+        onPause={() => go('PAUSED')}
+        canPause={canPause}
+        onLeave={versus && (screen === 'COUNTDOWN' || screen === 'PLAYING') ? () => setLeaving(true) : undefined}
+      />
       <BannerView />
       <TutorialHint />
       {controller && arrowButtons && screen === 'PLAYING' && <TouchControls controller={controller} />}
@@ -169,6 +181,41 @@ export default function GameScreen() {
           stepMs={versus ? 1000 : COUNT_STEP_MS}
         />
       )}
+
+      {versus && awaitingResult && screen === 'PLAYING' && (
+        <p className={styles.awaiting} role="status" data-testid="awaiting-result">
+          {t('match.waitingResult')}
+        </p>
+      )}
+
+      <Dialog
+        open={leaving && versus && (screen === 'COUNTDOWN' || screen === 'PLAYING')}
+        title={t('match.leaveTitle')}
+        description={t('match.leaveBody')}
+        tone="danger"
+        onClose={() => setLeaving(false)}
+        testId="leave-dialog"
+        actions={
+          <>
+            <Button size="lg" block onClick={() => setLeaving(false)} data-autofocus>
+              {t('match.keepPlaying')}
+            </Button>
+            <Button
+              variant="danger"
+              block
+              icon={<Icon name="logout" />}
+              onClick={() => {
+                setLeaving(false)
+                void useRoom.getState().leave()
+                go('MENU')
+              }}
+              data-testid="confirm-leave"
+            >
+              {t('match.leave')}
+            </Button>
+          </>
+        }
+      />
 
       <PauseDialog
         open={screen === 'PAUSED'}

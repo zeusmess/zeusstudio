@@ -13,6 +13,7 @@ export type BannerKind =
   | 'specialIntro'
   | 'obstacleIntro'
   | 'targetReached'
+  | 'timeUp'
 
 export interface Banner {
   id: number

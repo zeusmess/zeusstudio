@@ -14,13 +14,14 @@
     "lint": "oxlint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:rules": "firebase emulators:exec --only database,auth --project demo-cup-catcher \"vitest run --config vitest.rules.config.ts\"",
+    "test:rules": "node scripts/emulators.mjs -- vitest run --config vitest.rules.config.ts",
     "test:e2e": "playwright test --project=mobile --project=desktop",
-    "test:e2e:multiplayer": "firebase emulators:exec --only database,auth --project demo-cup-catcher \"playwright test --project=multiplayer\"",
-    "emulators": "firebase emulators:start --only database,auth --project demo-cup-catcher",
+    "test:e2e:multiplayer": "node scripts/emulators.mjs -- playwright test --project=multiplayer",
+    "emulators": "node scripts/emulators.mjs",
     "simulate": "tsx scripts/simulate-balance.ts",
     "assets:brand": "python3 scripts/process_brand_assets.py",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build"
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "rules:build": "tsx scripts/build-database-rules.ts"
   },
   "dependencies": {
     "@fontsource-variable/cairo": "^5.3.0",

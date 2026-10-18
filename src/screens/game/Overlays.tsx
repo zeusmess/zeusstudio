@@ -26,6 +26,8 @@ function bannerText(banner: Banner, { t, num }: I18n): string {
       return t('game.obstacleIntro')
     case 'targetReached':
       return t('match.targetReached')
+    case 'timeUp':
+      return t('match.timeUp')
   }
 }
 

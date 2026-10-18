@@ -61,7 +61,7 @@ describe('campaign levels', () => {
       expect(preset.target).toBe(getLevel(preset.levelId).target)
       expect(preset.timeLimitMs).toBeGreaterThan(0)
     }
-    const config = sessionConfigFor({ mode: 'versus', length: 'classic', seed: 4, roomCode: 'ABCDEF' })
+    const config = sessionConfigFor({ mode: 'versus', length: 'classic', seed: 4, roomCode: 'ABCDEF', round: 1 })
     expect(config.lives).toBe(Number.POSITIVE_INFINITY)
     expect(config.ramp).toBe('time')
   })

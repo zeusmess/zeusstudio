@@ -142,7 +142,7 @@ describe('GameSession', () => {
 
   it('is deterministic for a seed (both online players see the same cups)', () => {
     const spawnsFor = (seed: number) => {
-      const game = session({ mode: 'versus', length: 'classic', seed, roomCode: 'ABCDEF' })
+      const game = session({ mode: 'versus', length: 'classic', seed, roomCode: 'ABCDEF', round: 1 })
       game.start()
       game.advance(45_000, 45_000)
       return game
@@ -178,7 +178,7 @@ describe('GameSession', () => {
   })
 
   it('ends an online match at the time limit without using lives', () => {
-    const game = session({ mode: 'versus', length: 'quick', seed: 8, roomCode: 'ABCDEF' })
+    const game = session({ mode: 'versus', length: 'quick', seed: 8, roomCode: 'ABCDEF', round: 1 })
     game.setPointer(0)
     const events = play(game, null)
     expect(game.lives).toBe(Number.POSITIVE_INFINITY)
@@ -188,7 +188,7 @@ describe('GameSession', () => {
   })
 
   it('catches up to a shared clock in online matches', () => {
-    const game = session({ mode: 'versus', length: 'classic', seed: 9, roomCode: 'ABCDEF' })
+    const game = session({ mode: 'versus', length: 'classic', seed: 9, roomCode: 'ABCDEF', round: 1 })
     game.start()
     game.advanceTo(3_000)
     expect(game.time).toBeGreaterThanOrEqual(2_990)

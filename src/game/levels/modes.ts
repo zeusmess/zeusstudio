@@ -61,7 +61,7 @@ export const MATCH_PRESETS: Record<MatchLength, MatchPreset> = {
 export type PlayRequest =
   | { mode: 'campaign'; levelId: number; seed: number }
   | { mode: 'endless'; seed: number }
-  | { mode: 'versus'; length: MatchLength; seed: number; roomCode: string }
+  | { mode: 'versus'; length: MatchLength; seed: number; roomCode: string; round: number }
 
 export function sessionConfigFor(request: PlayRequest): SessionConfig {
   switch (request.mode) {

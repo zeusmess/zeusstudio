@@ -12,6 +12,8 @@ export const ROOM_JOIN_TTL_MS = 30 * 60 * 1000
 export const MATCH_COUNTDOWN_MS = 4000
 /** An opponent offline this long during a match forfeits it. */
 export const FORFEIT_AFTER_MS = 15_000
+/** Rooms older than this may be cleared out by anyone. */
+export const ROOM_TTL_MS = 2 * 60 * 60 * 1000
 
 export type RoomStatus = 'waiting' | 'live' | 'closed'
 
@@ -39,15 +41,21 @@ export interface RoomScore {
   lastCup: number
 }
 
-export interface MatchResultRecord {
+/** What the server stores when a round ends. */
+export interface StoredResult {
   /** The winner's uid, or 'tie'. */
   winner: string
   reason: MatchEndReason
   decidedAt: number
+}
+
+/** A round's result with the final scores (read from the score nodes, which freeze once a result exists). */
+export interface MatchResultRecord extends StoredResult {
   hostScore: number
   guestScore: number
 }
 
+/** A room as one player sees it; scores, result and rematch belong to the current round. */
 export interface RoomSnapshot {
   code: string
   meta: RoomMeta

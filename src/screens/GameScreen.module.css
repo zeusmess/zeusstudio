@@ -19,3 +19,21 @@
 .screen[data-state='PLAYING'] .surface:active {
   cursor: grabbing;
 }
+
+/* Online match: the local game ended and the server's result is on its way. */
+.awaiting {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 30%;
+  z-index: var(--z-hud);
+  margin-inline: auto;
+  width: fit-content;
+  max-width: calc(100% - 2 * var(--space-6));
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: rgb(4 32 26 / 0.7);
+  font-weight: var(--weight-heavy);
+  text-align: center;
+  box-shadow: var(--shadow-2);
+  pointer-events: none;
+}

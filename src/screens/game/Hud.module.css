@@ -167,6 +167,9 @@
 }
 
 .opponentName {
+  /* A name in the other script must still sit next to the avatar, not across the bar. */
+  justify-self: start;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -181,6 +184,13 @@
 
 .opponentBar {
   grid-column: 1 / -1;
+}
+
+.opponentStatus {
+  grid-column: 1 / -1;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  color: var(--red-400);
 }
 
 .dot {

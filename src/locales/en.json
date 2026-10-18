@@ -256,18 +256,54 @@
     "toast": "Achievement unlocked",
     "reward": "Reward: {reward}",
     "items": {
-      "first_catch": { "title": "First Catch", "desc": "Catch your first cup." },
-      "perfect_start": { "title": "Perfect Start", "desc": "Clear a level without losing a life." },
-      "golden_catch": { "title": "Golden Catch", "desc": "Catch a golden cup." },
-      "special_delivery": { "title": "Special Delivery", "desc": "Catch a special cup." },
-      "combo_master": { "title": "Combo Master", "desc": "Reach a ×3 combo." },
-      "steady_hands": { "title": "Steady Hands", "desc": "Catch 25 cups in a row." },
-      "cup_collector": { "title": "Cup Collector", "desc": "Catch 500 cups in total." },
-      "rising_barista": { "title": "Rising Barista", "desc": "Complete level 5." },
-      "campaign_champion": { "title": "Campaign Champion", "desc": "Complete all 15 levels." },
-      "endless_explorer": { "title": "Endless Explorer", "desc": "Reach wave 10 in Endless Mode." },
-      "friendly_rivalry": { "title": "Friendly Rivalry", "desc": "Finish an online match with a friend." },
-      "head_barista": { "title": "Head Barista", "desc": "Win an online match." }
+      "first_catch": {
+        "title": "First Catch",
+        "desc": "Catch your first cup."
+      },
+      "perfect_start": {
+        "title": "Perfect Start",
+        "desc": "Clear a level without losing a life."
+      },
+      "golden_catch": {
+        "title": "Golden Catch",
+        "desc": "Catch a golden cup."
+      },
+      "special_delivery": {
+        "title": "Special Delivery",
+        "desc": "Catch a special cup."
+      },
+      "combo_master": {
+        "title": "Combo Master",
+        "desc": "Reach a ×3 combo."
+      },
+      "steady_hands": {
+        "title": "Steady Hands",
+        "desc": "Catch 25 cups in a row."
+      },
+      "cup_collector": {
+        "title": "Cup Collector",
+        "desc": "Catch 500 cups in total."
+      },
+      "rising_barista": {
+        "title": "Rising Barista",
+        "desc": "Complete level 5."
+      },
+      "campaign_champion": {
+        "title": "Campaign Champion",
+        "desc": "Complete all 15 levels."
+      },
+      "endless_explorer": {
+        "title": "Endless Explorer",
+        "desc": "Reach wave 10 in Endless Mode."
+      },
+      "friendly_rivalry": {
+        "title": "Friendly Rivalry",
+        "desc": "Finish an online match with a friend."
+      },
+      "head_barista": {
+        "title": "Head Barista",
+        "desc": "Win an online match."
+      }
     }
   },
   "lobby": {
@@ -313,15 +349,21 @@
       "expired": "That room has expired. Ask your friend for a new code.",
       "full": "That room already has two players.",
       "started": "That match has already started.",
-      "ownRoom": "That's your own room — share the code with a friend.",
       "network": "Connection problem. Check your internet and try again.",
       "permission": "The server refused that action.",
       "auth": "Couldn't start an online session. Try again.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "unconfigured": "Online play awaits configuration."
     },
-    "roomClosed": "The host closed the room.",
-    "opponentLeft": "Your friend left the room.",
-    "matchStarting": "Match starting…"
+    "matchStarting": "Match starting…",
+    "notices": {
+      "roomClosed": "The host closed the room.",
+      "opponentLeft": "Your friend left the room.",
+      "matchInProgress": "A match is already being played in this room. Wait for it to finish, or leave the room."
+    },
+    "playSolo": "Play Solo",
+    "reconnecting": "Connection lost — reconnecting…",
+    "players": "Players"
   },
   "match": {
     "youWin": "You Win",
@@ -341,7 +383,15 @@
     "timeLeft": "Time left",
     "opponentDisconnected": "Opponent disconnected — waiting…",
     "waitingResult": "Waiting for the final result…",
-    "targetReached": "Target reached!"
+    "targetReached": "Target reached!",
+    "timeUp": "Time!",
+    "kicker": "Round {round}",
+    "vs": "vs",
+    "winner": "Winner",
+    "leave": "Leave Match",
+    "leaveTitle": "Leave the match?",
+    "leaveBody": "Leaving now counts as a forfeit — your friend wins this round.",
+    "keepPlaying": "Keep Playing"
   },
   "leaderboard": {
     "title": "Leaderboard",

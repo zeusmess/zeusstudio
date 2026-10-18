@@ -1,0 +1,214 @@
+.hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.label {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+}
+
+.error {
+  color: var(--red-400);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.joinForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.codeInput {
+  min-height: var(--control-lg);
+  padding-inline: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
+  background: rgb(0 0 0 / 0.25);
+  color: var(--color-text);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.3em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.codeInput::placeholder {
+  color: var(--color-text-subtle);
+  font-weight: var(--weight-regular);
+}
+
+.codeInput:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.codeInput[aria-invalid='true'] {
+  border-color: var(--red-400);
+}
+
+.codeCard {
+  align-items: center;
+  text-align: center;
+}
+
+.codeLabel {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-heavy);
+  color: var(--gold-300);
+}
+
+.code {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.22em;
+  line-height: var(--leading-tight);
+  color: var(--cream-50);
+  /* The spacing after the last letter would push the code off-centre. */
+  margin-inline-end: -0.22em;
+}
+
+.codeActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.matchInfo {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.loading {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--gold-300);
+}
+
+.players {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.player[data-ready='true'] {
+  border-color: var(--gold-300);
+}
+
+.empty {
+  border-style: dashed;
+  color: var(--color-text-muted);
+}
+
+.emptyAvatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--color-border-strong);
+}
+
+.playerText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.nameLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.playerName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--weight-bold);
+}
+
+.tag {
+  flex-shrink: 0;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--gold-400);
+  color: var(--green-950);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-black);
+}
+
+.hostTag {
+  background: rgb(242 240 235 / 0.16);
+  color: var(--cream-50);
+}
+
+.online,
+.offline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--green-400);
+}
+
+.offline .dot {
+  background: var(--red-400);
+}
+
+.ready,
+.notReady {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-heavy);
+}
+
+.ready {
+  color: var(--gold-200);
+}
+
+.notReady {
+  color: var(--color-text-subtle);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.waiting {
+  padding: var(--space-3);
+  text-align: center;
+  color: var(--gold-200);
+  font-weight: var(--weight-bold);
+}

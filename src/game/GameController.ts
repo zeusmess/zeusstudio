@@ -215,6 +215,18 @@ export class GameController implements SceneHost {
     audio.setMusic('menu')
   }
 
+  /** Online matches: the server decided the round (e.g. the opponent reached the target first). */
+  haltVersus(): void {
+    const session = this.session
+    if (!session || session.config.mode !== 'versus' || this.finished) return
+    this.finished = true
+    this.running = false
+    this.bot = null
+    session.setAxis(0)
+    session.setPointer(null)
+    this.scene?.freeze()
+  }
+
   /** Subscribe to simulation events (used by online matches). */
   addListener(listener: EventListener): () => void {
     this.listeners.add(listener)
