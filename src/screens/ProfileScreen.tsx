@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '../app/appStore'
 import { signInWithGoogle, signOutUser } from '../auth/authService'
+import { isNativeApp } from '../services/platform'
 import { isGoogleSignedIn, useAuth } from '../auth/authStore'
 import { Avatar, BasketImage } from '../components/Art'
 import { AvatarPicker } from '../components/AvatarPicker'
@@ -136,6 +137,10 @@ export default function ProfileScreen() {
             {auth.status === 'unconfigured' ? (
               <Notice tone="warning" title={t('login.notConfiguredTitle')}>
                 {t('login.notConfiguredBody')}
+              </Notice>
+            ) : isNativeApp() ? (
+              <Notice tone="info" title={t('login.inAppTitle')}>
+                {t('login.inAppBody')}
               </Notice>
             ) : (
               <Button

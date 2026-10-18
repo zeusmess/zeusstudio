@@ -5,6 +5,8 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Relative URLs: the same build runs at a site root, under a sub-path (GitHub Pages) and inside the Android app.
+  base: './',
   server: {
     // `npm run dev -- --host` exposes the dev server to phones on the same network.
     port: 5173,

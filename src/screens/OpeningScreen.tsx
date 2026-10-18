@@ -18,6 +18,7 @@ import { svgDataUrl } from '../game/art/svg'
 import { getLevel } from '../game/levels/levels'
 import { useI18n } from '../locales/i18n'
 import { useProfile } from '../profile/profileStore'
+import { isNativeApp } from '../services/platform'
 import { isCampaignComplete, isEndlessUnlocked, nextPlayableLevel } from '../profile/progress'
 import styles from './OpeningScreen.module.css'
 
@@ -61,6 +62,7 @@ export function OpeningScreen() {
   const endlessUnlocked = isEndlessUnlocked(progress)
   const nextLevel = nextPlayableLevel(progress)
   const showIdentity = !googleSignedIn && !profile.identityChosen
+  const inApp = isNativeApp()
 
   const onGoogle = async () => {
     if (authStatus === 'unconfigured') {
@@ -195,16 +197,18 @@ export function OpeningScreen() {
 
           {showIdentity ? (
             <div className={styles.identity}>
-              <Button
-                variant="google"
-                block
-                icon={<GoogleMark />}
-                loading={authStatus === 'signing-in'}
-                onClick={onGoogle}
-                data-testid="google-sign-in"
-              >
-                {t('menu.signInGoogle')}
-              </Button>
+              {!inApp && (
+                <Button
+                  variant="google"
+                  block
+                  icon={<GoogleMark />}
+                  loading={authStatus === 'signing-in'}
+                  onClick={onGoogle}
+                  data-testid="google-sign-in"
+                >
+                  {t('menu.signInGoogle')}
+                </Button>
+              )}
               <Button variant="ghost" block onClick={() => go('LOGIN')} data-testid="guest-play">
                 {t('menu.guestPlay')}
               </Button>

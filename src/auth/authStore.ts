@@ -9,6 +9,7 @@ export type AuthErrorCode =
   | 'network'
   | 'unauthorizedDomain'
   | 'operationNotAllowed'
+  | 'inApp'
   | 'generic'
 
 export type SyncState = 'idle' | 'syncing' | 'synced' | 'error'

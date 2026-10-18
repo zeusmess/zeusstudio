@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../app/appStore'
 import { signInWithGoogle } from '../auth/authService'
+import { isNativeApp } from '../services/platform'
 import { isGoogleSignedIn, useAuth } from '../auth/authStore'
 import { AvatarPicker } from '../components/AvatarPicker'
 import { Button } from '../components/Button'
@@ -59,6 +60,10 @@ export default function LoginScreen() {
         {unconfigured ? (
           <Notice tone="warning" title={t('login.notConfiguredTitle')} testId="google-unconfigured">
             {t('login.notConfiguredBody')}
+          </Notice>
+        ) : isNativeApp() ? (
+          <Notice tone="info" title={t('login.inAppTitle')} testId="google-in-app">
+            {t('login.inAppBody')}
           </Notice>
         ) : (
           <Button

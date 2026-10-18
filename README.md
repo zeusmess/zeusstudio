@@ -52,7 +52,9 @@ Without Firebase settings the game is fully playable as a guest; Google sign-in,
 | `npm run rules:build` | Regenerate `database.rules.json` from `src/multiplayer/databaseRules.ts` |
 | `npm run simulate -- 40 casual,normal,skilled` | Balance simulation: clear rate and time per level |
 | `npm run assets:brand` | Re-process supplied brand images into `public/assets/brand` (Python + Pillow) |
-| `npm run assets:icons` | Regenerate favicon and app icons from the original emblem |
+| `npm run assets:icons` | Regenerate favicon, app icons and Android icons/splash screens from the original emblem |
+| `npm run android:sync` | Build the game and copy it into the Android project |
+| `npm run android:apk` | …and build a debug APK (needs the Android SDK) |
 
 The Firebase emulators need Java 21+ (the CLI downloads the emulators themselves on first run). Playwright needs its Chromium: `npx playwright install chromium` if it is not already installed.
 
@@ -77,6 +79,8 @@ src/
   screens/        Opening, level select, sign-in, profile, settings, achievements, leaderboard, lobby, game
   services/       Configuration, storage, leaderboard
   styles/         Design tokens (single source for CSS and the canvas) and global styles
+android/          Capacitor Android project (the APK wraps the same web build)
+.github/workflows Android APK build, GitHub Pages deployment
 scripts/          Rules builder, emulator harness, balance simulator, icon and brand-asset builders
 tests/            rules/ (emulator) and e2e/ (Playwright); unit tests sit next to the code in src/
 database.rules.json  Generated security rules (do not edit by hand)
@@ -120,7 +124,27 @@ npm run check                                  # type-check, lint, tests, build
 npx firebase deploy --only hosting,database     # serves dist/ with the SPA rewrite and cache headers in firebase.json
 ```
 
-Any static host works for the game itself (serve `dist/` with a fallback to `index.html`); the app expects to be served from the site root. Add the final domain to Firebase's authorized domains for Google sign-in.
+Any static host works for the game itself: the build uses relative paths, so `dist/` can be served from a site root or a sub-path. Add the final domain to Firebase's authorized domains for Google sign-in.
+
+### GitHub Pages
+
+`.github/workflows/pages.yml` publishes the web version to `https://<owner>.github.io/<repository>/`. It does nothing until Pages is turned on:
+
+1. **Settings → Pages → Source: GitHub Actions.** (For a private repository, Pages needs a paid GitHub plan; otherwise make the repository public.)
+2. **Actions → Web (GitHub Pages) → Run workflow.** To publish on every push to the default branch, add the repository variable `PAGES_ENABLED=true`.
+
+To enable sign-in and online play there, add the `VITE_FIREBASE_*` values as repository **variables** (Settings → Secrets and variables → Actions → Variables) and the Pages domain to Firebase's authorized domains.
+
+## Android app (APK)
+
+The Android app wraps the same web build in a [Capacitor](https://capacitorjs.com) shell (`android/`, app id `com.youssefayman.cupcatcher`, label *Cup Catcher* / *صيّاد الأكواب*, portrait, the original emblem as icon and splash).
+
+- **Without installing anything:** every push runs `.github/workflows/android.yml`, which builds a debug APK on GitHub's servers. Open the run in the **Actions** tab and download `cup-catcher-android-…` from *Artifacts* (a zip containing the `.apk`).
+- **Locally** (Android Studio or the Android SDK, JDK 21): `npm run android:apk` → `android/app/build/outputs/apk/debug/app-debug.apk`. `npm run android:sync` copies a fresh web build into the project (e.g. before opening `android/` in Android Studio).
+
+Installing a debug APK on a phone needs *Install unknown apps* allowed for the browser or file manager used to open it. It is signed with a debug key: for Google Play, build a signed release (`./gradlew bundleRelease` with your own keystore) — and note that store listings using Starbucks' name and logo would need Starbucks' permission.
+
+Inside the app, Google doesn't allow its sign-in page in embedded browsers, so the app offers guest play (progress stays on the phone) and points to the web version for Google sign-in; online matches work in the app once Firebase is configured.
 
 ## Tests
 

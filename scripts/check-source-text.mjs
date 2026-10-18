@@ -12,7 +12,9 @@ import { extname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', 'test-results', 'playwright-report', 'coverage', '.firebase'])
+const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', 'test-results', 'playwright-report', 'coverage', '.firebase', 'build', '.gradle'])
+/** Generated copies of the web build (git-ignored). */
+const SKIP_PATHS = new Set(['android/app/src/main/assets/public'])
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.cjs', '.json', '.css', '.html', '.md', '.py', '.yml', '.yaml'])
 
 /** Inclusive code point ranges that are invisible or change the reading direction. */
@@ -31,7 +33,8 @@ const isForbidden = (code) => FORBIDDEN.some(([from, to]) => code >= from && cod
 function* files(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
-      if (!SKIP_DIRS.has(entry.name)) yield* files(join(dir, entry.name))
+      const path = join(dir, entry.name)
+      if (!SKIP_DIRS.has(entry.name) && !SKIP_PATHS.has(relative(ROOT, path))) yield* files(path)
     } else if (EXTENSIONS.has(extname(entry.name))) {
       yield join(dir, entry.name)
     }

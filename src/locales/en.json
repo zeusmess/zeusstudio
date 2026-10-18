@@ -56,12 +56,15 @@
     "guestButton": "Start as Guest",
     "notConfiguredTitle": "Google sign-in isn't set up yet",
     "notConfiguredBody": "This copy of the game has no Firebase settings, so accounts and online play are off. Guest play works fully.",
+    "inAppTitle": "Google sign-in is on the web version",
+    "inAppBody": "Google doesn't allow signing in inside this app yet. Play as a guest here — your progress stays on this phone — or open the web version to sign in and sync.",
     "errors": {
       "popupClosed": "The sign-in window was closed before finishing.",
       "popupBlocked": "Your browser blocked the sign-in window. Allow pop-ups and try again.",
       "network": "No connection. Check your internet and try again.",
       "unauthorizedDomain": "This website address isn't allowed to use Google sign-in yet.",
       "operationNotAllowed": "Google sign-in is turned off for this game.",
+      "inApp": "Google sign-in isn't available inside the app yet — use the web version.",
       "generic": "Sign-in didn't work. Please try again."
     },
     "linked": "Signed in. Your guest progress is now saved to your account.",

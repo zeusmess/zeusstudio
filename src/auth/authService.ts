@@ -6,6 +6,7 @@ import { flushSync, startSync, stopSync } from '../profile/sync'
 import { activateAccount, activateGuest } from './account'
 import { mapAuthError, useAuth, type AuthUser } from './authStore'
 import { firebaseStatus } from '../services/config'
+import { isNativeApp } from '../services/platform'
 import { getFirebase, isFirebaseConfigured } from './firebase'
 
 let initialised = false
@@ -68,6 +69,11 @@ export async function signInWithGoogle(): Promise<boolean> {
   const store = useAuth.getState()
   if (!isFirebaseConfigured()) {
     store.set({ status: 'unconfigured' })
+    return false
+  }
+  if (isNativeApp()) {
+    // Google refuses sign-in pages inside an app's embedded browser.
+    store.set({ error: 'inApp' })
     return false
   }
   const previousStatus = store.status
