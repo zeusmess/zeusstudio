@@ -31,10 +31,13 @@ const PATHS = {
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
   chart: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
   sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z',
+  cup: 'M5 8h14l-1.6 12.2a2 2 0 0 1-2 1.8H8.6a2 2 0 0 1-2-1.8zM4 4.5h16V8H4z',
+  crown: 'M3 18 4.8 7l5 4.5L12 4l2.2 7.5 5-4.5L21 18zM3 21h18',
+  bolt: 'M13 2 4 14h7l-1 8 9-12h-7z',
   wifiOff: 'M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5.2-2.7M19 13a10 10 0 0 0-2.4-1.7M12 20h.01M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 10.7 5',
 } as const
 
-const FILLED = new Set<IconName>(['play', 'star'])
+const FILLED = new Set<IconName>(['play', 'star', 'bolt'])
 /** Icons that point along the reading direction and must mirror in Arabic. */
 const DIRECTIONAL = new Set<IconName>(['back', 'chevron', 'logout'])
 
