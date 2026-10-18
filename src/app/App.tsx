@@ -9,6 +9,7 @@ import { onAchievementsUnlocked } from '../profile/profileStore'
 import { setController } from '../game/controllerStore'
 import { GameLayer } from '../screens/game/GameLayer'
 import { OpeningScreen } from '../screens/OpeningScreen'
+import { isEmbedded } from '../services/platform'
 import type { AppScreen } from '../types'
 import styles from './App.module.css'
 import { useApp } from './appStore'
@@ -69,7 +70,8 @@ export function App() {
   useEffect(() => {
     void initAuth()
     const unbindAudio = bindAudio()
-    const unbindBack = bindBackButton()
+    // Inside another page, Back belongs to that page; the game leaves it alone.
+    const unbindBack = isEmbedded() ? () => undefined : bindBackButton()
     audio.setMusic('menu')
     const unsubscribe = onAchievementsUnlocked((ids) => {
       const { t } = currentI18n()

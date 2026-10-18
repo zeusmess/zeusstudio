@@ -9,6 +9,7 @@
     "dev": "vite",
     "dev:emulators": "vite --mode emulator",
     "build": "tsc -b && vite build",
+    "build:single": "tsc -b && vite build --mode single",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "lint": "oxlint && node scripts/check-source-text.mjs",

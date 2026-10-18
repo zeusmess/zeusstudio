@@ -4,7 +4,7 @@
 
 Move the basket, catch the falling drinks, chain combos, clear 15 levels, then chase high scores in Endless Mode or challenge a friend online with an invitation code.
 
-> Fan-made game. Not affiliated with or endorsed by Starbucks Corporation. Starbucks, the Siren logo and the drink images are trademarks or property of Starbucks Corporation; they are shown only because they were supplied for this project. Set `VITE_BRAND_ASSETS=off` to ship the game with its original artwork only (the app icon and favicon are always original art).
+> Fan-made game. Not affiliated with or endorsed by Starbucks Corporation. Starbucks, the Siren logo and the drink images are trademarks or property of Starbucks Corporation; they are shown only because they were supplied for this project. The brand-free edition leaves all of them out (see [Editions](#editions)); the app icon and favicon are original art in both.
 
 ---
 
@@ -39,6 +39,7 @@ Without Firebase settings the game is fully playable as a guest; Google sign-in,
 | --- | --- |
 | `npm run dev` | Development server |
 | `npm run build` | Type-check and build to `dist/` |
+| `npm run build:single` | The brand-free edition as one self-contained HTML file in `dist-single/` |
 | `npm run preview` | Serve the production build |
 | `npm run check` | Type-check, lint, unit tests and build in one go |
 | `npm run typecheck` | TypeScript, strict |
@@ -71,20 +72,33 @@ src/
     systems/      Spawner, motion, scoring, collisions, basket
     levels/       The 15 level configurations, Endless and online match presets
     scenes/       Phaser renderer (draws the simulation; never decides outcomes)
-    art/          Original SVG art (cups, basket skins, avatars, emblem) and brand-asset mapping
+    art/          Original SVG art (cups, basket skins, avatars, emblem) and the art each edition uses
     GameController.ts, bot.ts, hudStore.ts
-  locales/        en.json, ar.json and the typed i18n helpers
+  locales/        en.json, ar.json (brand-free text), brand/ (the Starbucks edition's name and legal lines), typed i18n helpers
   multiplayer/    Room codes, match rules, room service, lobby/match coordinator, database rules source
   profile/        Profiles, progress, achievements, cosmetics, validation, cloud sync
   screens/        Opening, level select, sign-in, profile, settings, achievements, leaderboard, lobby, game
-  services/       Configuration, storage, leaderboard
+  services/       Configuration, editions, storage, leaderboard
   styles/         Design tokens (single source for CSS and the canvas) and global styles
 android/          Capacitor Android project (the APK wraps the same web build)
 .github/workflows Android APK build, GitHub Pages deployment
-scripts/          Rules builder, emulator harness, balance simulator, icon and brand-asset builders
+scripts/          Rules builder, emulator harness, balance simulator, icon and brand-asset builders, Vite plugins (editions, single file)
 tests/            rules/ (emulator) and e2e/ (Playwright); unit tests sit next to the code in src/
 database.rules.json  Generated security rules (do not edit by hand)
 ```
+
+## Editions
+
+| | Starbucks edition (default) | Brand-free edition |
+| --- | --- | --- |
+| Name | STARBUCKS CUP CATCHER · صيّاد أكواب ستاربكس | CUP CATCHER · صيّاد الأكواب |
+| Pictures | The drink photos and logo supplied for this project (`public/assets/brand`) | The original illustrations only |
+| Legal lines | Fan-made disclaimer and trademark notice | None needed |
+| Build | `npm run build` | `VITE_BRAND_ASSETS=off npm run build`, or `npm run build:single` |
+
+The edition is fixed at build time, so the brand-free output contains no Starbucks text (kept apart in `src/locales/brand/`) and no brand photos; the build fails if any output file still mentions the brand. That edition can be shared or published without Starbucks' permission.
+
+`npm run build:single` writes the brand-free edition as a single HTML file (`dist-single/index.html`, about 2.3 MB, with the scripts, styles, fonts and artwork inside). It runs from a double-click or on any host that takes one page. Like any build, it has online features only when the `VITE_FIREBASE_*` values are set, and Google sign-in also needs its domain authorized in Firebase, so not from a file opened directly.
 
 ## Firebase setup (Google sign-in, online play, global leaderboard)
 
@@ -142,7 +156,7 @@ The Android app wraps the same web build in a [Capacitor](https://capacitorjs.co
 - **Without installing anything:** every push runs `.github/workflows/android.yml`, which builds a debug APK on GitHub's servers. Builds of the default branch are published as the *Android test build* release, always at `https://github.com/<owner>/<repository>/releases/download/android-latest/cup-catcher-debug.apk` (sign in to GitHub first while the repository is private). Every run also keeps the APK under *Artifacts* in the **Actions** tab.
 - **Locally** (Android Studio or the Android SDK, JDK 21): `npm run android:apk` → `android/app/build/outputs/apk/debug/app-debug.apk`. `npm run android:sync` copies a fresh web build into the project (e.g. before opening `android/` in Android Studio).
 
-Installing a debug APK on a phone needs *Install unknown apps* allowed for the browser or file manager used to open it. It is signed with a debug key: for Google Play, build a signed release (`./gradlew bundleRelease` with your own keystore) — and note that store listings using Starbucks' name and logo would need Starbucks' permission.
+Installing a debug APK on a phone needs *Install unknown apps* allowed for the browser or file manager used to open it. It is signed with a debug key: for Google Play, build a signed release (`./gradlew bundleRelease` with your own keystore) — and note that store listings using Starbucks' name and logo would need Starbucks' permission. `VITE_BRAND_ASSETS=off npm run android:sync` packs the brand-free edition instead.
 
 Inside the app, Google doesn't allow its sign-in page in embedded browsers, so the app offers guest play (progress stays on the phone) and points to the web version for Google sign-in; online matches work in the app once Firebase is configured.
 

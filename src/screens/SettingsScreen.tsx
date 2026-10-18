@@ -103,8 +103,8 @@ export default function SettingsScreen() {
         <Wordmark size="compact" />
         <p className={styles.credit}>{t('app.credit')}</p>
         <p className={styles.version}>{t('app.version', { version: appVersion })}</p>
-        <p className={styles.legal}>{t('app.disclaimer')}</p>
-        <p className={styles.legal}>{t('app.trademark')}</p>
+        {t('app.disclaimer') && <p className={styles.legal}>{t('app.disclaimer')}</p>}
+        {t('app.trademark') && <p className={styles.legal}>{t('app.trademark')}</p>}
       </Card>
 
       <Dialog

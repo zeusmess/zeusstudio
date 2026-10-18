@@ -1,11 +1,11 @@
 {
   "app": {
-    "title": "STARBUCKS CUP CATCHER",
+    "title": "CUP CATCHER",
     "titleLocal": "",
     "subtitle": "Catch Every Cup. Beat Every Level.",
     "credit": "BY YOUSSEF AYMAN",
-    "disclaimer": "Fan-made game. Not affiliated with or endorsed by Starbucks Corporation.",
-    "trademark": "Starbucks, the Siren logo and the drink images are trademarks or property of Starbucks Corporation.",
+    "disclaimer": "",
+    "trademark": "",
     "loading": "Brewing…",
     "skip": "Skip",
     "back": "Back",
@@ -328,7 +328,7 @@
     "copy": "Copy code",
     "copied": "Copied!",
     "share": "Share",
-    "shareText": "Join me in STARBUCKS CUP CATCHER! Invitation code: {code}",
+    "shareText": "Join me in {title}! Invitation code: {code}",
     "waitingForFriend": "Waiting for your friend to join…",
     "ready": "I'm ready",
     "notReady": "Not ready",

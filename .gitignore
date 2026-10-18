@@ -12,6 +12,7 @@ ui-debug.log*
 node_modules
 dist
 dist-ssr
+dist-single
 *.local
 .env
 .env.production

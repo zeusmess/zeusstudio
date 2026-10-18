@@ -67,7 +67,7 @@ export function VictoryScreen({ onNext, onReplay, onMenu, onEndless, onReplayCam
           <img
             className={styles.logo}
             src={LOGO_ART.url}
-            alt={LOGO_ART.official ? 'Starbucks' : t('app.title')}
+            alt={LOGO_ART.alt ?? t('app.title')}
             draggable={false}
           />
           <Mascot className={styles.mascot} wink="once" size={92} label={t('victory.winkLabel')} />

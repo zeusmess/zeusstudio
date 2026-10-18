@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { getSettings, useSettings } from '../app/settings'
 import type { Language } from '../types'
 import ar from './ar.json'
+import brandAr from './brand/ar.json'
+import brandEn from './brand/en.json'
 import en from './en.json'
 
 export type Dictionary = typeof en
@@ -9,7 +11,33 @@ export type Dictionary = typeof en
 /** Arabic must provide every key English has — checked at compile time here. */
 const arabic: Dictionary = ar
 
-const DICTIONARIES: Record<Language, Dictionary> = { en, ar: arabic }
+/** Replaces some of a dictionary's strings; it can only name keys the dictionary has. */
+export type Overlay<T> = { [K in keyof T]?: T[K] extends string ? string : Overlay<T[K]> }
+
+/** The Starbucks edition's name and legal lines, laid over the brand-free text in en.json / ar.json. */
+const BRAND_TEXT: Record<Language, Overlay<Dictionary>> = { en: brandEn, ar: brandAr }
+
+export function withOverlay<T extends object>(base: T, overlay: Overlay<T>): T {
+  const merged = { ...base } as Record<string, unknown>
+  for (const [key, value] of Object.entries(overlay as Record<string, unknown>)) {
+    const current = merged[key]
+    merged[key] =
+      typeof value === 'object' && value !== null && typeof current === 'object' && current !== null
+        ? withOverlay(current, value as Overlay<typeof current>)
+        : value
+  }
+  return merged as T
+}
+
+/** The text of each edition. */
+export function editionDictionaries(branded: boolean): Record<Language, Dictionary> {
+  return branded ? { en: withOverlay(en, BRAND_TEXT.en), ar: withOverlay(arabic, BRAND_TEXT.ar) } : { en, ar: arabic }
+}
+
+// __BRANDED__ is a build-time literal, so a brand-free bundle leaves the brand text out entirely.
+const DICTIONARIES: Record<Language, Dictionary> = __BRANDED__
+  ? editionDictionaries(true)
+  : { en, ar: arabic }
 
 type Leaves<T, Prefix extends string = ''> = {
   [K in keyof T & string]: T[K] extends string ? `${Prefix}${K}` : Leaves<T[K], `${Prefix}${K}.`>

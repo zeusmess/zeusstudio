@@ -83,11 +83,4 @@ export function resolveFirebaseStatus(env: Env): FirebaseStatus {
 
 export const firebaseStatus: FirebaseStatus = resolveFirebaseStatus(import.meta.env as Env)
 
-/**
- * Whether the drink photos and logo supplied for this project are used.
- * Set VITE_BRAND_ASSETS=off to ship only the original artwork.
- */
-export const brandAssetsEnabled: boolean =
-  String((import.meta.env as Env).VITE_BRAND_ASSETS ?? 'on').toLowerCase() !== 'off'
-
 export const appVersion = '1.0.0'

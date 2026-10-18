@@ -1,7 +1,7 @@
 import { svgDocument } from './svg'
 
 /**
- * Original cup illustrations. Used whenever the brand photo pack is disabled
+ * Original cup illustrations. Used by the brand-free edition
  * (VITE_BRAND_ASSETS=off) and for menu decoration and icons.
  */
 export type OriginalCupId = 'latte' | 'iced' | 'frappe' | 'matcha' | 'pink' | 'golden' | 'special'

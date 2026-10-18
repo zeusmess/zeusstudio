@@ -1,12 +1,14 @@
-import { brandAssetsEnabled } from '../../services/config'
 import { emblemSvg } from './badges'
 import { burntBeanSvg, ORIGINAL_NORMAL_CUPS, originalCupSvg, type OriginalCupId } from './cups'
 import { svgDataUrl } from './svg'
 
 /**
- * Which pictures the game uses. With the brand pack on (default), the drink
- * photos supplied for this project are used; VITE_BRAND_ASSETS=off switches
- * everything to the original illustrations.
+ * Which pictures the game uses. The Starbucks edition (default) uses the drink
+ * photos and logo supplied for this project; the brand-free edition
+ * (VITE_BRAND_ASSETS=off) uses the original illustrations only.
+ *
+ * Every choice tests the build-time literal __BRANDED__ directly, so the
+ * brand-free bundle keeps no photo file names (src/services/edition.ts).
  */
 export interface SpriteArt {
   key: string
@@ -20,7 +22,7 @@ export interface SpriteArt {
 const base = import.meta.env.BASE_URL ?? '/'
 const brandUrl = (file: string) => `${base}assets/brand/${file}`
 
-const BRAND_NORMAL: SpriteArt[] = [
+const BRAND_NORMAL: SpriteArt[] = !__BRANDED__ ? [] : [
   ['drink-pumpkin-spice-latte', 182],
   ['drink-pumpkin-cream-cold-brew', 241],
   ['drink-spice-frappuccino', 190],
@@ -35,15 +37,15 @@ function original(id: OriginalCupId, scale = 1): SpriteArt {
   return { key: `cup-${id}`, url: svgDataUrl(originalCupSvg(id, 240)), aspect: 100 / 140, scale }
 }
 
-export const NORMAL_CUP_ART: readonly SpriteArt[] = brandAssetsEnabled
+export const NORMAL_CUP_ART: readonly SpriteArt[] = __BRANDED__
   ? BRAND_NORMAL
   : ORIGINAL_NORMAL_CUPS.map((id) => original(id))
 
-export const GOLDEN_CUP_ART: SpriteArt = brandAssetsEnabled
+export const GOLDEN_CUP_ART: SpriteArt = __BRANDED__
   ? { key: 'cup-ramadan', url: brandUrl('cup-ramadan.webp'), aspect: 209 / 320, scale: 1.04 }
   : original('golden', 1.04)
 
-export const SPECIAL_CUP_ART: SpriteArt = brandAssetsEnabled
+export const SPECIAL_CUP_ART: SpriteArt = __BRANDED__
   ? { key: 'tumbler-bear', url: brandUrl('tumbler-bear.webp'), aspect: 144 / 320, scale: 1.18 }
   : original('special', 1.12)
 
@@ -59,15 +61,16 @@ export function normalCupArt(variant: number): SpriteArt {
   return NORMAL_CUP_ART[Math.abs(variant) % NORMAL_CUP_ART.length]
 }
 
-export const LOGO_ART = brandAssetsEnabled
-  ? { url: brandUrl('logo-siren.webp'), official: true }
-  : { url: svgDataUrl(emblemSvg(400)), official: false }
+/** The logo on the victory screen; `alt` is null where the game's own title describes it. */
+export const LOGO_ART: { url: string; alt: string | null } = __BRANDED__
+  ? { url: brandUrl('logo-siren.webp'), alt: 'Starbucks' }
+  : { url: svgDataUrl(emblemSvg(400)), alt: null }
 
 export const EMBLEM_URL = svgDataUrl(emblemSvg(400))
 
-export const BACKDROP = brandAssetsEnabled
+export const BACKDROP = __BRANDED__
   ? { sharp: brandUrl('bg-cafe.webp'), blurred: brandUrl('bg-cafe-blur.webp') }
   : null
 
 /** The cup that drops into the basket on the opening screen. */
-export const HERO_CUP_ART: SpriteArt = brandAssetsEnabled ? BRAND_NORMAL[0] : original('latte')
+export const HERO_CUP_ART: SpriteArt = __BRANDED__ ? BRAND_NORMAL[0] : original('latte')

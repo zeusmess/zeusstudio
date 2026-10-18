@@ -12,7 +12,7 @@ import { extname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', 'test-results', 'playwright-report', 'coverage', '.firebase', 'build', '.gradle'])
+const SKIP_DIRS = new Set(['node_modules', 'dist', 'dist-single', '.git', 'test-results', 'playwright-report', 'coverage', '.firebase', 'build', '.gradle'])
 /** Generated copies of the web build (git-ignored). */
 const SKIP_PATHS = new Set(['android/app/src/main/assets/public'])
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.cjs', '.json', '.css', '.html', '.md', '.py', '.yml', '.yaml'])

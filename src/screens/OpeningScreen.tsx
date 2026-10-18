@@ -223,7 +223,7 @@ export function OpeningScreen() {
 
         <footer className={styles.footer}>
           <p className={styles.credit}>{t('app.credit')}</p>
-          <p className={styles.disclaimer}>{t('app.disclaimer')}</p>
+          {t('app.disclaimer') && <p className={styles.disclaimer}>{t('app.disclaimer')}</p>}
         </footer>
       </div>
 

@@ -242,7 +242,7 @@ function RoomView() {
 
   const share = () => {
     navigator
-      .share({ title: t('app.title'), text: t('lobby.shareText', { code }), url: inviteUrl(code) })
+      .share({ title: t('app.title'), text: t('lobby.shareText', { code, title: t('app.title') }), url: inviteUrl(code) })
       .catch(() => undefined)
   }
 
