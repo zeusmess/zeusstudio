@@ -39,7 +39,8 @@ export function VictoryScreen({ onNext, onReplay, onMenu, onEndless, onReplayCam
   }, [])
 
   useEffect(() => {
-    if (ready) primaryRef.current?.querySelector<HTMLButtonElement>('button')?.focus()
+    // Focus the main action without scrolling the celebration out of view on short screens.
+    if (ready) primaryRef.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true })
   }, [ready])
 
   if (!outcome || outcome.kind !== 'campaign') return null

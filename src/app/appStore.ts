@@ -2,13 +2,14 @@ import { create } from 'zustand'
 import type { SessionResult } from '../game/core/types'
 import type { PlayRequest } from '../game/levels/modes'
 import type { CampaignSummary, EndlessSummary } from '../profile/profileStore'
+import type { EndlessRank } from '../services/leaderboard'
 import type { AppScreen } from '../types'
 import { canTransition } from './stateMachine'
 
 /** What the result screens show after a run ends. */
 export type RunOutcome =
   | { kind: 'campaign'; result: SessionResult; summary: CampaignSummary }
-  | { kind: 'endless'; result: SessionResult; summary: EndlessSummary; rank: number | null }
+  | { kind: 'endless'; result: SessionResult; summary: EndlessSummary; rank: EndlessRank | null; rankPending: boolean }
 
 interface AppState {
   screen: AppScreen

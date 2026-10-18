@@ -107,7 +107,8 @@ interface ProfileState {
   /** The player picked guest play on the opening screen. */
   chooseGuest: () => void
   unlock: (ids: readonly AchievementId[]) => AchievementId[]
-  recordCampaign: (result: SessionResult) => CampaignSummary
+  /** `announce: false` when the caller shows the new achievements itself (the victory screen lists them). */
+  recordCampaign: (result: SessionResult, options?: { announce?: boolean }) => CampaignSummary
   recordEndless: (result: SessionResult) => EndlessSummary
   /** Records an online match once (by id); `play` adds the cups caught in it to the totals. */
   recordMatch: (record: MatchRecord, play?: SessionResult | null) => AchievementId[]
@@ -163,11 +164,11 @@ export const useProfile = create<ProfileState>()((set, get) => {
       return unlocked
     },
 
-    recordCampaign: (result) => {
+    recordCampaign: (result, options) => {
       const outcome = applyCampaignResult(get().record.progress, result)
       const { progress, unlocked } = unlockAchievements(outcome.progress, achievementsFromResult(result, outcome.progress))
       commitProgress(progress)
-      notify(unlocked)
+      if (options?.announce !== false) notify(unlocked)
       return { ...outcome, progress, achievements: unlocked }
     },
 

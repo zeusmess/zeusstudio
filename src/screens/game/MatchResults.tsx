@@ -31,7 +31,7 @@ export function MatchResults() {
   const actions = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    actions.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus()
+    actions.current?.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus({ preventScroll: true })
   }, [])
 
   const leave = () => {

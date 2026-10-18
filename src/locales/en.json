@@ -219,6 +219,7 @@
     "personalBest": "Personal best",
     "newBest": "New personal best!",
     "rank": "Global rank #{rank}",
+    "deviceRank": "Rank #{rank} on this device",
     "playAgain": "Play Again",
     "leaderboard": "Leaderboard"
   },

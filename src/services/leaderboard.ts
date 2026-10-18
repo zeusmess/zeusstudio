@@ -14,6 +14,12 @@ export interface LeaderboardEntry {
   at: number
 }
 
+/** Where an endless score ranks: on the global board, or (offline / not configured) on this device. */
+export interface EndlessRank {
+  value: number
+  scope: 'global' | 'device'
+}
+
 const LOCAL_KEY = 'scc:v1:leaderboard:endless'
 const LOCAL_LIMIT = 10
 export const GLOBAL_LIMIT = 20
@@ -50,8 +56,12 @@ export async function markEndlessRunStart(): Promise<void> {
   }
 }
 
-/** Saves an endless result locally and, when online play is configured, globally. Returns the rank. */
-export async function submitEndlessScore(result: SessionResult): Promise<number | null> {
+/**
+ * Saves an endless result locally and, when online play is configured,
+ * globally. Returns its rank, or null when it is outside this device's top ten
+ * and could not be ranked globally.
+ */
+export async function submitEndlessScore(result: SessionResult): Promise<EndlessRank | null> {
   const { profile } = getProfile()
   const entry: LeaderboardEntry = {
     uid: profile.id,
@@ -61,7 +71,8 @@ export async function submitEndlessScore(result: SessionResult): Promise<number 
     wave: result.wave,
     at: Date.now(),
   }
-  const localRank = recordLocal(entry)
+  const position = recordLocal(entry)
+  const localRank: EndlessRank | null = position === null ? null : { value: position, scope: 'device' }
   if (!isFirebaseConfigured() || result.score <= 0) return localRank
   try {
     const uid = await ensureOnlineUser()
@@ -73,7 +84,7 @@ export async function submitEndlessScore(result: SessionResult): Promise<number 
       return { name: profile.displayName, avatar: profile.avatarId, score: result.score, wave: result.wave, at: serverTimestamp() }
     })
     const better = await get(query(ref(db, 'leaderboard/endless'), orderByChild('score'), startAt(result.score + 1)))
-    return better.size + 1
+    return { value: better.size + 1, scope: 'global' }
   } catch {
     return localRank
   }

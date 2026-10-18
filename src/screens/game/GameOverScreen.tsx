@@ -22,7 +22,7 @@ export function GameOverScreen({ onRetry, onLevels, onMenu, onLeaderboard }: Gam
   const primary = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    primary.current?.querySelector<HTMLButtonElement>('button')?.focus()
+    primary.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true })
   }, [])
 
   if (!outcome) return null
@@ -71,9 +71,15 @@ export function GameOverScreen({ onRetry, onLevels, onMenu, onLeaderboard }: Gam
         </div>
 
         {endless && outcome.summary.newBest && <p className={styles.newBest}>{t('gameOver.newBest')}</p>}
-        {endless && (
-          <p className={styles.rank} aria-live="polite">
-            {outcome.rank === null ? <Spinner size={16} /> : t('gameOver.rank', { rank: outcome.rank })}
+        {endless && (outcome.rankPending || outcome.rank) && (
+          <p className={styles.rank} aria-live="polite" data-testid="endless-rank">
+            {outcome.rankPending ? (
+              <Spinner size={16} label={t('leaderboard.loading')} />
+            ) : outcome.rank?.scope === 'global' ? (
+              t('gameOver.rank', { rank: outcome.rank.value })
+            ) : (
+              t('gameOver.deviceRank', { rank: outcome.rank?.value ?? 0 })
+            )}
           </p>
         )}
 

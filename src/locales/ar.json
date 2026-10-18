@@ -219,6 +219,7 @@
     "personalBest": "أفضل نتيجة شخصية",
     "newBest": "رقم شخصي جديد!",
     "rank": "الترتيب العالمي #{rank}",
+    "deviceRank": "الترتيب #{rank} على هذا الجهاز",
     "playAgain": "العب مجددًا",
     "leaderboard": "لوحة الصدارة"
   },

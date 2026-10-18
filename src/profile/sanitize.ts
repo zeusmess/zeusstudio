@@ -57,7 +57,8 @@ export function sanitizeProgress(raw: unknown): Progress {
     : null
   const stats = isObject(raw.matchStats) ? raw.matchStats : {}
   return {
-    unlockedLevel: Math.max(1, Math.min(LEVEL_COUNT, num(raw.unlockedLevel, 1)), ...completed.map((l) => Math.min(LEVEL_COUNT, l + 1))),
+    // Levels open strictly in order, so the next playable level follows from the cleared ones.
+    unlockedLevel: Math.max(1, ...completed.map((l) => Math.min(LEVEL_COUNT, l + 1))),
     completedLevels: completed.sort((a, b) => a - b),
     bestScores,
     totalCupsCaught: num(raw.totalCupsCaught),

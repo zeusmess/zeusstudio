@@ -409,7 +409,7 @@ export class GameController implements SceneHost {
       scene?.celebrate()
       audio.play('victory')
       audio.setMusic('off')
-      const summary = useProfile.getState().recordCampaign(result)
+      const summary = useProfile.getState().recordCampaign(result, { announce: false })
       app.setOutcome({ kind: 'campaign', result, summary })
       window.setTimeout(() => getApp().go('LEVEL_COMPLETE'), reduced ? 350 : 1150)
       return
@@ -420,11 +420,11 @@ export class GameController implements SceneHost {
     audio.setMusic('off')
     if (result.mode === 'endless') {
       const summary = useProfile.getState().recordEndless(result)
-      app.setOutcome({ kind: 'endless', result, summary, rank: null })
+      app.setOutcome({ kind: 'endless', result, summary, rank: null, rankPending: true })
       void submitEndlessScore(result).then((rank) => {
         const outcome = getApp().outcome
-        if (rank !== null && outcome?.kind === 'endless' && outcome.result === result) {
-          getApp().setOutcome({ ...outcome, rank })
+        if (outcome?.kind === 'endless' && outcome.result === result) {
+          getApp().setOutcome({ ...outcome, rank, rankPending: false })
         }
       })
     } else {
