@@ -40,11 +40,16 @@ export function sanitizeProgress(raw: unknown): Progress {
     ? [...new Set(raw.completedLevels.filter((l): l is number => Number.isInteger(l) && l >= 1 && l <= LEVEL_COUNT))]
     : []
   const bestScores: Record<string, number> = {}
-  if (isObject(raw.bestScores)) {
-    for (const [key, value] of Object.entries(raw.bestScores)) {
-      const level = Number(key)
-      if (Number.isInteger(level) && level >= 1 && level <= LEVEL_COUNT) bestScores[String(level)] = num(value)
-    }
+  // The Realtime Database returns objects with numeric keys ({"1": 640}) as sparse arrays ([, 640]);
+  // Array.from visits the holes too.
+  const scoreEntries = Array.isArray(raw.bestScores)
+    ? Array.from(raw.bestScores as unknown[], (value, index) => [String(index), value] as const)
+    : isObject(raw.bestScores)
+      ? Object.entries(raw.bestScores)
+      : []
+  for (const [key, value] of scoreEntries) {
+    const level = Number(key)
+    if (Number.isInteger(level) && level >= 1 && level <= LEVEL_COUNT && typeof value === 'number') bestScores[String(level)] = num(value)
   }
   const achievements: Progress['achievements'] = {}
   if (isObject(raw.achievements)) {

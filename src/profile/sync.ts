@@ -66,7 +66,14 @@ export async function startSync(uid: string): Promise<void> {
       try {
         const result = await runTransaction(
           userRef,
-          (remote: unknown) => toRemote(mergeRecords(normalizeArrays(remote), getProfile())),
+          (remote: unknown) => {
+            // An error thrown in here would be swallowed by the SDK and stall the sync; abort instead.
+            try {
+              return toRemote(mergeRecords(normalizeArrays(remote), getProfile()))
+            } catch {
+              return undefined
+            }
+          },
           { applyLocally: false },
         )
         const merged = mergeRecords(normalizeArrays(result.snapshot.val()), getProfile())

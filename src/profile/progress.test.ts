@@ -1,6 +1,7 @@
 import { sessionResult } from '../test/fixtures'
 import type { MatchRecord } from '../types'
 import { applyCampaignResult, applyMatchResult, createProgress, mergeProgress, unlockAchievements } from './progress'
+import { sanitizeProgress } from './sanitize'
 
 const NOW = 1_800_000_000_000
 
@@ -104,5 +105,17 @@ describe('merging two copies of the same player (sync, sign-in)', () => {
     expect({ ...ab, matchHistory: [] }).toEqual({ ...ba, matchHistory: [] })
     expect(mergeProgress(ab, ab)).toEqual(ab)
     expect(mergeProgress(ab, cloud)).toEqual(ab)
+  })
+})
+
+describe('reading progress back from the cloud', () => {
+  it('keeps best scores the database returns as an array', () => {
+    const progress = sanitizeProgress({ unlockedLevel: 3, completedLevels: [1, 2], bestScores: [null, 640, 1720] })
+    expect(progress.bestScores).toEqual({ '1': 640, '2': 1720 })
+    // What the SDK really returns for {"1": 640}: an array with a hole at 0.
+    const sparse: number[] = []
+    sparse[1] = 640
+    expect(sanitizeProgress({ completedLevels: [1], bestScores: sparse }).bestScores).toEqual({ '1': 640 })
+    expect(sanitizeProgress({ bestScores: { '3': 2600 } }).bestScores).toEqual({ '3': 2600 })
   })
 })

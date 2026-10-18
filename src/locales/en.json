@@ -107,7 +107,7 @@
     "vs": "vs {name}",
     "account": "Account",
     "guestNotice": "You're playing as a guest. Sign in with Google to back up your progress.",
-    "googleNotice": "Signed in with Google. Progress syncs automatically.",
+    "googleNotice": "Signed in with Google — progress syncs automatically",
     "outcome": {
       "win": "Win",
       "loss": "Loss",

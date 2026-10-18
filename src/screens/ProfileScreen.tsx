@@ -11,7 +11,6 @@ import { NameField } from '../components/NameField'
 import { Notice } from '../components/Notice'
 import { ProgressBar } from '../components/ProgressBar'
 import { Screen, ScreenHeader } from '../components/Screen'
-import { Spinner } from '../components/Spinner'
 import { toast } from '../components/toastStore'
 import { LEVEL_COUNT } from '../game/levels/levels'
 import { useI18n } from '../locales/i18n'
@@ -122,9 +121,8 @@ export default function ProfileScreen() {
       <Card title={t('profile.account')}>
         {google ? (
           <>
-            <Notice tone="success">
-              {t('profile.googleNotice')}{' '}
-              {auth.sync === 'syncing' && <Spinner size={14} />}
+            <Notice tone={auth.sync === 'error' ? 'warning' : 'success'} title={t('profile.googleNotice')} testId="sync-status">
+              {auth.sync === 'syncing' && t('login.syncing')}
               {auth.sync === 'synced' && t('login.synced')}
               {auth.sync === 'error' && t('login.syncFailed')}
             </Notice>

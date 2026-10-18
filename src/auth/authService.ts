@@ -5,6 +5,7 @@ import { getProfile } from '../profile/profileStore'
 import { flushSync, startSync, stopSync } from '../profile/sync'
 import { activateAccount, activateGuest } from './account'
 import { mapAuthError, useAuth, type AuthUser } from './authStore'
+import { firebaseStatus } from '../services/config'
 import { getFirebase, isFirebaseConfigured } from './firebase'
 
 let initialised = false
@@ -144,4 +145,28 @@ export async function ensureOnlineUser(): Promise<string> {
   } catch (error) {
     throw new OnlineUnavailableError('auth', error)
   }
+}
+
+/**
+ * End-to-end tests only: signs in to the Firebase Auth emulator as a made-up
+ * Google account (the emulator accepts unsigned test credentials), following
+ * the same path as a real sign-in once Google has answered. It refuses to run
+ * against a real Firebase project and is only exposed in development builds.
+ */
+export async function signInWithEmulatorGoogleAccount(email: string, name: string): Promise<void> {
+  if (!firebaseStatus.useEmulators) throw new Error('Only available with the Firebase emulators')
+  const { auth } = await getFirebase()
+  const { GoogleAuthProvider, linkWithCredential, signInWithCredential } = await import('firebase/auth')
+  const credential = GoogleAuthProvider.credential(JSON.stringify({ sub: email, email, name, email_verified: true }))
+  if (auth.currentUser?.isAnonymous) {
+    try {
+      await linkWithCredential(auth.currentUser, credential)
+      await auth.currentUser.reload()
+      handleUser(auth.currentUser)
+      return
+    } catch (error) {
+      if ((error as { code?: string }).code !== 'auth/credential-already-in-use') throw error
+    }
+  }
+  await signInWithCredential(auth, credential)
 }

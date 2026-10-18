@@ -67,7 +67,10 @@ export function OpeningScreen() {
       go('LOGIN')
       return
     }
-    await signInWithGoogle()
+    const signedIn = await signInWithGoogle()
+    const error = useAuth.getState().error
+    // Closing the window is the player's choice; anything else is explained.
+    if (!signedIn && error && error !== 'popupClosed') toast({ tone: 'error', title: t(`login.errors.${error}`) })
   }
 
   const onEndless = () => {
