@@ -1,0 +1,52 @@
+/* Styles for the new screens (splash, community, career, shift, admin). */
+
+.sbc-splash-bg {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(0, 112, 74, 0.55) 0%, rgba(0, 112, 74, 0) 55%),
+    radial-gradient(circle at 100% 100%, rgba(203, 162, 88, 0.18) 0%, rgba(203, 162, 88, 0) 45%),
+    linear-gradient(180deg, #0b1915 0%, #07110e 100%);
+  transition: opacity 0.3s ease;
+}
+.sbc-fade-out {
+  opacity: 0;
+}
+.sbc-rise {
+  animation: sbcRise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes sbcRise {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.sbc-logo-ring {
+  padding: 4px;
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, #CBA258, #00704A, #CBA258, #00704A, #CBA258);
+  box-shadow: 0 0 28px rgba(0, 112, 74, 0.65);
+  animation: sbcGlow 3.2s ease-in-out infinite;
+}
+@keyframes sbcGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(0, 112, 74, 0.55); }
+  50% { box-shadow: 0 0 34px rgba(203, 162, 88, 0.55); }
+}
+.sbc-spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  border: 3px solid rgba(203, 162, 88, 0.25);
+  border-top-color: #CBA258;
+  animation: sbcSpin 0.8s linear infinite;
+  display: inline-block;
+}
+.sbc-spinner-dark {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  border-color: rgba(17, 34, 29, 0.25);
+  border-top-color: #11221d;
+}
+@keyframes sbcSpin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sbc-rise, .sbc-logo-ring, .sbc-spinner { animation: none; }
+}
