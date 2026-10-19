@@ -1,5 +1,6 @@
 """Draws the Starbucks Career launcher icons and splash screens (original art:
-a white takeaway cup with a gold sleeve on green) into the Android project.
+a white takeaway cup with a gold sleeve on green) into the Android project and
+the web app icons into public/icons.
 
     python3 scripts/build_icons.py
 """
@@ -8,7 +9,9 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-RES = Path(__file__).resolve().parent.parent / "android/app/src/main/res"
+ROOT = Path(__file__).resolve().parent.parent
+RES = ROOT / "android/app/src/main/res"
+WEB = ROOT / "public/icons"
 GREEN = (0, 112, 74, 255)
 DARK = (11, 25, 21, 255)
 GOLD = (203, 162, 88, 255)
@@ -71,6 +74,15 @@ def main() -> None:
         '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n'
         '    <color name="ic_launcher_background">#00704A</color>\n</resources>\n'
     )
+
+    WEB.mkdir(parents=True, exist_ok=True)
+    for size in (192, 512):
+        full_icon(size, round_=False).save(WEB / f"icon-{size}.png")
+    # Maskable: the cup on a full green square, inside the 80% safe circle.
+    maskable = Image.new("RGBA", (512, 512), GREEN)
+    art = cup(int(512 * 1.05))
+    maskable.alpha_composite(art, ((512 - art.width) // 2, (512 - art.height) // 2))
+    maskable.save(WEB / "icon-maskable-512.png")
 
     for path in RES.glob("drawable*/splash.png"):
         w, h = Image.open(path).size

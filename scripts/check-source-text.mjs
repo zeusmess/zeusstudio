@@ -13,11 +13,8 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'dist-single', '.git', 'test-results', 'playwright-report', 'coverage', '.firebase', 'build', '.gradle'])
-/**
- * Generated copies of the web builds (git-ignored), and the Starbucks Career page,
- * kept as an exact copy of the original whose emoji use zero-width joiners.
- */
-const SKIP_PATHS = new Set(['android/app/src/main/assets/public', 'career/android/app/src/main/assets/public', 'career/www'])
+/** Generated copies of the web builds (git-ignored). */
+const SKIP_PATHS = new Set(['android/app/src/main/assets/public', 'career/android/app/src/main/assets/public'])
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.mjs', '.cjs', '.json', '.css', '.html', '.md', '.py', '.yml', '.yaml'])
 
 /** Inclusive code point ranges that are invisible or change the reading direction. */
