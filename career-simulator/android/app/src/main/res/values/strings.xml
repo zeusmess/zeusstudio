@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Starbucks Career</string>
+    <string name="webview_missing">This game needs Android System WebView. Install or update it from Google Play, then open the game again.</string>
+</resources>

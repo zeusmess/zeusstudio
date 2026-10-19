@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The game page's own colours (the sb-dark, sb-green, sb-light and sb-gold variables in web/index.html). -->
+    <color name="sb_dark">#1E3932</color>
+    <color name="sb_green">#00704A</color>
+    <color name="sb_light">#F2F0EB</color>
+    <color name="sb_gold">#CBA258</color>
+</resources>

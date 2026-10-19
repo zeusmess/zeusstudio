@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مسيرة ستاربكس</string>
+    <string name="webview_missing">تحتاج اللعبة إلى تطبيق Android System WebView. ثبّته أو حدّثه من Google Play ثم افتح اللعبة مرة أخرى.</string>
+</resources>

@@ -81,7 +81,8 @@ src/
   services/       Configuration, editions, storage, leaderboard
   styles/         Design tokens (single source for CSS and the canvas) and global styles
 android/          Capacitor Android project (the APK wraps the same web build)
-.github/workflows Android APK build, GitHub Pages deployment
+.github/workflows Android APK builds (both apps), GitHub Pages deployment
+career-simulator/ A separate game: Starbucks Career & District Simulator, one HTML page and its Android app
 scripts/          Rules builder, emulator harness, balance simulator, icon and brand-asset builders, Vite plugins (editions, single file)
 tests/            rules/ (emulator) and e2e/ (Playwright); unit tests sit next to the code in src/
 database.rules.json  Generated security rules (do not edit by hand)
@@ -159,6 +160,10 @@ The Android app wraps the same web build in a [Capacitor](https://capacitorjs.co
 Installing a debug APK on a phone needs *Install unknown apps* allowed for the browser or file manager used to open it. It is signed with a debug key: for Google Play, build a signed release (`./gradlew bundleRelease` with your own keystore) — and note that store listings using Starbucks' name and logo would need Starbucks' permission. `VITE_BRAND_ASSETS=off npm run android:sync` packs the brand-free edition instead.
 
 Inside the app, Google doesn't allow its sign-in page in embedded browsers, so the app offers guest play (progress stays on the phone) and points to the web version for Google sign-in; online matches work in the app once Firebase is configured.
+
+## Starbucks Career & District Simulator
+
+`career-simulator/` holds a second, unrelated game: an Arabic idle career game, from Barista to District Manager, written as one HTML page (`career-simulator/web/index.html`), with a native Android app around it. It has its own build (`.github/workflows/career-simulator.yml`) and instructions in [career-simulator/README.md](career-simulator/README.md).
 
 ## Tests
 

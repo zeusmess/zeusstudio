@@ -6,7 +6,7 @@ name: Android APK
 # https://github.com/<owner>/<repository>/releases/download/android-latest/cup-catcher-debug.apk
 on:
   push:
-    paths-ignore: ['**.md']
+    paths-ignore: ['**.md', 'career-simulator/**', '.github/workflows/career-simulator.yml']
   workflow_dispatch:
 
 permissions:

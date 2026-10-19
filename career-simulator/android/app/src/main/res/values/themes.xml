@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The window (and the Android 12+ launch screen) starts in the header's dark green, so opening never flashes white. -->
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/sb_dark</item>
+        <item name="android:colorPrimary">@color/sb_green</item>
+        <item name="android:colorPrimaryDark">@color/sb_dark</item>
+        <item name="android:colorAccent">@color/sb_gold</item>
+        <item name="android:statusBarColor">@color/sb_dark</item>
+        <item name="android:navigationBarColor">@color/sb_dark</item>
+    </style>
+</resources>

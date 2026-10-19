@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1E3932">
+    <title>Starbucks Career & District Simulator</title>
+    <style>
+        :root {
+            --sb-green: #00704A;
+            --sb-dark: #1E3932;
+            --sb-gold: #CBA258;
+            --sb-light: #F2F0EB;
+            --danger: #d9534f;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        input {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        button {
+            touch-action: manipulation;
+        }
+        body {
+            background-color: var(--sb-light);
+            color: var(--sb-dark);
+            padding-bottom: 80px;
+        }
+        /* Header & Stats */
+        header {
+            background: linear-gradient(135deg, var(--sb-dark), var(--sb-green));
+            color: white;
+            padding: 15px;
+            border-bottom: 4px solid var(--sb-gold);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .rank-badge {
+            background: var(--sb-gold);
+            color: var(--sb-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            text-align: center;
+            background: rgba(0,0,0,0.25);
+            padding: 8px;
+            border-radius: 10px;
+        }
+        .stat-box span {
+            display: block;
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+        .stat-box strong {
+            font-size: 1.05rem;
+            color: #fff;
+            direction: ltr;
+            unicode-bidi: isolate;
+        }
+        /* 1000 Hard Tasks Progress Bar */
+        .dm-progress-container {
+            margin-top: 12px;
+        }
+        .dm-progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: #f9d976;
+            font-weight: bold;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 14px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--sb-gold);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #CBA258, #ffd700);
+            transition: width 0.3s ease;
+        }
+
+        /* Main Containers */
+        .container {
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-right: 5px solid var(--sb-green);
+        }
+        .card h3 {
+            color: var(--sb-dark);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--sb-green);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.95rem;
+            transition: transform 0.1s, background 0.2s;
+            margin-top: 8px;
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn-gold {
+            background: var(--sb-gold);
+            color: var(--sb-dark);
+        }
+        .btn:disabled {
+            background: #ccc;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        /* Order / Barista Area */
+        .customer-order {
+            background: #fff8e7;
+            border: 2px dashed var(--sb-gold);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .drink-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--sb-dark);
+            margin: 5px 0;
+        }
+        .order-meta {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        /* Missions & Targets */
+        .mission-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .mission-item:last-child {
+            border-bottom: none;
+        }
+        .mission-item .btn {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .mission-info {
+            flex: 1;
+            padding-left: 10px;
+        }
+        .mission-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .mission-info p {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        .badge-hard {
+            background: #ffebe6;
+            color: #d9534f;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        /* District Managers List */
+        .dm-card {
+            background: linear-gradient(135deg, #1E3932, #0d211c);
+            color: white;
+            border-right: 5px solid var(--sb-gold);
+        }
+        .dm-card h3 {
+            color: var(--sb-gold);
+        }
+        .branch-list {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .branch-pill {
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(203, 162, 88, 0.4);
+        }
+
+        /* Bottom Navigation */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            border-top: 2px solid #e0e0e0;
+            padding: 8px 0;
+            z-index: 100;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .nav-btn.active {
+            color: var(--sb-green);
+        }
+        .nav-btn span.icon {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+
+        /* Modal for 1000 Tasks Promotion */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 20px;
+        }
+        .modal-box {
+            background: white;
+            border: 4px solid var(--sb-gold);
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            animation: popIn 0.4s ease;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-box h2 {
+            color: var(--sb-green);
+            margin-bottom: 10px;
+        }
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid var(--sb-green);
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--sb-dark);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            display: none;
+            border: 1px solid var(--sb-gold);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<header>
+    <div class="top-row">
+        <div>
+            <strong>☕ ستاربكس مصر - الإدارة</strong>
+            <div id="playerNameDisplay" style="font-size: 0.8rem; color: #CBA258;">الموظف: باريستا جديد</div>
+        </div>
+        <div class="rank-badge" id="rankBadge">Barista</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <span>الرصيد المالي</span>
+            <strong id="moneyDisplay">$0</strong>
+        </div>
+        <div class="stat-box">
+            <span>الربح/ثانية</span>
+            <strong id="incomeDisplay">$0/s</strong>
+        </div>
+        <div class="stat-box">
+            <span>تارجت الشفت</span>
+            <strong id="shiftTargetDisplay">0 / 15</strong>
+        </div>
+    </div>
+
+    <div class="dm-progress-container">
+        <div class="dm-progress-label">
+            <span>🏆 الترقية لمدير منطقة (District Manager)</span>
+            <span id="hardTasksText">0 / 1000 مهمة صعبة</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="hardTasksBar"></div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- TAB 1: BAR & OPERATIONS -->
+    <div id="tab-bar" class="tab-content active">
+        <div class="card">
+            <h3>
+                <span>البار وتحضير المشروبات</span>
+                <span class="badge-hard">+مهام صعبة</span>
+            </h3>
+            <div class="customer-order">
+                <div class="order-meta" id="orderType">طلب Rush Hour معقد 🔥</div>
+                <div class="drink-title" id="currentDrink">Caramel Macchiato - Extra Shot</div>
+                <div class="order-meta" id="drinkReward">العائد: $15 | +1 مهمة صعبة</div>
+            </div>
+            <button class="btn" onclick="serveDrink()">⚡ تحضير وتسليم الطلب فوراً</button>
+        </div>
+
+        <div class="card">
+            <h3>
+                <span>عمليات الشفت العاجلة (Shift Tasks)</span>
+                <span style="font-size:0.8rem; color:#00704A;">ترفع التارجت سريعاً</span>
+            </h3>
+            <div class="mission-item">
+                <div class="mission-info">
+                    <h4>مراجعة Playbook وتوزيع الـ Duty Roster</h4>
+                    <p>تنظيم الفريق في أوقات الذروة (+5 مهام صعبة | +$50 | مرة كل 30 ث)</p>
+                </div>
+                <button class="btn" style="width:auto;" data-task="roster" onclick="doSpecialTask('roster')">تنفيذ</button>
+            </div>
+            <div class="mission-item">
+                <div class="mission-info">
+                    <h4>اجتياز تفتيش الجودة (QASA Audit)</h4>
+                    <p>فحص درجات الحرارة والنظافة والبار (+20 مهمة صعبة | +$200 | مرة كل 120 ث)</p>
+                </div>
+                <button class="btn btn-gold" style="width:auto;" data-task="qasa" onclick="doSpecialTask('qasa')">فحص</button>
+            </div>
+            <div class="mission-item">
+                <div class="mission-info">
+                    <h4>تسليم العهدة و Safe Handover & Petty Cash</h4>
+                    <p>تقفيل الحسابات والطلبيات بدون عجز (+15 مهمة صعبة | +$120 | مرة كل 60 ث)</p>
+                </div>
+                <button class="btn" style="width:auto;" data-task="safe" onclick="doSpecialTask('safe')">تقفيل</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: MISSIONS & TARGETS -->
+    <div id="tab-missions" class="tab-content">
+        <div class="card">
+            <h3>🎯 التارجت والمهمات الكبرى</h3>
+            <p style="font-size: 0.85rem; color:#555; margin-bottom:10px;">
+                أكمل هذه التحديات للوصول إلى <strong>1000 مهمة صعبة</strong> والترقية إلى مدير منطقة (District Manager).
+            </p>
+            <div id="missionsContainer"></div>
+        </div>
+    </div>
+
+    <!-- TAB 3: UPGRADES & CAREER -->
+    <div id="tab-upgrades" class="tab-content">
+        <div class="card">
+            <h3>⬆️ الترقيات الوظيفية والمعدات</h3>
+            <div id="upgradesContainer"></div>
+        </div>
+    </div>
+
+    <!-- TAB 4: DISTRICT MANAGERS -->
+    <div id="tab-districts" class="tab-content">
+        <div class="card">
+            <h3>👔 مجلس مديري المناطق (District Managers)</h3>
+            <p style="font-size: 0.85rem; color:#555; margin-bottom:12px;">
+                عند وصولك إلى 1000 مهمة صعبة، سيُكتب اسمك هنا وتُضاف إليك فروع منطقتك الخاصة!
+            </p>
+            <div id="dmListContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for 1000 Hard Tasks Promotion -->
+<div id="promotionModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="font-size: 3rem;">👑</div>
+        <h2>مبروك الترقية الكبرى!</h2>
+        <p style="font-size: 0.95rem; color:#333; margin: 10px 0;">
+            لقد أتممت <strong>1000 مهمة صعبة</strong> بنجاح وأثبتّ كفاءة استثنائية في إدارة التشغيل والتارجت!
+            تمت ترقيتك رسمياً إلى منصب <strong>مدير منطقة (District Manager)</strong>.
+        </p>
+        <p style="font-size: 0.85rem; color:#00704A; font-weight:bold;">
+            اكتب اسمك ليتم تسجيله في لوحة مديري المناطق واستلام فروعك الـ 4 الجديدة:
+        </p>
+        <input type="text" id="dmNameInput" placeholder="اكتب اسمك هنا (مثال: يوسف أيمن)" maxlength="25" />
+        <button class="btn btn-gold" onclick="confirmPromotion()">تسجيل الاسم واستلام الفروع 🏢</button>
+    </div>
+</div>
+
+<nav>
+    <button class="nav-btn active" data-tab="tab-bar" onclick="switchTab('tab-bar')">
+        <span class="icon">☕</span>
+        <span>البار والشفت</span>
+    </button>
+    <button class="nav-btn" data-tab="tab-missions" onclick="switchTab('tab-missions')">
+        <span class="icon">🎯</span>
+        <span>المهمات والتارجت</span>
+    </button>
+    <button class="nav-btn" data-tab="tab-upgrades" onclick="switchTab('tab-upgrades')">
+        <span class="icon">⚡</span>
+        <span>الترقيات</span>
+    </button>
+    <button class="nav-btn" data-tab="tab-districts" onclick="switchTab('tab-districts')">
+        <span class="icon">🏢</span>
+        <span>مديري المناطق</span>
+    </button>
+</nav>
+
+<script>
+    // ---------- Game rules ----------
+    const SAVE_KEY = "sb_career_save_v1"; // the first version's key, so its saves still load
+    const TARGET_GOAL = 1000;
+    const TASKS_PER_DRINK = 2;
+    const DM_PASSIVE_BONUS = 1500;
+    const MAX_AWAY_SECONDS = 8 * 60 * 60; // income earned while the game is closed counts for 8 hours at most
+
+    // Shift tasks pay instantly, then rest for `cooldown` seconds.
+    const SHIFT_TASKS = {
+        roster: { tasks: 5, money: 50, cooldown: 30, label: "تنفيذ", message: "تم تنظيم الـ Duty Roster بنجاح!" },
+        qasa: { tasks: 20, money: 200, cooldown: 120, label: "فحص", message: "اجتزت تفتيش QASA بنسبة 100%!" },
+        safe: { tasks: 15, money: 120, cooldown: 60, label: "تقفيل", message: "تم تسليم Safe Handover بنجاح!" }
+    };
+
+    const UPGRADES = [
+        { id: 1, name: "ماكينة Mastrena II سريعة", cost: 100, bonusMoney: 10, bonusPassive: 5 },
+        { id: 2, name: "ترقية: Barista Trainer (مدرب)", cost: 350, bonusMoney: 20, bonusPassive: 15, rankSet: "Barista Trainer" },
+        { id: 3, name: "ترقية: Shift Supervisor (مشرف شفت)", cost: 900, bonusMoney: 40, bonusPassive: 40, rankSet: "Shift Supervisor" },
+        { id: 4, name: "تطوير نظام Cold Bar & Frappuccino", cost: 2000, bonusMoney: 65, bonusPassive: 85 },
+        { id: 5, name: "ترقية: Store Manager (مدير فرع)", cost: 5000, bonusMoney: 120, bonusPassive: 200, rankSet: "Store Manager" }
+    ];
+
+    // reqDrinks counts every drink served since the start of the game.
+    const MISSIONS = [
+        { id: 101, title: "تحدي الـ Peak Hour الصباحي", desc: "تحضير 30 مشروب اسبريسو بدون خطأ", rewardTasks: 50, rewardMoney: 400, reqDrinks: 30 },
+        { id: 102, title: "جرد المخزن والـ Warehouse بدون عجز", desc: "الوصول إلى 50 مشروب وتقفيل الطلبيات", rewardTasks: 100, rewardMoney: 900, reqDrinks: 50 },
+        { id: 103, title: "إطلاق حملة Pumpkin Spice الموسمية", desc: "تحقيق مبيعات عالية وتحضير 100 مشروب", rewardTasks: 200, rewardMoney: 2500, reqDrinks: 100 },
+        { id: 104, title: "تحقيق Zero Waste وتصفير الهالك", desc: "إدارة مثالية للفرع وتحضير 180 مشروب", rewardTasks: 300, rewardMoney: 5000, reqDrinks: 180 }
+    ];
+
+    const DISTRICTS = [
+        {
+            manager: "أحمد طارق (قطاع القاهرة الكبرى)",
+            income: "$450/ث",
+            branches: ["فرع الزمالك", "فرع التجمع الخامس", "فرع المعادي", "فرع سيتي ستارز"]
+        },
+        {
+            manager: "سارة محمود (قطاع الجيزة والشيخ زايد)",
+            income: "$520/ث",
+            branches: ["فرع أركان بلازا", "فرع مول العرب", "فرع المهندسين", "فرع الهرم"]
+        }
+    ];
+
+    const drinksMenu = [
+        "Iced Caramel Macchiato - Extra Shot",
+        "White Chocolate Mocha - Whipped Cream",
+        "Pumpkin Spice Latte - Oat Milk",
+        "Iced Shaken Espresso - Brown Sugar",
+        "Flat White - Ristretto Shots",
+        "Matcha Green Tea Latte - Iced",
+        "Cold Brew - Vanilla Sweet Cream",
+        "Java Chip Frappuccino - Double Blended"
+    ];
+
+    function playerDistrict(name) {
+        return {
+            manager: `👑 أ/ ${name} (مدير منطقة معتمد - VIP)`,
+            income: `+$${fmt(DM_PASSIVE_BONUS)}/ث`,
+            branches: [
+                `فرع شارع شهاب - بإدارة ${name}`,
+                `فرع الدقي Chillout - بإدارة ${name}`,
+                `فرع المهندسين الرئيسي - بإدارة ${name}`,
+                `فرع النيل بلازا VIP - بإدارة ${name}`
+            ]
+        };
+    }
+
+    // ---------- Saving ----------
+    function newGame() {
+        return {
+            money: 0,
+            hardTasks: 0,
+            targetGoal: TARGET_GOAL,
+            shiftDrinks: 0,
+            shiftTarget: 15,
+            totalDrinks: 0,
+            drinkPower: 15,
+            passiveIncome: 0,
+            isPromotedToDM: false,
+            playerName: "باريستا طموح",
+            currentDrink: drinksMenu[0],
+            cooldowns: {},
+            incomeAt: Date.now(),
+            savedAt: 0,
+            upgrades: UPGRADES.map(u => Object.assign({}, u, { bought: 0 })),
+            missions: MISSIONS.map(m => Object.assign({}, m, { done: false }))
+        };
+    }
+
+    function number(value, fallback, min) {
+        return typeof value === "number" && isFinite(value) && value >= min ? value : fallback;
+    }
+
+    // Takes only valid values from a save, so an old or damaged save can never break the game.
+    function restore(saved) {
+        const game = newGame();
+        if (!saved || typeof saved !== "object") return game;
+        const now = Date.now();
+        game.money = number(saved.money, 0, 0);
+        game.hardTasks = Math.floor(number(saved.hardTasks, 0, 0));
+        game.shiftDrinks = Math.floor(number(saved.shiftDrinks, 0, 0));
+        game.shiftTarget = Math.floor(number(saved.shiftTarget, 15, 1));
+        game.totalDrinks = Math.floor(number(saved.totalDrinks, 0, 0));
+        game.drinkPower = number(saved.drinkPower, 15, 1);
+        game.passiveIncome = number(saved.passiveIncome, 0, 0);
+        game.isPromotedToDM = saved.isPromotedToDM === true;
+        if (typeof saved.playerName === "string" && saved.playerName.trim()) {
+            game.playerName = saved.playerName.trim().slice(0, 25);
+        }
+        if (drinksMenu.includes(saved.currentDrink)) game.currentDrink = saved.currentDrink;
+        game.incomeAt = Math.min(number(saved.incomeAt, now, 0), now);
+        Object.keys(SHIFT_TASKS).forEach(key => {
+            const until = saved.cooldowns && saved.cooldowns[key];
+            if (typeof until === "number" && until > now) {
+                game.cooldowns[key] = Math.min(until, now + SHIFT_TASKS[key].cooldown * 1000);
+            }
+        });
+        if (Array.isArray(saved.upgrades)) {
+            game.upgrades.forEach(u => {
+                const s = saved.upgrades.find(x => x && x.id === u.id);
+                if (s) {
+                    u.bought = Math.floor(number(s.bought, 0, 0));
+                    u.cost = Math.floor(number(s.cost, u.cost, u.cost));
+                }
+            });
+        }
+        if (Array.isArray(saved.missions)) {
+            game.missions.forEach(m => {
+                const s = saved.missions.find(x => x && x.id === m.id);
+                if (s) m.done = s.done === true;
+            });
+        }
+        return game;
+    }
+
+    // The Android app keeps a second copy on the phone (window.AndroidSave); the newer copy wins.
+    function readSave() {
+        const saves = [];
+        try { saves.push(JSON.parse(localStorage.getItem(SAVE_KEY))); } catch (e) {}
+        try { if (window.AndroidSave) saves.push(JSON.parse(window.AndroidSave.load() || "null")); } catch (e) {}
+        return saves
+            .filter(s => s && typeof s === "object")
+            .sort((a, b) => number(b.savedAt, 0, 0) - number(a.savedAt, 0, 0))[0] || null;
+    }
+
+    function saveGame() {
+        state.savedAt = Date.now();
+        const json = JSON.stringify(state);
+        try { localStorage.setItem(SAVE_KEY, json); } catch (e) {}
+        try { if (window.AndroidSave) window.AndroidSave.save(json); } catch (e) {}
+    }
+
+    // ---------- Actions ----------
+    function serveDrink() {
+        state.money += state.drinkPower;
+        state.hardTasks += TASKS_PER_DRINK;
+        state.shiftDrinks += 1;
+        state.totalDrinks += 1;
+
+        if (state.shiftDrinks >= state.shiftTarget) {
+            const bonus = 150;
+            state.money += bonus;
+            state.hardTasks += 10;
+            state.shiftDrinks = 0;
+            state.shiftTarget += 10;
+            showToast(`🎯 قفلت تارجت الشفت! مكافأة +$${bonus} و +10 مهام صعبة!`);
+        }
+
+        // Next random drink, never the same one twice in a row
+        let next;
+        do {
+            next = drinksMenu[Math.floor(Math.random() * drinksMenu.length)];
+        } while (next === state.currentDrink);
+        state.currentDrink = next;
+
+        afterChange();
+    }
+
+    function doSpecialTask(key) {
+        const task = SHIFT_TASKS[key];
+        if (!task || cooldownLeft(key) > 0) return;
+        state.hardTasks += task.tasks;
+        state.money += task.money;
+        state.cooldowns[key] = Date.now() + task.cooldown * 1000;
+        showToast(task.message);
+        afterChange();
+    }
+
+    function cooldownLeft(key) {
+        return Math.max(0, Math.ceil(((state.cooldowns[key] || 0) - Date.now()) / 1000));
+    }
+
+    function buyUpgrade(id) {
+        const upg = state.upgrades.find(u => u.id === id);
+        if (!upg || state.money < upg.cost) return;
+
+        state.money -= upg.cost;
+        upg.bought += 1;
+        state.drinkPower += upg.bonusMoney;
+        state.passiveIncome += upg.bonusPassive;
+        upg.cost = Math.floor(upg.cost * 1.8);
+
+        showToast(`✅ تم شراء: ${upg.name}`);
+        afterChange();
+    }
+
+    function claimMission(id) {
+        const m = state.missions.find(x => x.id === id);
+        if (!m || m.done || state.totalDrinks < m.reqDrinks) return;
+
+        m.done = true;
+        state.hardTasks += m.rewardTasks;
+        state.money += m.rewardMoney;
+        showToast(`🏆 أنجزت المهمة! +${m.rewardTasks} مهمة صعبة`);
+        afterChange();
+    }
+
+    function afterChange() {
+        checkPromotion();
+        refresh();
+        saveGame();
+    }
+
+    function checkPromotion() {
+        if (state.hardTasks >= state.targetGoal && !state.isPromotedToDM) {
+            document.getElementById("promotionModal").style.display = "flex";
+        }
+    }
+
+    function confirmPromotion() {
+        if (state.isPromotedToDM || state.hardTasks < state.targetGoal) return;
+        const input = document.getElementById("dmNameInput");
+        const finalName = input.value.trim().slice(0, 25) || "المدير التنفيذي";
+        input.blur();
+
+        state.playerName = finalName;
+        state.isPromotedToDM = true;
+        state.passiveIncome += DM_PASSIVE_BONUS;
+
+        document.getElementById("promotionModal").style.display = "none";
+        showToast(`🎉 مبروك يا ${finalName}! تم تسليمك 4 فروع جديدة كمدير منطقة!`);
+        renderDistricts();
+        refresh();
+        saveGame();
+
+        // Show the District Managers tab with their name and branches
+        switchTab("tab-districts");
+    }
+
+    // Income is paid for the real time that passed, so it stays right when the phone slows
+    // or pauses the timer, and it keeps coming (up to MAX_AWAY_SECONDS) while the game is closed.
+    function payIncome() {
+        const now = Date.now();
+        const seconds = Math.min((now - state.incomeAt) / 1000, MAX_AWAY_SECONDS);
+        state.incomeAt = now;
+        if (!(seconds > 0) || state.passiveIncome <= 0) return false;
+        const earned = state.passiveIncome * seconds;
+        state.money += earned;
+        if (seconds >= 60) showToast(`💰 أرباحك أثناء غيابك: +$${fmt(earned)}`);
+        return true;
+    }
+
+    function tick() {
+        const paid = payIncome();
+        refresh();
+        if (paid) saveGame();
+    }
+
+    // ---------- Screen ----------
+    const views = { missions: {}, upgrades: {} };
+    let toastTimer = 0;
+
+    function fmt(n) {
+        return Math.floor(n).toLocaleString("en-US");
+    }
+
+    // Keeps "12 / 30" in reading order inside right-to-left text.
+    function ltr(text) {
+        return "\u2066" + text + "\u2069";
+    }
+
+    function setText(el, text) {
+        if (el.textContent !== text) el.textContent = text;
+    }
+
+    function make(tag, className, text) {
+        const el = document.createElement(tag);
+        if (className) el.className = className;
+        if (text !== undefined) el.textContent = text;
+        return el;
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.display = "block";
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { t.style.display = "none"; }, 2500);
+    }
+
+    function currentRank() {
+        if (state.isPromotedToDM) return "District Manager 👑";
+        let rank = "Barista";
+        state.upgrades.forEach(u => { if (u.rankSet && u.bought > 0) rank = u.rankSet; });
+        return rank;
+    }
+
+    function buildMissions() {
+        const container = document.getElementById("missionsContainer");
+        container.innerHTML = "";
+        state.missions.forEach(m => {
+            const div = document.createElement("div");
+            div.className = "mission-item";
+            div.innerHTML = `
+                <div class="mission-info">
+                    <h4>${m.title}</h4>
+                    <p>${m.desc}</p>
+                    <p data-progress></p>
+                    <span class="badge-hard">+${m.rewardTasks} مهمة صعبة | +$${fmt(m.rewardMoney)}</span>
+                </div>
+                <button class="btn" style="width:auto;" onclick="claimMission(${m.id})"></button>
+            `;
+            container.appendChild(div);
+            views.missions[m.id] = { progress: div.querySelector("[data-progress]"), button: div.querySelector("button") };
+        });
+    }
+
+    function refreshMissions() {
+        state.missions.forEach(m => {
+            const view = views.missions[m.id];
+            const ready = state.totalDrinks >= m.reqDrinks;
+            const shown = m.done ? m.reqDrinks : Math.min(state.totalDrinks, m.reqDrinks);
+            setText(view.progress, `التقدم: ${ltr(`${shown} / ${m.reqDrinks}`)} مشروب`);
+            view.button.disabled = m.done || !ready;
+            view.button.classList.toggle("btn-gold", !m.done && ready);
+            setText(view.button, m.done ? "مكتملة ✔️"
+                : ready ? "إنجاز المهمة"
+                : `🔒 باقي ${m.reqDrinks - state.totalDrinks}`);
+        });
+    }
+
+    function buildUpgrades() {
+        const container = document.getElementById("upgradesContainer");
+        container.innerHTML = "";
+        state.upgrades.forEach(u => {
+            const div = document.createElement("div");
+            div.className = "mission-item";
+            div.innerHTML = `
+                <div class="mission-info">
+                    <h4></h4>
+                    <p>يرفع ربح المشروب +$${u.bonusMoney} | دخل تلقائي +$${u.bonusPassive}/ث</p>
+                </div>
+                <button class="btn" style="width:auto;" onclick="buyUpgrade(${u.id})"></button>
+            `;
+            container.appendChild(div);
+            views.upgrades[u.id] = { title: div.querySelector("h4"), button: div.querySelector("button") };
+        });
+    }
+
+    function refreshUpgrades() {
+        state.upgrades.forEach(u => {
+            const view = views.upgrades[u.id];
+            setText(view.title, `${u.name} (مستوى ${u.bought})`);
+            setText(view.button, `شراء ($${fmt(u.cost)})`);
+            view.button.disabled = state.money < u.cost;
+        });
+    }
+
+    function refreshShiftTasks() {
+        Object.keys(SHIFT_TASKS).forEach(key => {
+            const button = document.querySelector(`[data-task="${key}"]`);
+            const left = cooldownLeft(key);
+            button.disabled = left > 0;
+            setText(button, left > 0 ? `⏳ ${left} ث` : SHIFT_TASKS[key].label);
+        });
+    }
+
+    // Names are written as text, never as HTML, so any name shows exactly as typed.
+    function renderDistricts() {
+        const container = document.getElementById("dmListContainer");
+        container.innerHTML = "";
+        const list = state.isPromotedToDM ? [playerDistrict(state.playerName)].concat(DISTRICTS) : DISTRICTS;
+        list.forEach(d => {
+            const card = make("div", "card dm-card");
+            const title = make("h3");
+            const income = make("span", "", d.income);
+            income.style.cssText = "font-size:0.85rem; color:#fff;";
+            title.append(make("span", "", d.manager), income);
+            const branches = make("div", "branch-list");
+            d.branches.forEach(b => branches.appendChild(make("div", "branch-pill", `📍 ${b}`)));
+            card.append(title, branches);
+            container.appendChild(card);
+        });
+    }
+
+    function updateUI() {
+        setText(document.getElementById("moneyDisplay"), `$${fmt(state.money)}`);
+        setText(document.getElementById("incomeDisplay"), `$${fmt(state.passiveIncome)}/s`);
+        setText(document.getElementById("shiftTargetDisplay"), `${state.shiftDrinks} / ${state.shiftTarget}`);
+        setText(document.getElementById("playerNameDisplay"), `الاسم: ${state.playerName}`);
+        setText(document.getElementById("rankBadge"), currentRank());
+        setText(document.getElementById("currentDrink"), state.currentDrink);
+        setText(document.getElementById("drinkReward"), `العائد: $${fmt(state.drinkPower)} | +${TASKS_PER_DRINK} مهمة صعبة`);
+
+        const pct = Math.min(100, (state.hardTasks / state.targetGoal) * 100);
+        document.getElementById("hardTasksBar").style.width = `${pct}%`;
+        setText(document.getElementById("hardTasksText"), `${ltr(`${state.hardTasks} / ${state.targetGoal}`)} مهمة صعبة`);
+    }
+
+    function refresh() {
+        updateUI();
+        refreshMissions();
+        refreshUpgrades();
+        refreshShiftTasks();
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll(".tab-content").forEach(t => t.classList.toggle("active", t.id === tabId));
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabId));
+    }
+
+    // The Android app's Back button: back to the first tab, and from there out of the app.
+    window.onAndroidBack = function () {
+        if (document.getElementById("tab-bar").classList.contains("active")) return false;
+        switchTab("tab-bar");
+        return true;
+    };
+
+    // ---------- Start ----------
+    let state = restore(readSave());
+    buildMissions();
+    buildUpgrades();
+    renderDistricts();
+    payIncome();
+    refresh();
+    checkPromotion();
+    saveGame();
+
+    document.getElementById("dmNameInput").addEventListener("keydown", e => {
+        if (e.key === "Enter") confirmPromotion();
+    });
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) saveGame();
+        else tick();
+    });
+    window.addEventListener("pagehide", saveGame);
+    setInterval(tick, 1000);
+</script>
+</body>
+</html>

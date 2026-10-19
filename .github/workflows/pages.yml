@@ -6,7 +6,7 @@ name: Web (GitHub Pages)
 # to publish on every push to the default branch.
 on:
   push:
-    paths-ignore: ['**.md', 'android/**']
+    paths-ignore: ['**.md', 'android/**', 'career-simulator/**', '.github/workflows/career-simulator.yml']
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,48 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace = 'com.youssefayman.careersim'
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId 'com.youssefayman.careersim'
+        minSdk 24
+        targetSdk 36
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    signingConfigs {
+        // One key for every build, wherever it is made, so a newer APK installs over
+        // an older one and keeps the saved game. It is a test key (password "android"),
+        // not a secret: sign Google Play uploads with a key of your own.
+        shared {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.shared
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.shared
+        }
+    }
+
+    sourceSets {
+        // The game page is kept outside the Android project, in career-simulator/web.
+        main.assets.srcDirs = ['../../web']
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
