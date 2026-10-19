@@ -1,0 +1,9 @@
+{
+  "appId": "com.youssefayman.starbuckscareer",
+  "appName": "Starbucks Career",
+  "webDir": "build",
+  "backgroundColor": "#0b1915",
+  "android": {
+    "backgroundColor": "#0b1915"
+  }
+}

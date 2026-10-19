@@ -1,0 +1,78 @@
+name: Starbucks Career APK
+
+# Builds an installable debug APK of Starbucks Career (the career/ folder) when
+# it changes. Download it from the run's "Artifacts" section (Actions tab).
+# Builds of the default branch are also published as the "Starbucks Career"
+# release, at a fixed address:
+# https://github.com/<owner>/<repository>/releases/download/career-latest/starbucks-career-debug.apk
+on:
+  push:
+    paths:
+      - 'career/**'
+      - '.github/workflows/career-android.yml'
+  workflow_dispatch:
+
+permissions:
+  # Write access only to publish the APK as a release asset.
+  contents: write
+
+concurrency:
+  group: career-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: career
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: career/package-lock.json
+
+      - run: npm ci
+
+      - name: Bundle the page for offline use and copy it into the Android project
+        run: npm run android:sync
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Build the APK
+        working-directory: career/android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/starbucks-career-${{ github.run_number }}-debug.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: starbucks-career-android-${{ github.run_number }}
+          path: career/out/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish as the "Starbucks Career" release
+        if: github.ref_name == github.event.repository.default_branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp out/*.apk out/starbucks-career-debug.apk
+          gh release delete career-latest --yes --cleanup-tag || true
+          gh release create career-latest out/starbucks-career-debug.apk \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "Starbucks Career (Android)" \
+            --notes "Debug build of ${GITHUB_SHA::7} (run ${{ github.run_number }}). To install, allow your browser or file manager to install unknown apps."

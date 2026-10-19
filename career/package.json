@@ -1,0 +1,23 @@
+{
+  "name": "starbucks-career",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Starbucks Career — the single-file operations simulator packaged as an Android app.",
+  "author": "Youssef Ayman",
+  "type": "module",
+  "scripts": {
+    "vendor": "node scripts/vendor-assets.mjs",
+    "android:sync": "npm run vendor && cap sync android",
+    "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
