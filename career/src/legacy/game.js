@@ -2020,6 +2020,7 @@ function sendBaristaToBreak(staffId, isAuto) {
 // =========================================================================
 let spawnAccumulator = 0;
 let emailTickCounter = 0;
+let spawnLpCaseFn = null; // set once the V8 controls are wired
 
 function simulationStep() {
   if (state.paused) return;
@@ -7405,6 +7406,7 @@ function setupV8EventListeners() {
     showToast(`🕵️\u200D♂️ سجل مفتش الـ LP ملف تحقيق جديد: ${tpl.typeBadge}!`);
     renderV8UI();
   };
+  spawnLpCaseFn = spawnLpCaseByType;
 
   document.getElementById('btnTriggerLpVisit')?.addEventListener('click', () => {
     initAudio();
@@ -7546,6 +7548,7 @@ export const game = {
   syncActiveStoreStaffIntoState: () => syncActiveStoreStaffIntoState(),
   ensureNetwork: () => ensure500NetworkStaffAndMetadata(),
   getUniqueName: () => getUniqueCustomerName(),
+  spawnLpCase: (typeKey) => (spawnLpCaseFn ? spawnLpCaseFn(typeKey) : undefined),
   ROLE_PERMISSIONS_META,
   STATION_ROLES,
   STEP_LABELS
