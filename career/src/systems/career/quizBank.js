@@ -133,5 +133,14 @@ export function drawQuestions(certId, n = 10, rand = Math.random) {
     const j = Math.floor(rand() * (i + 1))
     ;[order[i], order[j]] = [order[j], order[i]]
   }
-  return order.slice(0, Math.min(n, bank.length)).map((i) => ({ ...bank[i], bankIndex: i }))
+  // Options are shuffled too, so the right answer is never in a memorised place.
+  return order.slice(0, Math.min(n, bank.length)).map((i) => {
+    const q = bank[i]
+    const idx = q.options.map((_, k) => k)
+    for (let k = idx.length - 1; k > 0; k--) {
+      const j = Math.floor(rand() * (k + 1))
+      ;[idx[k], idx[j]] = [idx[j], idx[k]]
+    }
+    return { ...q, options: idx.map((k) => q.options[k]), answer: idx.indexOf(q.answer), bankIndex: i }
+  })
 }

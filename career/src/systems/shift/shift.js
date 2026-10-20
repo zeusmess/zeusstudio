@@ -27,8 +27,8 @@ export const LABOR_TARGET = { min: 18, max: 25 }
 export const MAX_CONSECUTIVE_MIN = 300 // Labour Law No. 14/2025, art. 118
 export const MIN_BREAK_MIN = 20
 export const STORE_OPENS = 420 // 07:00 (drive-thru stores open around the clock)
-const OPENING_WINDOW = [360, 450]
-const CLOSING_WINDOW = [1260, 1320]
+export const OPENING_WINDOW = [360, 450] // 06:00 – 07:30
+export const CLOSING_WINDOW = [1230, 1320] // 20:30 – 22:00
 
 const DRB_SCHEDULE = [
   { id: 'fridge_open', kind: 'fridge', at: 375, label: 'حرارة الثلاجات — الافتتاح' },
@@ -39,7 +39,7 @@ const DRB_SCHEDULE = [
   { id: 'bucket_2', kind: 'bucket', at: 1110, label: 'تغيير جرادل التعقيم (كل 4 ساعات)' },
   { id: 'fridge_close', kind: 'fridge', at: 1270, label: 'حرارة الثلاجات — الإغلاق' },
 ]
-const DRB_GRACE_MIN = 60
+const DRB_GRACE_MIN = 90
 
 export function isDriveThruStore(name) {
   return /dt|drive|chill out|airport|toll|rest/i.test(name || '')
@@ -214,7 +214,8 @@ export function installShift({ getState, game, hooks, getRankRole }) {
     if (sh.drb.day !== state.day) {
       sh.drb = {
         day: state.day,
-        tasks: DRB_SCHEDULE.map((t) => ({ ...t, due: t.at + DRB_GRACE_MIN, status: 'scheduled', reading: null, choice: null, correct: null })),
+        // A day joined late (a new game, a reload) skips what was due before the player arrived.
+        tasks: DRB_SCHEDULE.map((t) => ({ ...t, due: t.at + DRB_GRACE_MIN, status: t.at + DRB_GRACE_MIN < state.dayMinutes ? 'skipped' : 'scheduled', reading: null, choice: null, correct: null })),
       }
     }
     if (sh.checklists.day !== state.day) {
@@ -225,6 +226,8 @@ export function installShift({ getState, game, hooks, getRankRole }) {
         closing: { waste: null, till: null, clean: false, restock: false, done: false, missed: false },
         float,
       }
+      if (state.dayMinutes > OPENING_WINDOW[0] + 20) sh.checklists.opening.skipped = true
+      if (state.dayMinutes > CLOSING_WINDOW[0] + 20) sh.checklists.closing.skipped = true
     }
     if (state.dayMinutes <= 362) sh.partners = {}
   }
@@ -467,6 +470,13 @@ export function installShift({ getState, game, hooks, getRankRole }) {
     // A partner who cannot count the till leaves it to the shift supervisor on duty.
     for (const [kind, win] of [['opening', OPENING_WINDOW], ['closing', CLOSING_WINDOW]]) {
       const c = lists[kind]
+      if (!c || c.skipped) continue
+      if (c && !c.announced && minutes >= win[0] && minutes < win[1]) {
+        c.announced = true
+        game.playSound('ding')
+        game.showToast(kind === 'opening' ? '📋 بدأ وقت قائمة الافتتاح (حتى 7:30 ص): معايرة الإسبريسو، عدّ الدرج، تواريخ المخبوزات، تحضير القهوة — تبويب «الوردية».' : '📋 بدأ وقت قائمة الإغلاق (حتى 10:00 م): سجل الهدر، عدّ الدرج، تنظيف الماكينات، التموين — تبويب «الوردية».')
+        emit('shift:changed', {})
+      }
       if (!canLead() && minutes >= win[0] + 30 && c && !c.till?.done) {
         tillPuzzle(kind)
         c.till.done = true

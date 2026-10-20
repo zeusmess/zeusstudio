@@ -36,8 +36,8 @@ export const isOnlineConfigured = Boolean(
 
 /** Where players get the game; the admin can override both from the config screen. */
 export const DEFAULT_LINKS = {
-  web: env.VITE_CAREER_WEB_URL || '',
-  apk: env.VITE_CAREER_APK_URL || '',
+  web: env.VITE_CAREER_WEB_URL || 'https://zeusmess.github.io/zeusstudio/career/',
+  apk: env.VITE_CAREER_APK_URL || 'https://github.com/zeusmess/zeusstudio/releases/download/career-latest/starbucks-career-debug.apk',
 }
 
 /** "1.2.10" > "1.2.9" */

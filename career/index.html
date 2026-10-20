@@ -18,19 +18,19 @@
   <div id="sbcSplashRoot"></div>
 
   <!-- TOP EXECUTIVE HUD BAR -->
-  <header class="sticky top-0 z-30 bg-[#132822]/95 border-b border-emerald-800/70 px-3 py-2 shadow-xl backdrop-blur-md">
+  <header class="relative lg:sticky lg:top-0 z-30 bg-[#132822]/95 border-b border-emerald-800/70 px-3 py-2 shadow-xl backdrop-blur-md">
     <div class="max-w-[1940px] mx-auto flex flex-wrap items-center justify-between gap-2">
       <!-- Brand & Active Branch Switcher -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2.5 min-w-0 max-w-full">
         <div class="w-10 h-10 rounded-full bg-[#00704A] border-2 border-[#CBA258] flex items-center justify-center shadow-md shrink-0 relative">
           <span class="text-xl">🧜&#x200D;♀️</span>
           <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#132822]" title="متصل بالمركز الرئيسي"></span>
         </div>
-        <div>
+        <div class="min-w-0">
           <div class="flex flex-wrap items-center gap-2">
             <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">Starbucks Career</h1>
             <span id="hudBranchBadge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-[#CBA258]/20 text-[#CBA258] border border-[#CBA258]/50">Nile City Cairo</span>
-            <select id="hudStoreSelector" class="bg-[#0b1915] border border-[#CBA258] text-amber-200 text-xs font-extrabold rounded-xl px-2.5 py-1 shadow cursor-pointer" title="اختر أي فرع من الـ 75 فرعاً للتحكم المباشر فيه">
+            <select id="hudStoreSelector" class="max-w-full bg-[#0b1915] border border-[#CBA258] text-amber-200 text-xs font-extrabold rounded-xl px-2.5 py-1 shadow cursor-pointer" title="اختر أي فرع من الـ 75 فرعاً للتحكم المباشر فيه">
               <option value="downtown__0">📍 تحكم بفرع: طلعت حرب (وسط البلد)</option>
             </select>
             <button id="btnQuickBranchRadar" class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow transition flex items-center gap-1" title="تنقل فوري بين الـ 75 فرعاً ورادار فروع الذروة">
@@ -143,7 +143,7 @@
       </div>
 
       <!-- Game Speed, APK Modal & Utility Controls -->
-      <div class="flex items-center gap-1">
+      <div class="flex flex-wrap items-center gap-1">
         <button id="btnPause" class="px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 transition" title="إيقاف مؤقت / استئناف">⏸️ إيقاف</button>
         <button id="btnSpeed1" class="px-2 py-1.5 rounded-lg text-xs font-bold bg-[#00704A] text-white border border-emerald-400 transition">1x</button>
         <button id="btnSpeed2" class="px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 transition">2x ⏩</button>
@@ -155,6 +155,9 @@
       </div>
     </div>
   </header>
+
+  <!-- ADMIN ANNOUNCEMENT (set by the game's owner from the admin panel) -->
+  <div id="sbcAnnouncement" class="hidden max-w-[1940px] w-full mx-auto px-2.5 sm:px-3.5 pt-2.5"></div>
 
   <!-- MAIN WORKSPACE GRID -->
   <main class="flex-1 max-w-[1940px] w-full mx-auto p-2.5 sm:p-3.5 grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
@@ -235,6 +238,20 @@
           <div class="flex items-center gap-2">
             <button id="btnBannerApologizeNow" class="px-3 py-1 rounded-lg text-xs font-extrabold bg-[#CBA258] text-slate-950 hover:brightness-110 shadow">
               🤝 اعتذر للعميل وعوّضه فوراً (LATTE)
+            </button>
+          </div>
+        </div>
+
+        <!-- Live complex problem (incident) banner -->
+        <div id="sbcIncidentBanner" class="hidden mb-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-950 via-orange-900 to-rose-950 border-2 border-amber-400 flex flex-wrap items-center justify-between gap-2 shadow-xl">
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-white min-w-0">
+            <span class="text-xl animate-bounce">🚨</span>
+            <span id="sbcIncidentBannerText" class="min-w-0">مشكلة في الفرع تحتاج قرارك الآن!</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="sbcIncidentBannerTimer" class="text-xs font-extrabold font-num px-2.5 py-0.5 rounded bg-black/50 text-white">45ث</span>
+            <button id="sbcIncidentBannerOpen" class="px-3 py-1 rounded-lg text-xs font-extrabold bg-[#CBA258] text-slate-950 hover:brightness-110 shadow">
+              ⚡ اتخذ القرار
             </button>
           </div>
         </div>
@@ -353,7 +370,7 @@
           <span>🧭 لوحة التحكم الرئيسية (أيقونات كبيرة ومقسمة بوضوح)</span>
           <span class="text-[11px] text-emerald-300">اضغط أي قسم للتبديل الفوري</span>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div id="sbcNavGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
           <button data-tab="bar" class="nav-tab tab-active py-2.5 px-2 rounded-xl font-extrabold border border-emerald-600/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2">
             <span class="text-xl">🍹</span>
             <span>البار والطلبات</span>
@@ -388,6 +405,21 @@
             <span class="text-xl">🏆</span>
             <span>المهام</span>
             <span id="missionAlertDot" class="hidden w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+          </button>
+          <button data-tab="shift" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">⏱️</span>
+            <span>الوردية</span>
+            <span id="sbcShiftDot" class="hidden w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+          </button>
+          <button data-tab="career" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">🎖️</span>
+            <span>المسيرة والترقيات</span>
+            <span id="sbcCareerDot" class="hidden w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+          </button>
+          <button data-tab="community" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">👥</span>
+            <span>الزملاء والترتيب</span>
+            <span id="sbcOnlineBadge" class="hidden px-1.5 py-0.5 rounded-full bg-emerald-600 text-white font-num text-[10px]">0</span>
           </button>
         </div>
 
@@ -1202,20 +1234,42 @@
 
       <!-- TAB 8: MISSIONS & OBJECTIVES -->
       <div id="tab-missions" class="tab-panel hidden flex-col gap-3">
-        <div class="sb-card rounded-2xl p-3.5 shadow-xl">
-          <div class="border-b border-emerald-800/60 pb-2.5 mb-3">
-            <h3 class="text-sm font-extrabold text-[#CBA258]">🏆 المهام والتحديات التشغيلية (Missions & Milestones)</h3>
-            <p class="text-[11px] text-emerald-200/80">أكمل المهام لكسب مكافآت مالية كبيرة تساعدك على ترقية الفرع وفتح فروع جديدة حول المدينة.</p>
-          </div>
+        <!-- The 1000 career missions (rendered by src/ui/tabs/missionsTab.js) -->
+        <div id="sbcMissionsRoot" class="flex flex-col gap-3"></div>
 
+        <details class="sb-card rounded-2xl p-3.5 shadow-xl">
+          <summary class="cursor-pointer text-sm font-extrabold text-[#CBA258]">🎁 مهام البداية الكلاسيكية (Missions & Milestones)</summary>
+          <p class="text-[11px] text-emerald-200/80 mt-1 mb-3">المهام الأصلية للعبة بمكافآت مالية تساعدك على ترقية الفرع وفتح فروع جديدة حول المدينة.</p>
           <div id="missionsListContainer" class="space-y-2.5 max-h-[430px] overflow-y-auto pl-1">
             <!-- Populated dynamically -->
           </div>
-        </div>
+        </details>
+      </div>
+
+      <!-- TAB 9: SHIFT MANAGEMENT -->
+      <div id="tab-shift" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcShiftRoot" class="flex flex-col gap-3"></div>
+      </div>
+
+      <!-- TAB 10: CAREER LADDER, CERTIFICATES AND INTERVIEWS -->
+      <div id="tab-career" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcCareerRoot" class="flex flex-col gap-3"></div>
+      </div>
+
+      <!-- TAB 11: PARTNERS, LIVE TOP 10 AND HALL OF FAME -->
+      <div id="tab-community" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcCommunityRoot" class="flex flex-col gap-3"></div>
       </div>
 
     </section>
   </main>
+
+  <footer id="sbcFooter" class="max-w-[1940px] w-full mx-auto px-3 pb-4 pt-1 text-center text-[11px] text-emerald-200/80">
+    <button type="button" id="sbcFooterAbout" class="hover:text-[#CBA258] transition">
+      ☕ Starbucks Career <span id="sbcFooterVersion" class="font-num"></span> • powered by <strong class="text-[#CBA258]">Youssef Ayman</strong>
+    </button>
+    <div class="text-[10px] text-emerald-300/60 mt-0.5">لعبة تدريبية غير رسمية للزملاء — ليست تطبيقاً رسمياً من Starbucks.</div>
+  </footer>
 
   <!-- APK & MOBILE INSTALL MODAL -->
   <div id="apkModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">

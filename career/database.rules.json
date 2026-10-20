@@ -26,6 +26,7 @@
         "rewardMultiplier": { ".validate": "newData.isNumber() && newData.val() >= 0.5 && newData.val() <= 3" },
         "eventTitle": { ".validate": "newData.isString() && newData.val().length <= 120" },
         "registrationOpen": { ".validate": "newData.isBoolean()" },
+        "incidentRate": { ".validate": "newData.isNumber() && newData.val() >= 0.25 && newData.val() <= 4" },
         "updatedAt": { ".validate": "newData.isNumber()" },
         "$other": { ".validate": false }
       },
