@@ -7,8 +7,9 @@ android {
         applicationId "com.youssefayman.starbuckscareer"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // CI passes the run number so every build installs over the previous one.
+        versionCode((System.getenv('VERSION_CODE') ?: '1').toInteger())
+        versionName "2.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +17,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // One fixed key for every build, so an update installs over the previous
+    // version and Google sign-in can trust its SHA-1. The committed key is for
+    // test builds; set KEYSTORE_FILE (and the passwords) to sign with your own.
+    signingConfigs {
+        career {
+            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'starbucks-career-test.keystore')
+            storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'starbuckscareer'
+            keyAlias System.getenv('KEY_ALIAS') ?: 'starbuckscareer'
+            keyPassword System.getenv('KEY_PASSWORD') ?: 'starbuckscareer'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.career
+        }
         release {
+            signingConfig signingConfigs.career
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -30,6 +30,7 @@
   "devDependencies": {
     "@capacitor/cli": "^8.5.3",
     "@firebase/rules-unit-testing": "5.0.2",
+    "@playwright/test": "1.56.1",
     "autoprefixer": "^10.4.21",
     "firebase-tools": "15.34.0",
     "postcss": "^8.5.6",

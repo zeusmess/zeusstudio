@@ -1,10 +1,17 @@
 name: Starbucks Career APK
 
-# Builds an installable debug APK of Starbucks Career (the career/ folder) when
-# it changes. Download it from the run's "Artifacts" section (Actions tab).
+# Builds an installable APK of Starbucks Career (the career/ folder) when it
+# changes. Download it from the run's "Artifacts" section (Actions tab).
 # Builds of the default branch are also published as the "Starbucks Career"
 # release, at a fixed address:
 # https://github.com/<owner>/<repository>/releases/download/career-latest/starbucks-career-debug.apk
+#
+# Online play (accounts, live players list, top 10) needs the Firebase web
+# settings of the Starbucks Career project as repository variables:
+#   CAREER_FIREBASE_API_KEY, CAREER_FIREBASE_AUTH_DOMAIN, CAREER_FIREBASE_DATABASE_URL,
+#   CAREER_FIREBASE_PROJECT_ID, CAREER_FIREBASE_APP_ID
+# Google sign-in inside the app also needs the secret CAREER_GOOGLE_SERVICES_JSON
+# (the content of google-services.json). See career/docs/SETUP.ar.md.
 on:
   push:
     paths:
@@ -21,10 +28,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  apk:
-    name: Build debug APK
+  tests:
+    name: Rules and end-to-end tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: career
@@ -37,9 +44,70 @@ jobs:
           cache: npm
           cache-dependency-path: career/package-lock.json
 
+      # The Firebase emulators run on Java.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
       - run: npm ci
 
-      - name: Bundle the page for offline use and copy it into the Android project
+      - run: npx playwright install --with-deps chromium
+
+      - name: Database rules
+        run: npm run test:rules
+
+      - name: Play in a browser (offline, and two players online)
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: career-e2e-results
+          path: career/test-results
+          retention-days: 7
+
+  apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: career
+    env:
+      VITE_FIREBASE_API_KEY: ${{ vars.CAREER_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.CAREER_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_DATABASE_URL: ${{ vars.CAREER_FIREBASE_DATABASE_URL }}
+      VITE_FIREBASE_PROJECT_ID: ${{ vars.CAREER_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_APP_ID: ${{ vars.CAREER_FIREBASE_APP_ID }}
+      VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: career/package-lock.json
+
+      - run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Native Google sign-in (only when google-services.json is provided)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.CAREER_GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+            npm install --no-audit --no-fund @capacitor-firebase/authentication@8.5.2
+            echo "Google sign-in is included in this build."
+          else
+            echo "No CAREER_GOOGLE_SERVICES_JSON secret: the app offers registration by employee ID (Google sign-in works on the web link)."
+          fi
+
+      - name: Bundle the page and copy it into the Android project
         run: npm run android:sync
 
       - uses: actions/setup-java@v4
@@ -55,7 +123,7 @@ jobs:
       - name: Name the APK
         run: |
           mkdir -p out
-          cp android/app/build/outputs/apk/debug/app-debug.apk "out/starbucks-career-${{ github.run_number }}-debug.apk"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/starbucks-career-${{ github.run_number }}.apk"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -75,4 +143,4 @@ jobs:
             --prerelease \
             --target "$GITHUB_SHA" \
             --title "Starbucks Career (Android)" \
-            --notes "Debug build of ${GITHUB_SHA::7} (run ${{ github.run_number }}). To install, allow your browser or file manager to install unknown apps."
+            --notes "Build ${GITHUB_SHA::7} (run ${{ github.run_number }}). To install, allow your browser or file manager to install unknown apps. Updates install over the previous version and keep your progress."

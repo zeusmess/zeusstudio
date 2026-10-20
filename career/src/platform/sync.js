@@ -65,7 +65,7 @@ export function createSync(session, game, hooks) {
 
   async function publishProgress() {
     progressTimer = null
-    if (!cloud) return
+    if (!cloud || session.moderation?.banned) return
     const progress = progressSource()
     if (!progress) return
     try {

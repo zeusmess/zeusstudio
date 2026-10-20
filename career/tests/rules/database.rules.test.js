@@ -224,11 +224,14 @@ describe('only the admin controls the game', () => {
     await assertSucceeds(as(ADMIN).ref('career/config/announcement').set({ text: 'مرحبا', level: 'info', updatedAt: Date.now() }))
     await assertSucceeds(as(ADMIN).ref('career/config/minVersion').set('2.0.0'))
     await assertSucceeds(as(ADMIN).ref('career/config/maintenance').set(true))
+    await assertSucceeds(as(ADMIN).ref('career/config/incidentRate').set(1.5))
   })
 
   it('validates config values even from the admin', async () => {
     await assertFails(as(ADMIN).ref('career/config/minVersion').set('two'))
     await assertFails(as(ADMIN).ref('career/config/rewardMultiplier').set(50))
+    await assertFails(as(ADMIN).ref('career/config/incidentRate').set(10))
+    await assertFails(as(ADMIN).ref('career/config/somethingElse').set(true))
   })
 
   it('cannot make anyone an admin from the app', async () => {
