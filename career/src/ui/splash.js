@@ -1,14 +1,25 @@
-// The opening screen colleagues see first: Google sign-in on top, or a
-// registration with their two-part name, employee ID and job title.
+// The opening screen colleagues see first, with three choices: log in with
+// the employee ID and a password, sign in with Google, or register for the
+// first time (two-part name, employee ID, password, job title).
 // Resolves once the player presses "start", with who they are.
 import { ALL_STORES, INITIAL_BRANCHES } from '../data/branches.js'
 import { JOB_TITLES, jobTitleLabel } from '../data/jobTitles.js'
-import { authErrorMessage, completeRedirect, googleSignInSupported, signInAsEmployee, signInWithGoogle, signOutEverywhere } from '../platform/auth.js'
+import {
+  authErrorMessage,
+  completeRedirect,
+  googleSignInSupported,
+  setEmployeePassword,
+  signInWithEmployeeId,
+  signInWithGoogle,
+  signOutEverywhere,
+  signUpWithEmployeeId,
+} from '../platform/auth.js'
 import { Cloud } from '../platform/cloud.js'
 import { APP_VERSION, compareVersions, isOnlineConfigured } from '../platform/config.js'
 import { loadFirebase } from '../platform/firebase.js'
 import {
   displayName,
+  employeeIdFromEmail,
   loadLocalIdentity,
   normalizeEmployeeId,
   normalizeName,
@@ -16,6 +27,7 @@ import {
   saveLocalIdentity,
   validateEmployeeId,
   validateJobTitle,
+  validatePassword,
   validateTwoPartName,
 } from '../platform/identity.js'
 import { esc } from './dom.js'
@@ -71,7 +83,7 @@ function footerBlock() {
       <p class="text-[11px] font-extrabold text-[#CBA258]">powered by Youssef Ayman</p>
       <p class="text-[10px] text-emerald-200/60 leading-relaxed">
         لعبة تدريبية غير رسمية للتسلية والمنافسة بين الزملاء — غير تابعة لشركة ستاربكس أو مجموعة الشايع.
-        لا يُطلب منك أي كلمة سر هنا.
+        كلمة السر خاصة باللعبة فقط — ما تستخدمش كلمة سر أي حساب تاني.
       </p>
       <p class="text-[10px] text-emerald-300/50 font-num">v${esc(APP_VERSION)}</p>
     </div>`
@@ -90,7 +102,9 @@ export function runSplash(root) {
       busy: false,
       message: '',
       messageKind: 'error',
-      form: { name: '', employeeId: '', job: '', store: '', consent: false },
+      form: { name: '', employeeId: '', job: '', store: '', consent: false, password: '', password2: '' },
+      login: { id: '', password: '' },
+      showPassword: false,
       fb: null,
       user: null,
       profile: null,
@@ -112,32 +126,62 @@ export function runSplash(root) {
       if (q('#sbcJob')) ui.form.job = q('#sbcJob').value
       if (q('#sbcStore')) ui.form.store = q('#sbcStore').value
       if (q('#sbcConsent')) ui.form.consent = q('#sbcConsent').checked
+      if (q('#sbcPassword')) ui.form.password = q('#sbcPassword').value
+      if (q('#sbcPassword2')) ui.form.password2 = q('#sbcPassword2').value
+      if (q('#sbcLoginId')) ui.login.id = q('#sbcLoginId').value
+      if (q('#sbcLoginPassword')) ui.login.password = q('#sbcLoginPassword').value
     }
 
-    function validate({ employeeIdRequired }) {
+    function validate({ employeeIdRequired, passwordRequired = false }) {
       const nameErr = validateTwoPartName(ui.form.name)
       if (nameErr) return nameErr
       const idErr = validateEmployeeId(ui.form.employeeId, { required: employeeIdRequired })
       if (idErr) return idErr
+      if (passwordRequired) {
+        const pwErr = validatePassword(ui.form.password, ui.form.password2)
+        if (pwErr) return pwErr
+      }
       const jobErr = validateJobTitle(ui.form.job)
       if (jobErr) return jobErr
       if (!ui.form.consent) return 'وافق على ظهور اسمك ومسماك في قائمة اللاعبين للمتابعة.'
       return null
     }
 
-    function formFields({ employeeIdRequired, nameReadOnly = false }) {
+    function passwordInput(id, value, placeholder, autocomplete) {
+      return `<div class="relative">
+          <input id="${id}" type="${ui.showPassword ? 'text' : 'password'}" dir="ltr" autocomplete="${autocomplete}" maxlength="64"
+            value="${esc(value)}" placeholder="${placeholder}" class="${INPUT_CLS} text-left pl-11" />
+          <button type="button" data-toggle-password class="absolute left-2 top-1/2 -translate-y-1/2 px-1.5 py-1 rounded-lg text-[10px] font-extrabold text-emerald-200 hover:text-white">${ui.showPassword ? 'إخفاء' : 'إظهار'}</button>
+        </div>`
+    }
+
+    function formFields({ employeeIdRequired, withPassword = false, lockedId = '' }) {
       return `
         <div class="space-y-2.5">
           <div>
             <label for="sbcName" class="${LABEL_CLS}">الاسم الثنائي</label>
-            <input id="sbcName" type="text" autocomplete="name" maxlength="40" ${nameReadOnly ? '' : ''}
+            <input id="sbcName" type="text" autocomplete="name" maxlength="40"
               value="${esc(ui.form.name)}" placeholder="مثال: منى عادل" class="${INPUT_CLS}" />
           </div>
           <div>
             <label for="sbcEmployeeId" class="${LABEL_CLS}">الرقم الوظيفي في الشركة ${employeeIdRequired ? '' : '<span class="text-emerald-300/70 font-bold">(اختياري)</span>'}</label>
-            <input id="sbcEmployeeId" type="text" dir="ltr" autocomplete="off" maxlength="16"
-              value="${esc(ui.form.employeeId)}" placeholder="12345" class="${INPUT_CLS} text-left font-num tracking-wider" />
+            <input id="sbcEmployeeId" type="text" dir="ltr" autocomplete="username" maxlength="16" ${lockedId ? 'readonly' : ''}
+              value="${esc(lockedId || ui.form.employeeId)}" placeholder="12345" class="${INPUT_CLS} text-left font-num tracking-wider ${lockedId ? 'opacity-70' : ''}" />
           </div>
+          ${
+            withPassword
+              ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label for="sbcPassword" class="${LABEL_CLS}">كلمة السر (6 على الأقل)</label>
+                    ${passwordInput('sbcPassword', ui.form.password, '••••••', 'new-password')}
+                  </div>
+                  <div>
+                    <label for="sbcPassword2" class="${LABEL_CLS}">تأكيد كلمة السر</label>
+                    ${passwordInput('sbcPassword2', ui.form.password2, '••••••', 'new-password')}
+                  </div>
+                </div>`
+              : ''
+          }
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label for="sbcJob" class="${LABEL_CLS}">المسمى الوظيفي</label>
@@ -165,45 +209,85 @@ export function runSplash(root) {
             <span>جاري تجهيز الفرع…</span>
           </div>`
       } else if (ui.view === 'welcome') {
-        const googleOk = isOnlineConfigured && googleSignInSupported()
+        const online = isOnlineConfigured && !!ui.fb
+        const googleOk = online && googleSignInSupported()
+        const choice = (id, iconName, title, sub, disabled = false) => `
+          <button id="${id}" type="button" ${disabled || ui.busy ? 'disabled' : ''}
+            class="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-[#0b1915] border-2 border-[#CBA258]/80 hover:bg-emerald-950 hover:border-[#CBA258] text-right transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <span class="w-11 h-11 rounded-full bg-[#00704A] border border-[#CBA258]/70 flex items-center justify-center text-white shrink-0">${icon(iconName, 'w-5 h-5')}</span>
+            <span class="min-w-0"><span class="block text-sm font-black text-white">${title}</span><span class="block text-[11px] text-emerald-300/80">${sub}</span></span>
+          </button>`
         body = `
           ${brandBlock()}
-          <button id="sbcGoogleBtn" type="button" ${googleOk && !ui.busy ? '' : 'disabled'}
-            class="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-2xl bg-white text-slate-800 text-sm font-black shadow-xl hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">
-            ${GOOGLE_G}<span>الدخول بحساب Google</span>
-          </button>
+          <div class="space-y-2.5">
+            ${choice('sbcChoiceLogin', 'idCard', 'تسجيل الدخول', 'بالرقم الوظيفي وكلمة السر', !online)}
+            <button id="sbcGoogleBtn" type="button" ${googleOk && !ui.busy ? '' : 'disabled'}
+              class="w-full flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-white text-slate-800 text-sm font-black shadow-xl hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">
+              ${GOOGLE_G}<span>الدخول بحساب Google</span>
+            </button>
+            ${choice('sbcChoiceRegister', 'userPlus', 'أول مرة؟ سجّل حساب جديد', 'الاسم الثنائي والرقم الوظيفي والمسمى وكلمة سر')}
+          </div>
           ${
             !isOnlineConfigured
-              ? '<p class="mt-1.5 text-[10px] text-amber-200/80 text-center">الدخول بـ Google والقوائم المباشرة تعمل بعد ربط اللعبة بخادم Firebase — يمكنك اللعب الآن وسيُحفظ تقدمك على جهازك.</p>'
-              : !googleSignInSupported()
-                ? '<p class="mt-1.5 text-[10px] text-amber-200/80 text-center">الدخول بـ Google غير مفعّل في نسخة الأندرويد هذه — سجّل برقمك الوظيفي أو استخدم نسخة الويب.</p>'
+              ? '<p class="mt-2 text-[10px] text-amber-200/80 text-center">وضع بدون إنترنت: سجّل لأول مرة وسيُحفظ تقدمك على هذا الجهاز.</p>'
+              : online && !googleSignInSupported()
+                ? '<p class="mt-2 text-[10px] text-amber-200/80 text-center">الدخول بـ Google غير مفعّل في نسخة الأندرويد هذه — استخدم الرقم الوظيفي وكلمة السر.</p>'
                 : ''
           }
-          <div class="flex items-center gap-3 my-4 text-[11px] font-extrabold text-emerald-300/80">
-            <span class="flex-1 h-px bg-emerald-800"></span><span>أو سجّل ببياناتك الوظيفية</span><span class="flex-1 h-px bg-emerald-800"></span>
-          </div>
+          ${messageLine(ui.message, ui.messageKind)}`
+      } else if (ui.view === 'login') {
+        body = `
+          ${brandBlock()}
+          <button type="button" data-back class="mb-3 text-[11px] font-extrabold text-emerald-300 hover:text-white">→ رجوع</button>
+          <h3 class="text-sm font-black text-white mb-3">🔑 تسجيل الدخول بالرقم الوظيفي</h3>
+          <form id="sbcLoginForm" novalidate class="space-y-2.5">
+            <div>
+              <label for="sbcLoginId" class="${LABEL_CLS}">الرقم الوظيفي</label>
+              <input id="sbcLoginId" type="text" dir="ltr" autocomplete="username" maxlength="16" value="${esc(ui.login.id)}" placeholder="12345" class="${INPUT_CLS} text-left font-num tracking-wider" />
+            </div>
+            <div>
+              <label for="sbcLoginPassword" class="${LABEL_CLS}">كلمة السر</label>
+              ${passwordInput('sbcLoginPassword', ui.login.password, '••••••', 'current-password')}
+            </div>
+            ${messageLine(ui.message, ui.messageKind)}
+            <button id="sbcLoginBtn" type="submit" ${ui.busy ? 'disabled' : ''}
+              class="w-full px-6 py-2.5 rounded-2xl text-sm font-black sb-btn-gold shadow-xl flex items-center justify-center gap-2 disabled:opacity-60">
+              ${ui.busy ? '<span class="sbc-spinner sbc-spinner-dark" aria-hidden="true"></span>' : icon('coffee', 'w-4 h-4')}
+              <span>${ui.busy ? 'جاري الدخول…' : 'دخول'}</span>
+            </button>
+          </form>
+          <p class="mt-3 text-[11px] text-emerald-200/80 text-center leading-relaxed">نسيت كلمة السر؟ كلّم مسؤول اللعبة <strong class="text-[#CBA258]">يوسف أيمن</strong> وهيرجّعلك حسابك بتقدمه.</p>
+          <button type="button" data-goto="register" class="mt-2 w-full text-[11px] font-extrabold text-[#CBA258] hover:text-white">مالكش حساب؟ سجّل لأول مرة</button>`
+      } else if (ui.view === 'register') {
+        const online = isOnlineConfigured && !!ui.fb
+        body = `
+          ${brandBlock()}
+          <button type="button" data-back class="mb-3 text-[11px] font-extrabold text-emerald-300 hover:text-white">→ رجوع</button>
+          <h3 class="text-sm font-black text-white mb-3">✨ تسجيل حساب جديد</h3>
           <form id="sbcRegisterForm" novalidate>
-            ${formFields({ employeeIdRequired: true })}
+            ${formFields({ employeeIdRequired: true, withPassword: online })}
+            ${online ? '<p class="mt-2 text-[10px] text-emerald-300/80">هتدخل بعد كده من أي موبايل بالرقم الوظيفي وكلمة السر دي، وتقدمك هيرجعلك زي ما هو.</p>' : ''}
             ${messageLine(ui.message, ui.messageKind)}
             <button id="sbcRegisterBtn" type="submit" ${ui.busy ? 'disabled' : ''}
               class="mt-3 w-full px-6 py-2.5 rounded-2xl text-sm font-black sb-btn-gold shadow-xl flex items-center justify-center gap-2 disabled:opacity-60">
               ${ui.busy ? '<span class="sbc-spinner sbc-spinner-dark" aria-hidden="true"></span>' : icon('rocket', 'w-4 h-4')}
               <span>${ui.busy ? 'جاري التسجيل…' : 'سجّل وابدأ اللعب'}</span>
             </button>
-          </form>`
+          </form>
+          ${online ? '<button type="button" data-goto="login" class="mt-3 w-full text-[11px] font-extrabold text-[#CBA258] hover:text-white">عندك حساب؟ ادخل بالرقم الوظيفي وكلمة السر</button>' : ''}`
       } else if (ui.view === 'profile') {
         body = `
           ${brandBlock()}
           <div class="mb-3 p-3 rounded-xl bg-[#0b1915] border border-emerald-700/70 flex items-center gap-2.5">
             ${ui.user?.photoURL ? `<img src="${esc(ui.user.photoURL)}" alt="" class="w-9 h-9 rounded-full border border-[#CBA258]" referrerpolicy="no-referrer" />` : icon('user', 'w-8 h-8 text-[#CBA258]')}
             <div class="text-xs">
-              <div class="font-extrabold text-white">${esc(ui.user?.displayName || 'حساب Google')}</div>
-              <div class="text-[11px] text-emerald-300/80" dir="ltr">${esc(ui.user?.email || '')}</div>
+              <div class="font-extrabold text-white">${esc(ui.user?.displayName || (employeeIdFromEmail(ui.user?.email) ? 'حسابك بالرقم الوظيفي' : 'حساب Google'))}</div>
+              <div class="text-[11px] text-emerald-300/80" dir="ltr">${esc(employeeIdFromEmail(ui.user?.email) || ui.user?.email || '')}</div>
             </div>
           </div>
           <p class="text-[11px] text-emerald-100/90 mb-2.5">خطوة أخيرة: أكمل بياناتك الوظيفية لتظهر لزملائك في قائمة اللاعبين.</p>
           <form id="sbcProfileForm" novalidate>
-            ${formFields({ employeeIdRequired: false })}
+            ${formFields({ employeeIdRequired: !!employeeIdFromEmail(ui.user?.email), lockedId: employeeIdFromEmail(ui.user?.email) })}
             ${messageLine(ui.message, ui.messageKind)}
             <button id="sbcProfileBtn" type="submit" ${ui.busy ? 'disabled' : ''}
               class="mt-3 w-full px-6 py-2.5 rounded-2xl text-sm font-black sb-btn-gold shadow-xl flex items-center justify-center gap-2 disabled:opacity-60">
@@ -240,6 +324,19 @@ export function runSplash(root) {
             <span>${ui.busy ? 'جاري تحميل تقدمك…' : 'متابعة اللعب'}</span>
           </button>
           ${
+            anonymous && priv.employeeId
+              ? `<div class="mt-3 p-3 rounded-2xl bg-sky-950/60 border-2 border-sky-500/60">
+                  <div class="text-xs font-black text-sky-100">🔐 اعمل كلمة سر لحسابك</div>
+                  <p class="text-[10px] text-sky-100/80 mt-0.5 mb-2">عشان تقدر تدخل برقمك الوظيفي <span class="font-num">${esc(priv.employeeId)}</span> من أي موبايل من غير ما تقدمك يضيع.</p>
+                  <form id="sbcSetPasswordForm" novalidate class="space-y-2">
+                    ${passwordInput('sbcPassword', ui.form.password, 'كلمة السر (6 على الأقل)', 'new-password')}
+                    ${passwordInput('sbcPassword2', ui.form.password2, 'تأكيد كلمة السر', 'new-password')}
+                    <button id="sbcSetPasswordBtn" type="submit" ${ui.busy ? 'disabled' : ''} class="w-full px-4 py-2 rounded-xl text-xs font-black bg-sky-600 hover:bg-sky-500 text-white disabled:opacity-60">حفظ كلمة السر</button>
+                  </form>
+                </div>`
+              : ''
+          }
+          ${
             anonymous && googleSignInSupported()
               ? `<button id="sbcLinkGoogleBtn" type="button" class="mt-2 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/95 text-slate-800 text-xs font-extrabold hover:bg-white">${GOOGLE_G}<span>اربط حساب Google لتفتح تقدمك من أي جهاز</span></button>`
               : ''
@@ -275,6 +372,26 @@ export function runSplash(root) {
       root.querySelector('#sbcContinueBtn')?.addEventListener('click', onContinue)
       root.querySelector('#sbcSignOutBtn')?.addEventListener('click', onSignOut)
       root.querySelector('#sbcLinkGoogleBtn')?.addEventListener('click', onGoogle)
+      root.querySelector('#sbcLoginForm')?.addEventListener('submit', onLogin)
+      root.querySelector('#sbcSetPasswordForm')?.addEventListener('submit', onSetPassword)
+      root.querySelector('#sbcChoiceLogin')?.addEventListener('click', () => go('login'))
+      root.querySelector('#sbcChoiceRegister')?.addEventListener('click', () => go('register'))
+      root.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => go(b.getAttribute('data-goto'))))
+      root.querySelectorAll('[data-back]').forEach((b) => b.addEventListener('click', () => go('welcome')))
+      root.querySelectorAll('[data-toggle-password]').forEach((b) =>
+        b.addEventListener('click', () => {
+          readForm()
+          ui.showPassword = !ui.showPassword
+          render()
+        }),
+      )
+    }
+
+    function go(view) {
+      readForm()
+      ui.view = view
+      ui.message = ''
+      render()
     }
 
     async function afterSignIn(user) {
@@ -287,6 +404,8 @@ export function runSplash(root) {
       } else {
         ui.view = 'profile'
         ui.form.name = ui.form.name || normalizeName(user.displayName || '')
+        const id = employeeIdFromEmail(user.email)
+        if (id) ui.form.employeeId = id
       }
     }
 
@@ -330,7 +449,8 @@ export function runSplash(root) {
       event.preventDefault()
       if (ui.busy) return
       readForm()
-      const err = validate({ employeeIdRequired: true })
+      const online = isOnlineConfigured && !!ui.fb
+      const err = validate({ employeeIdRequired: true, passwordRequired: online })
       if (err) {
         setMessage(err)
         return
@@ -357,8 +477,18 @@ export function runSplash(root) {
       ui.busy = true
       setMessage('')
       render()
+      let user = null
       try {
-        const user = await signInAsEmployee(ui.fb)
+        user = await signUpWithEmployeeId(ui.fb, employeeId, ui.form.password)
+      } catch (error) {
+        console.warn('[splash] sign-up', error)
+        ui.busy = false
+        ui.message = authErrorMessage(error)
+        ui.messageKind = 'error'
+        render()
+        return
+      }
+      try {
         ui.user = user
         ui.cloud?.dispose()
         ui.cloud = new Cloud(ui.fb, user.uid)
@@ -372,24 +502,94 @@ export function runSplash(root) {
         })
         ui.profile = await ui.cloud.loadProfile()
         ui.busy = false
+        ui.form.password = ui.form.password2 = ''
         await onContinue()
       } catch (error) {
         console.warn('[splash] register', error)
-        ui.busy = false
         const denied = /permission/i.test(error?.message || '') || error?.code === 'PERMISSION_DENIED'
+        // The ID belongs to an older account: do not keep a login that cannot hold it.
+        if (denied) {
+          try {
+            await user.delete()
+          } catch {
+            await signOutEverywhere(ui.fb).catch(() => {})
+          }
+          ui.user = null
+          ui.cloud?.dispose()
+          ui.cloud = null
+        }
+        ui.busy = false
         ui.message = denied
-          ? 'الرقم الوظيفي ده مسجّل قبل كده، أو التسجيل مغلق حالياً. لو ده رقمك ادخل بحساب Google اللي ربطته، أو كلّم مسؤول اللعبة.'
+          ? 'الرقم الوظيفي ده مسجّل بحساب تاني (أو التسجيل مقفول حالياً). لو ده رقمك ونسيت كلمة السر، كلّم مسؤول اللعبة.'
           : authErrorMessage(error)
         ui.messageKind = 'error'
         render()
       }
     }
 
+    async function onLogin(event) {
+      event.preventDefault()
+      if (ui.busy) return
+      readForm()
+      const idErr = validateEmployeeId(ui.login.id, { required: true })
+      if (idErr) return setMessage(idErr)
+      if (!ui.login.password) return setMessage('اكتب كلمة السر.')
+      ui.busy = true
+      setMessage('')
+      render()
+      try {
+        const user = await signInWithEmployeeId(ui.fb, normalizeEmployeeId(ui.login.id), ui.login.password)
+        await afterSignIn(user)
+        ui.login.password = ''
+        ui.busy = false
+        if (ui.view === 'returning') {
+          await onContinue()
+          return
+        }
+      } catch (error) {
+        console.warn('[splash] login', error)
+        ui.message = authErrorMessage(error)
+        ui.messageKind = 'error'
+      }
+      ui.busy = false
+      render()
+    }
+
+    async function onSetPassword(event) {
+      event.preventDefault()
+      if (ui.busy) return
+      readForm()
+      const err = validatePassword(ui.form.password, ui.form.password2)
+      if (err) return setMessage(err)
+      const employeeId = ui.profile?.priv?.employeeId
+      if (!employeeId) return
+      ui.busy = true
+      setMessage('')
+      render()
+      try {
+        ui.user = await setEmployeePassword(ui.fb, employeeId, ui.form.password)
+        ui.form.password = ui.form.password2 = ''
+        ui.message = `تم ✅ — تقدر تدخل دلوقتي من أي موبايل برقمك ${employeeId} وكلمة السر دي.`
+        ui.messageKind = 'ok'
+      } catch (error) {
+        console.warn('[splash] set password', error)
+        ui.message =
+          error?.code === 'auth/email-already-in-use' || error?.code === 'auth/credential-already-in-use'
+            ? 'الرقم الوظيفي ده عليه كلمة سر لحساب تاني. كلّم مسؤول اللعبة.'
+            : authErrorMessage(error)
+        ui.messageKind = 'error'
+      }
+      ui.busy = false
+      render()
+    }
+
     async function onCompleteProfile(event) {
       event.preventDefault()
       if (ui.busy) return
       readForm()
-      const err = validate({ employeeIdRequired: false })
+      const lockedId = employeeIdFromEmail(ui.user?.email)
+      if (lockedId) ui.form.employeeId = lockedId
+      const err = validate({ employeeIdRequired: !!lockedId })
       if (err) {
         setMessage(err)
         return
@@ -405,8 +605,8 @@ export function runSplash(root) {
           employeeId: normalizeEmployeeId(ui.form.employeeId),
           jobTitle: jobTitleLabel(ui.form.job),
           store: ui.form.store,
-          provider: 'google',
-          email: ui.user?.email || '',
+          provider: lockedId ? 'employee' : 'google',
+          email: lockedId ? '' : ui.user?.email || '',
           photo: ui.user?.photoURL || '',
         })
         ui.profile = await ui.cloud.loadProfile()
@@ -450,8 +650,9 @@ export function runSplash(root) {
           employeeId: priv?.employeeId || '',
           jobTitle: pub.title || priv?.jobTitle || '',
           store: pub.store || priv?.store || '',
-          email: ui.user.email || '',
+          email: employeeIdFromEmail(ui.user.email) ? '' : ui.user.email || '',
           photo: ui.user.photoURL || '',
+          anonymous: !!ui.user.isAnonymous,
         }
         finish({ identity, cloud: ui.cloud, fb: ui.fb, isAdmin, moderation, config })
       } catch (error) {

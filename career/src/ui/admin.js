@@ -145,7 +145,9 @@ export function installAdmin({ session, getConfig }) {
             <button type="button" data-a="ban" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold ${mod.banned ? 'bg-emerald-800 hover:bg-emerald-700' : 'bg-rose-800 hover:bg-rose-700'} text-white">${mod.banned ? '✅ رفع الحظر' : '⛔ حظر'}</button>
             <button type="button" data-a="reset" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-amber-700 hover:bg-amber-600 text-white">🔄 تصفير التقدم</button>
             <button type="button" data-a="remove" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-rose-950 hover:bg-rose-900 text-rose-200 border border-rose-700/60">🗑️ حذف اللاعب</button>
+            ${priv?.employeeId ? `<button type="button" data-a="release" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-sky-800 hover:bg-sky-700 text-white">🔓 تحرير الرقم الوظيفي (نسي كلمة السر)</button>` : ''}
           </div>
+          <p class="mt-2 text-[10px] text-emerald-300/70 leading-relaxed">لو اللاعب نسي كلمة السر: (1) احذف حسابه من Firebase ← Authentication ← Users (ابحث بـ <span class="font-num" dir="ltr">${esc((priv?.employeeId || '').toLowerCase())}@partners</span>) (2) اضغط «تحرير الرقم الوظيفي» (3) خلّيه يسجّل لأول مرة بنفس الرقم (4) انقل تقدمه القديم للحساب الجديد من الخانة اللي تحت.</p>
           <form data-form="transfer" class="mt-3 p-2.5 rounded-xl bg-[#0b1915] border border-emerald-800/70 space-y-2">
             <div class="text-[11px] font-extrabold text-[#CBA258]">📦 نقل تقدم هذا اللاعب إلى حساب جديد (موبايل جديد أو إعادة تثبيت)</div>
             ${input('to', '', 'placeholder="UID الحساب الجديد (يظهر للاعب في ملفه)" required')}
@@ -242,6 +244,9 @@ export function installAdmin({ session, getConfig }) {
       } else if (a === 'reset' && uid) {
         if (!window.confirm('تصفير تقدم هذا اللاعب بالكامل (الحفظ والمهام والترتيب)؟')) return
         await act(() => cloud.adminResetPlayer(uid), 'تم تصفير التقدم.')
+      } else if (a === 'release' && uid && ui.priv?.employeeId) {
+        if (!window.confirm(`تحرير الرقم الوظيفي ${ui.priv.employeeId} عشان صاحبه يسجّل من جديد؟ التقدم القديم يفضل محفوظ لحد ما تنقله.`)) return
+        await act(() => cloud.adminReleaseEmployeeId(uid, ui.priv.employeeId), 'تم تحرير الرقم الوظيفي.')
       } else if (a === 'remove' && uid) {
         if (!window.confirm('حذف اللاعب وكل بياناته نهائياً؟')) return
         await act(() => cloud.adminRemovePlayer(uid), 'تم حذف اللاعب.')

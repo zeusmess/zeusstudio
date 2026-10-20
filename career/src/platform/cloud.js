@@ -306,6 +306,15 @@ export class Cloud {
     await this.adminLog('remove', uid)
   }
 
+  /**
+   * Frees an employee ID held by an account whose password was forgotten, so the
+   * partner can register again; their old progress can then be moved over.
+   */
+  async adminReleaseEmployeeId(uid, employeeId) {
+    await this.D.update(this.ref('/'), { [`career/employeeIds/${employeeId}`]: null })
+    await this.adminLog('release-id', uid, employeeId)
+  }
+
   /** Moves a player's progress to another account (a new phone, a reinstall). */
   async adminTransferProgress(fromUid, toUid) {
     const [save, fromPub, fromPriv, toPub] = await Promise.all([

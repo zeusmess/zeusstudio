@@ -112,3 +112,21 @@ describe('labour belongs to whoever can manage it', () => {
     expect(asPartner.laborOnTarget).toBe(false) // it never counts toward the labour KPI
   })
 })
+
+describe('employee ID accounts', () => {
+  it('ask for a password of at least 6 characters, typed twice the same', async () => {
+    const { validatePassword } = await import('../../src/platform/identity.js')
+    expect(validatePassword('')).toBeTruthy()
+    expect(validatePassword('12345')).toBeTruthy()
+    expect(validatePassword('123456', '123457')).toBeTruthy()
+    expect(validatePassword('123456', '123456')).toBeNull()
+  })
+
+  it('map an employee ID to a sign-in address and back', async () => {
+    const { employeeEmail, employeeIdFromEmail } = await import('../../src/platform/identity.js')
+    const email = employeeEmail('eg-900 379', 'starbucks-career.firebaseapp.com')
+    expect(email).toBe('eg900379@partners.starbucks-career.firebaseapp.com')
+    expect(employeeIdFromEmail(email)).toBe('EG900379')
+    expect(employeeIdFromEmail('someone@gmail.com')).toBe('')
+  })
+})

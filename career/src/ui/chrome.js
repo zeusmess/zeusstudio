@@ -6,7 +6,8 @@ import { on } from '../core/events.js'
 import { currentRank, RANKS } from '../systems/career/career.js'
 import { missionsDone } from '../systems/missions/engine.js'
 import { APP_VERSION, compareVersions, DEFAULT_LINKS } from '../platform/config.js'
-import { signInWithGoogle, signOutEverywhere, authErrorMessage, googleSignInSupported } from '../platform/auth.js'
+import { authErrorMessage, googleSignInSupported, setEmployeePassword, signInWithGoogle, signOutEverywhere } from '../platform/auth.js'
+import { validatePassword } from '../platform/identity.js'
 import { saveLocalIdentity } from '../platform/identity.js'
 import { $, esc, fmtNum } from './dom.js'
 import { icon } from './icons.js'
@@ -70,7 +71,7 @@ export function installChrome({ game, session, sync, systems, getConfig, openAdm
     const state = game.state
     const rank = currentRank(state)
     const m = openModal({ title: '🪪 ملفك في Starbucks Career' })
-    const providerLabel = identity.provider === 'google' ? 'حساب Google' : identity.provider === 'employee' ? 'تسجيل بالرقم الوظيفي' : 'وضع محلي (بدون إنترنت)'
+    const providerLabel = identity.provider === 'google' ? 'حساب Google' : identity.provider === 'employee' ? (identity.anonymous ? 'الرقم الوظيفي (بدون كلمة سر)' : 'الرقم الوظيفي وكلمة السر') : 'وضع محلي (بدون إنترنت)'
     const line = (k, v) => `<div class="flex items-center justify-between gap-2 py-1.5 border-b border-emerald-900/60 text-xs"><span class="text-emerald-200">${k}</span><span class="font-extrabold text-white text-left">${v}</span></div>`
     const lastSave = state.sbc?.flags?.lastCloudSave
     const draw = (msg = '') => {
@@ -85,10 +86,11 @@ export function installChrome({ game, session, sync, systems, getConfig, openAdm
         ${line('المهام المنجزة', `<span class="font-num">${fmtNum(missionsDone(state))} / 1000</span>`)}
         ${line('الحفظ', cloud ? `☁️ محفوظ على حسابك${lastSave ? ` • ${new Date(lastSave).toLocaleTimeString('ar-EG')}` : ''}` : '📱 محفوظ على هذا الجهاز فقط')}
         ${msg ? `<div class="mt-3 p-2 rounded-xl bg-black/85 border border-[#CBA258] text-xs font-bold text-amber-200">${msg}</div>` : ''}
-        ${identity.provider === 'employee' && googleSignInSupported() ? '<div class="mt-3 p-2.5 rounded-xl bg-sky-950/70 border border-sky-500/50 text-[11px] text-sky-100">🔐 احمِ تقدمك: اربط حساب Google بحسابك الحالي عشان تقدر تكمّل من أي موبايل بدون ما يضيع أي إنجاز.</div>' : ''}
+        ${identity.anonymous ? '<div class="mt-3 p-2.5 rounded-xl bg-sky-950/70 border border-sky-500/50 text-[11px] text-sky-100">🔐 احمِ تقدمك: اعمل كلمة سر لحسابك (أو اربطه بـ Google) عشان تقدر تكمّل من أي موبايل بدون ما يضيع أي إنجاز.</div>' : ''}
         <div class="mt-4 flex flex-wrap justify-end gap-2">
           ${session.isAdmin ? `<button type="button" data-p="admin" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-amber-500 hover:bg-amber-400 text-slate-950">👑 لوحة تحكم المسؤول</button>` : ''}
-          ${identity.provider === 'employee' && googleSignInSupported() ? '<button type="button" data-p="link" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-slate-900">🔗 اربط Google</button>' : ''}
+          ${identity.anonymous && identity.employeeId ? '<button type="button" data-p="password" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-sky-600 hover:bg-sky-500 text-white">🔐 اعمل كلمة سر</button>' : ''}
+          ${identity.provider === 'employee' && identity.anonymous && googleSignInSupported() ? '<button type="button" data-p="link" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-slate-900">🔗 اربط Google</button>' : ''}
           <button type="button" data-p="about" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-slate-800 hover:bg-slate-700 text-white">ℹ️ عن اللعبة</button>
           <button type="button" data-p="logout" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-rose-950 hover:bg-rose-900 text-rose-200 border border-rose-700/60">⎋ تسجيل الخروج</button>
         </div>`)
@@ -103,6 +105,29 @@ export function installChrome({ game, session, sync, systems, getConfig, openAdm
       } else if (what === 'admin') {
         m.close()
         openAdmin()
+      } else if (what === 'password') {
+        m.setBody(`
+          <p class="text-xs text-emerald-100 mb-2">اعمل كلمة سر لحسابك عشان تدخل برقمك الوظيفي <strong class="font-num">${esc(identity.employeeId)}</strong> من أي موبايل.</p>
+          <form data-pw-form class="space-y-2">
+            <input name="pw" type="password" dir="ltr" maxlength="64" autocomplete="new-password" placeholder="كلمة السر (6 على الأقل)" class="w-full bg-[#0b1915] border border-[#CBA258] rounded-xl px-3 py-2 text-xs font-bold text-white" />
+            <input name="pw2" type="password" dir="ltr" maxlength="64" autocomplete="new-password" placeholder="تأكيد كلمة السر" class="w-full bg-[#0b1915] border border-[#CBA258] rounded-xl px-3 py-2 text-xs font-bold text-white" />
+            <div data-pw-msg class="text-[11px] font-bold text-amber-200"></div>
+            <div class="flex justify-end gap-2"><button type="submit" class="px-4 py-2 rounded-xl text-xs font-extrabold sb-btn-gold">حفظ كلمة السر</button></div>
+          </form>`)
+        m.body.querySelector('[data-pw-form]').addEventListener('submit', async (ev) => {
+          ev.preventDefault()
+          const f = new FormData(ev.target)
+          const msg = m.body.querySelector('[data-pw-msg]')
+          const err = validatePassword(f.get('pw'), f.get('pw2'))
+          if (err) return (msg.textContent = `⚠️ ${err}`)
+          try {
+            await setEmployeePassword(fb, identity.employeeId, String(f.get('pw')))
+            identity.anonymous = false
+            draw('✅ تم — تقدر تدخل من أي موبايل برقمك الوظيفي وكلمة السر دي.')
+          } catch (error) {
+            msg.textContent = `⚠️ ${error?.code === 'auth/email-already-in-use' || error?.code === 'auth/credential-already-in-use' ? 'الرقم ده عليه كلمة سر لحساب تاني — كلّم مسؤول اللعبة.' : authErrorMessage(error)}`
+          }
+        })
       } else if (what === 'link') {
         try {
           b.disabled = true
@@ -110,6 +135,7 @@ export function installChrome({ game, session, sync, systems, getConfig, openAdm
           if (!user) return
           await cloud.D.update(cloud.ref(`career/players/${identity.uid}`), { provider: 'google', ...(user.photoURL ? { photo: user.photoURL } : {}), lastSeen: cloud.D.serverTimestamp() })
           identity.provider = 'google'
+          identity.anonymous = false
           identity.email = user.email || ''
           identity.photo = user.photoURL || ''
           renderChip()
@@ -119,8 +145,8 @@ export function installChrome({ game, session, sync, systems, getConfig, openAdm
         }
       } else if (what === 'logout') {
         const warn =
-          identity.provider === 'employee'
-            ? 'تنبيه: حسابك مسجل بالرقم الوظيفي فقط وغير مربوط بـ Google. لو خرجت مش هتقدر ترجع لنفس الحساب من جهاز تاني إلا عن طريق مسؤول اللعبة. هل تريد الخروج؟'
+          identity.provider === 'employee' && identity.anonymous
+            ? 'تنبيه: حسابك لسه مالوش كلمة سر. لو خرجت مش هتقدر ترجع لنفس الحساب إلا عن طريق مسؤول اللعبة — اعمل كلمة سر الأول من «🔐 اعمل كلمة سر». هل تريد الخروج برضه؟'
             : 'هل تريد تسجيل الخروج؟ تقدمك محفوظ وهيرجع لما تدخل تاني.'
         if (!window.confirm(warn)) return
         sync.flush()
