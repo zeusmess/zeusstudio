@@ -47,7 +47,8 @@ export function installCommunityTab({ game, session, systems }) {
       data.players = rows
       data.loaded = true
       changed()
-    })
+      publishStats()
+    }, 2000)
     cloud.watchTopAllTime((rows) => {
       data.top = rows
       changed()
@@ -66,6 +67,27 @@ export function installCommunityTab({ game, session, systems }) {
       changed()
     })
   }
+
+  // The counters on the opening screen (registered, in today, active now) are
+  // public: every signed-in game refreshes them from the live players list.
+  let lastStats = ''
+  let lastStatsAt = 0
+  function publishStats(force = false) {
+    if (!cloud || !data.loaded) return
+    const t = now()
+    if (!force && t - lastStatsAt < 30_000) return
+    const today = cairoDateKey(new Date(t))
+    const players = data.players.filter(visibleRow)
+    const registered = players.length
+    const enteredToday = players.filter((p) => p.lastSeen && cairoDateKey(new Date(p.lastSeen)) === today).length
+    const activeNow = Math.min(enteredToday, players.filter((p) => t - (p.lastSeen || 0) < ACTIVE_MS).length)
+    const key = `${registered}/${enteredToday}/${activeNow}/${today}`
+    if (key === lastStats && t - lastStatsAt < 4 * 60_000) return
+    lastStats = key
+    lastStatsAt = t
+    cloud.D.set(cloud.ref('career/stats'), { registered, enteredToday, activeNow, date: today, updatedAt: cloud.D.serverTimestamp() }).catch((e) => console.warn('[community] stats', e))
+  }
+  if (cloud) setInterval(() => publishStats(true), 60_000)
 
   function me(row) {
     return row.uid === identity.uid

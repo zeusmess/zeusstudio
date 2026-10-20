@@ -16,6 +16,7 @@ import {
 } from '../platform/auth.js'
 import { Cloud } from '../platform/cloud.js'
 import { APP_VERSION, compareVersions, isOnlineConfigured } from '../platform/config.js'
+import { cairoDateKey } from '../platform/time.js'
 import { loadFirebase } from '../platform/firebase.js'
 import {
   displayName,
@@ -110,6 +111,28 @@ export function runSplash(root) {
       profile: null,
       cloud: null,
       offlineIdentity: null,
+    }
+
+    // Live counters from career/stats (readable before signing in).
+    function statsBlock() {
+      const st = ui.stats
+      if (!isOnlineConfigured || !st) return '<div id="sbcStats"></div>'
+      const fresh = Date.now() - (Number(st.updatedAt) || 0) < 5 * 60_000
+      const today = st.date === cairoDateKey()
+      const tile = (label, value, dot = '') => `
+        <div class="bg-[#0b1915] border border-emerald-800/70 rounded-xl px-2 py-2 text-center">
+          <div class="text-base font-black font-num text-[#CBA258] flex items-center justify-center gap-1.5">${dot}${Number(value || 0).toLocaleString('en-US')}</div>
+          <div class="text-[10px] font-bold text-emerald-200/80">${label}</div>
+        </div>`
+      return `<div id="sbcStats" class="grid grid-cols-3 gap-2 mb-4">
+          ${tile('سجّلوا في اللعبة', st.registered)}
+          ${tile('دخلوا النهارده', today ? st.enteredToday : 0)}
+          ${tile('نشطين الآن', fresh && today ? st.activeNow : 0, '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>')}
+        </div>`
+    }
+    function updateStats() {
+      const el = root.querySelector('#sbcStats')
+      if (el) el.outerHTML = statsBlock()
     }
 
     const setMessage = (text, kind = 'error') => {
@@ -219,6 +242,7 @@ export function runSplash(root) {
           </button>`
         body = `
           ${brandBlock()}
+          ${statsBlock()}
           <div class="space-y-2.5">
             ${choice('sbcChoiceLogin', 'idCard', 'تسجيل الدخول', 'بالرقم الوظيفي وكلمة السر', !online)}
             <button id="sbcGoogleBtn" type="button" ${googleOk && !ui.busy ? '' : 'disabled'}
@@ -305,6 +329,7 @@ export function runSplash(root) {
         const anonymous = !isOffline && ui.user?.isAnonymous
         body = `
           ${brandBlock()}
+          ${statsBlock()}
           <div class="p-3.5 rounded-2xl bg-[#0b1915] border-2 border-[#CBA258]/70 text-center space-y-1">
             <div class="text-sm font-black text-white">أهلاً بعودتك يا ${esc(name)} 👋</div>
             <div class="text-[11px] text-emerald-300">${esc(title)}${pub.store ? ` • ${esc(pub.store)}` : ''}</div>
@@ -695,6 +720,11 @@ export function runSplash(root) {
     }
 
     function finish(result) {
+      try {
+        ui.statsOff?.()
+      } catch {
+        // already detached
+      }
       root.querySelector('.sbc-splash-bg')?.classList.add('sbc-fade-out')
       setTimeout(() => {
         root.innerHTML = ''
@@ -722,6 +752,18 @@ export function runSplash(root) {
         ui.message = 'تعذّر تحميل خدمات الدخول. تأكد من الإنترنت ثم أعد فتح اللعبة.'
         render()
         return
+      }
+      try {
+        ui.statsOff = ui.fb.D.onValue(
+          ui.fb.D.ref(ui.fb.db, 'career/stats'),
+          (snap) => {
+            ui.stats = snap.val()
+            updateStats()
+          },
+          () => {},
+        )
+      } catch (error) {
+        console.warn('[splash] stats', error)
       }
       await completeRedirect(ui.fb)
       const user = await new Promise((done) => {

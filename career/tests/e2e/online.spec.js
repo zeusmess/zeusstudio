@@ -51,6 +51,12 @@ test('the owner announces, a colleague sees it live with the players list, and I
   await expect(colleague.locator('#sbcCommunityRoot')).toContainText('يوسف أيمن')
   await expect(colleague.locator('#sbcCommunityRoot')).toContainText('هالة منير')
 
+  // The opening screen shows the live counters to someone who has not signed in.
+  const visitor = await (await browser.newContext()).newPage()
+  await visitor.goto('/')
+  await expect(visitor.locator('#sbcStats')).toContainText('سجّلوا في اللعبة')
+  await expect.poll(async () => Number((await visitor.locator('#sbcStats .font-num').first().innerText()).replace(/,/g, '')), { timeout: 60_000 }).toBeGreaterThanOrEqual(2)
+
   // A banned player is stopped at once.
   const colleagueUid = await colleague.evaluate(() => window.__sbc.session.identity.uid)
   await owner.locator('[data-tab-admin="players"]').click()
