@@ -22,7 +22,8 @@ export const STAFF_SHIFTS = {
 }
 
 /** $ per game hour. */
-export const WAGES = { store_manager: 8, assistant_manager: 6.5, shift_supervisor: 5.5, barista: 4.5, barista_delivery: 4.5 }
+// Tuned so a well-staffed shift lands in the 18–25% labour target and an overstaffed one does not.
+export const WAGES = { store_manager: 12, assistant_manager: 10, shift_supervisor: 8.5, barista: 7, barista_delivery: 7 }
 export const LABOR_TARGET = { min: 18, max: 25 }
 export const MAX_CONSECUTIVE_MIN = 300 // Labour Law No. 14/2025, art. 118
 export const MIN_BREAK_MIN = 20
@@ -87,7 +88,9 @@ function rand(a, b) {
 }
 
 /** A shift's score out of 100 and its letter grade. Exported for the tests. */
-export function gradeShift(c, { cleanliness = 100, machineHealth = 100, openComplaints = 0 } = {}) {
+// laborManaged: false when the player is a partner who cannot send anyone home — the
+// supervisor on duty owns the labour line, so it is scored as on target.
+export function gradeShift(c, { cleanliness = 100, machineHealth = 100, openComplaints = 0, laborManaged = true } = {}) {
   const orders = c.orders || 0
   const angry = c.angry || 0
   const fastPct = orders ? (c.fast || 0) / orders : 0
@@ -95,7 +98,8 @@ export function gradeShift(c, { cleanliness = 100, machineHealth = 100, openComp
   const laborOnTarget = c.sales > 0 && laborPct >= LABOR_TARGET.min && laborPct <= LABOR_TARGET.max
   const service = orders === 0 ? 20 : 35 * Math.max(0, 1 - (angry / orders) * 4) * (0.6 + 0.4 * fastPct)
   let labor
-  if (orders === 0) labor = 10
+  if (!laborManaged) labor = 17
+  else if (orders === 0) labor = 10
   else if (laborOnTarget) labor = 20
   else if (laborPct < LABOR_TARGET.min) labor = angry <= 1 ? 17 : 9
   else if (laborPct <= 30) labor = 12
@@ -106,7 +110,7 @@ export function gradeShift(c, { cleanliness = 100, machineHealth = 100, openComp
   const problems = Math.max(0, 10 - 3 * openComplaints - 4 * (c.incidentTimeouts || 0))
   const score = Math.round(Math.max(0, Math.min(100, service + labor + breaks + drb + quality + problems)))
   const grade = score >= 93 ? 'A+' : score >= 85 ? 'A' : score >= 78 ? 'B+' : score >= 70 ? 'B' : score >= 60 ? 'C' : score >= 50 ? 'D' : 'F'
-  return { score, grade, laborPct: Math.round(laborPct * 10) / 10, laborOnTarget, fastPct }
+  return { score, grade, laborPct: Math.round(laborPct * 10) / 10, laborOnTarget: laborManaged && laborOnTarget, laborManaged, fastPct }
 }
 
 export function installShift({ getState, game, hooks, getRankRole }) {
@@ -160,7 +164,7 @@ export function installShift({ getState, game, hooks, getRankRole }) {
     const c = sh.cur
     if (!c) return null
     const openComplaints = (state.complaints || []).filter((x) => !x.resolved && x.inStore).length
-    const g = gradeShift(c, { cleanliness: state.cleanliness, machineHealth: state.machineHealth, openComplaints })
+    const g = gradeShift(c, { cleanliness: state.cleanliness, machineHealth: state.machineHealth, openComplaints, laborManaged: canLead() })
     const dtAvg = c.dtTimes.length ? Math.round(c.dtTimes.reduce((a, b) => a + b, 0) / c.dtTimes.length) : 0
     const phase = PHASES.find((p) => p.key === c.phase) || PHASES[0]
     const report = {
@@ -175,6 +179,7 @@ export function installShift({ getState, game, hooks, getRankRole }) {
       laborCost: Math.round(c.laborCost * 100) / 100,
       laborPct: g.laborPct,
       laborOnTarget: g.laborOnTarget,
+      laborManaged: g.laborManaged,
       dtAvg,
       fastPct: Math.round(g.fastPct * 100),
       breakViolations: c.breakViolations,

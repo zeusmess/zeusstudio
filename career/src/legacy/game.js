@@ -1690,7 +1690,16 @@ function spawnCustomerOrder(forcedChannel) {
   const availableMenu = state.menu.filter(m => m.unlocked && m.active);
   if (availableMenu.length === 0) return;
 
-  const item = availableMenu[Math.floor(Math.random() * availableMenu.length)];
+  // Most orders are drinks: a food item alone is less likely than a beverage
+  // (18 food items would otherwise make up 38% of all orders).
+  const itemWeight = (m) => (m.category === 'فرن التسخين' ? 0.45 : 1);
+  const totalWeight = availableMenu.reduce((acc, m) => acc + itemWeight(m), 0);
+  let pick = Math.random() * totalWeight;
+  let item = availableMenu[availableMenu.length - 1];
+  for (const m of availableMenu) {
+    pick -= itemWeight(m);
+    if (pick <= 0) { item = m; break; }
+  }
   const branch = getActiveBranch();
 
   const channels = ['cafe', 'drive_thru', 'mobile', 'delivery'];

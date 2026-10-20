@@ -139,8 +139,18 @@ async function main() {
   }
 
   const child = spawn(command[0], command.slice(1), { cwd: ROOT, env, stdio: 'inherit', shell: process.platform === 'win32' })
-  child.on('exit', (code, signal) => {
-    stop()
+  child.on('exit', async (code, signal) => {
+    // Wait until the emulators have really stopped, so a next run (rules tests
+    // then browser tests) starts its own instead of finding them half closed.
+    if (emulators && emulators.exitCode === null) {
+      const exited = new Promise((done) => emulators.once('exit', done))
+      stop()
+      await Promise.race([exited, new Promise((done) => setTimeout(done, 20_000))])
+      const deadline = Date.now() + 10_000
+      while (Date.now() < deadline && ((await portOpen(AUTH_PORT)) || (await portOpen(DATABASE_PORT)))) {
+        await new Promise((r) => setTimeout(r, 300))
+      }
+    }
     process.exit(code ?? (signal ? 1 : 0))
   })
 }

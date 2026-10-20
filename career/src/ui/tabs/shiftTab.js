@@ -75,7 +75,7 @@ export function installShiftTab({ game, systems }) {
     const c = sh.cur
     const phase = phaseFor(state.dayMinutes)
     if (!c) return '<div class="p-3 rounded-xl bg-slate-900/70 text-xs text-emerald-300 text-center">لا توجد وردية جارية.</div>'
-    const g = gradeShift(c, { cleanliness: state.cleanliness, machineHealth: state.machineHealth, openComplaints: (state.complaints || []).filter((x) => !x.resolved && x.inStore).length })
+    const g = gradeShift(c, { cleanliness: state.cleanliness, machineHealth: state.machineHealth, openComplaints: (state.complaints || []).filter((x) => !x.resolved && x.inStore).length, laborManaged: api.canLead() })
     const laborCls = c.sales <= 0 ? 'text-slate-300' : g.laborOnTarget ? 'text-emerald-300' : g.laborPct > LABOR_TARGET.max ? 'text-rose-300' : 'text-amber-300'
     const dtAvg = c.dtTimes.length ? Math.round(c.dtTimes.reduce((a, b) => a + b, 0) / c.dtTimes.length) : 0
     const onFloor = game.getActiveBranchStaff().length
@@ -373,7 +373,7 @@ export function installShiftTab({ game, systems }) {
       ${line('متوسط زمن الدرايف ثرو', r.dtAvg ? `${r.dtAvg} ثانية` : '—')}
       ${line('المبيعات', fmtMoney(r.sales), 'text-[#CBA258]')}
       ${line('تكلفة العمالة', fmtMoney(r.laborCost))}
-      ${line(`نسبة العمالة (المستهدف ${LABOR_TARGET.min}–${LABOR_TARGET.max}%)`, `${r.laborPct}%`, r.laborOnTarget ? 'text-emerald-300' : 'text-amber-300')}
+      ${line(`نسبة العمالة (المستهدف ${LABOR_TARGET.min}–${LABOR_TARGET.max}%)`, `${r.laborPct}%${r.laborManaged === false ? ' — يديرها المشرف' : ''}`, r.laborOnTarget ? 'text-emerald-300' : 'text-amber-300')}
       ${line('مخالفات قانون الراحات', r.breakViolations, r.breakViolations ? 'text-rose-300' : 'text-emerald-300')}
       ${line('سجلات DRB', `${r.drbDone}/${r.drbDue}`)}
       ${line('مشكلات معقدة (أفضل قرار/الكل)', `${r.incidentsBest}/${r.incidents}`)}

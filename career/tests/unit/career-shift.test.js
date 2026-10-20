@@ -102,3 +102,13 @@ describe('shift management', () => {
     expect(bad.laborPct).toBe(60)
   })
 })
+
+describe('labour belongs to whoever can manage it', () => {
+  it('does not mark a partner down for staffing they cannot change', () => {
+    const shift = { orders: 40, angry: 0, fast: 30, sales: 400, laborCost: 170, breakViolations: 0, drbDue: 2, drbDone: 2, incidentTimeouts: 0 }
+    const asLeader = gradeShift(shift, { cleanliness: 95, machineHealth: 95 })
+    const asPartner = gradeShift(shift, { cleanliness: 95, machineHealth: 95, laborManaged: false })
+    expect(asPartner.score).toBeGreaterThan(asLeader.score)
+    expect(asPartner.laborOnTarget).toBe(false) // it never counts toward the labour KPI
+  })
+})
