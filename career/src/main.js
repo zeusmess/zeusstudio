@@ -16,6 +16,7 @@ import { openModal } from './ui/modal.js'
 import { runSplash } from './ui/splash.js'
 import { installCareerTab } from './ui/tabs/careerTab.js'
 import { installCommunityTab } from './ui/tabs/communityTab.js'
+import { installGuideTab } from './ui/tabs/guideTab.js'
 import { installMissionsTab } from './ui/tabs/missionsTab.js'
 import { installShiftTab } from './ui/tabs/shiftTab.js'
 
@@ -40,6 +41,7 @@ async function main() {
     shift: installShiftTab({ game, systems }),
     career: installCareerTab({ game, systems, identity: session.identity }),
     community: installCommunityTab({ game, session, systems }),
+    guide: installGuideTab(),
   }
   installIncidentsUI({ game, systems })
   const chrome = installChrome({ game, session, sync, systems, getConfig, openAdmin: admin.open })

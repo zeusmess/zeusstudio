@@ -1,5 +1,6 @@
 import { emit } from '../core/events.js';
 import { INITIAL_BRANCHES } from '../data/branches.js';
+import { drawAmbient, drawCar, drawMachineFx, drawPerson, nightLevel } from '../render/scene.js';
 
 // Extension points for the new systems (shift, incidents, career, cloud sync).
 // Each hook is optional: with none set the game behaves as it always did.
@@ -3365,7 +3366,7 @@ function draw3DTableAndChairs(c, t) {
     c.fillText('🥤🧻', tx, ty - 6);
     drawRoundedRect(c, tx - 36, ty - 34, 72, 16, 5, '#991b1b', '#fca5a5', 1.2);
     c.fillStyle = '#ffffff';
-    c.font = 'bold 9.5px Cairo, sans-serif';
+    c.font = 'bold 9.5px "Cairo Variable", Cairo, sans-serif';
     c.fillText('🧹 اضغط للتنظيف!', tx, ty - 22);
   } else {
     // Subtle decorative cup/menu on clean table
@@ -3379,118 +3380,20 @@ function draw3DTableAndChairs(c, t) {
     c.fill();
 
     c.fillStyle = '#ffffff';
-    c.font = 'bold 10.5px Cairo, sans-serif';
+    c.font = 'bold 10.5px "Cairo Variable", Cairo, sans-serif';
     c.textAlign = 'center';
     c.fillText(`طاولة ${t.id}`, tx, ty + 2);
   }
 }
 
 // Draw a 3D Humanoid Character (Barista, Customer, or Manager)
-function draw3DPerson(c, x, y, shirtColor, apronColor, icon, labelText, badgeColor, energyRatio, isSelected) {
-  // Floor shadow
-  c.fillStyle = 'rgba(0,0,0,0.42)';
-  c.beginPath();
-  c.ellipse(x, y + 18, 15, 6, 0, 0, Math.PI * 2);
-  c.fill();
-
-  // Legs
-  c.strokeStyle = '#1e293b';
-  c.lineWidth = 4;
-  c.beginPath();
-  c.moveTo(x - 5, y + 6);
-  c.lineTo(x - 5, y + 17);
-  c.moveTo(x + 5, y + 6);
-  c.lineTo(x + 5, y + 17);
-  c.stroke();
-
-  // 3D Torso / Shirt
-  drawRoundedRect(c, x - 12, y - 9, 24, 18, 6, shirtColor, isSelected ? '#CBA258' : '#ffffff', isSelected ? 2.5 : 1.2);
-
-  // Starbucks Green Apron if Barista
-  if (apronColor) {
-    drawRoundedRect(c, x - 9, y - 6, 18, 15, 3, apronColor, 'rgba(255,255,255,0.35)', 1);
-  }
-
-  // 3D Head
-  c.beginPath();
-  c.arc(x, y - 15, 10, 0, Math.PI * 2);
-  c.fillStyle = '#fde68a';
-  c.fill();
-  c.lineWidth = 1.5;
-  c.strokeStyle = '#78350f';
-  c.stroke();
-
-  // Emoji expression/hat on head
-  c.font = '14px sans-serif';
-  c.textAlign = 'center';
-  c.fillText(icon, x, y - 10);
-
-  // Floating Label Pill
-  if (labelText) {
-    const pillW = Math.max(76, labelText.length * 5.4);
-    drawRoundedRect(c, x - pillW / 2, y - 44, pillW, 17, 6, 'rgba(11, 25, 21, 0.92)', badgeColor || '#CBA258', 1.3);
-    c.fillStyle = '#ffffff';
-    c.font = 'bold 9.5px Cairo, sans-serif';
-    c.fillText(labelText, x, y - 32);
-  }
-
-  // Energy or Patience Bar below character
-  if (typeof energyRatio === 'number') {
-    c.fillStyle = '#0f172a';
-    c.fillRect(x - 24, y + 20, 48, 4.5);
-    c.fillStyle = energyRatio > 0.55 ? '#34d399' : energyRatio > 0.3 ? '#fbbf24' : '#f87171';
-    c.fillRect(x - 24, y + 20, 48 * Math.max(0, Math.min(1, energyRatio)), 4.5);
-  }
+function draw3DPerson(c, x, y, shirtColor, apronColor, icon, labelText, badgeColor, energyRatio, isSelected, entity, kind) {
+  drawPerson(c, { x, y, shirt: shirtColor, apron: apronColor, icon, label: labelText, badgeColor, ratio: energyRatio, selected: isSelected, entity, kind });
 }
 
 // Draw a 3D Car in the Drive-Thru Lane
 function draw3DCar(c, ord, isSelected) {
-  const x = ord.x;
-  const y = ord.y;
-
-  // Car road shadow
-  c.fillStyle = 'rgba(0,0,0,0.48)';
-  drawRoundedRect(c, x - 48, y - 8, 96, 34, 10, 'rgba(0,0,0,0.48)', null, 0);
-
-  // Wheels
-  c.fillStyle = '#090d16';
-  c.beginPath();
-  c.arc(x - 28, y + 18, 7, 0, Math.PI * 2);
-  c.arc(x + 28, y + 18, 7, 0, Math.PI * 2);
-  c.fill();
-
-  // 3D Lower Car Chassis
-  drawRoundedRect(c, x - 48, y - 6, 96, 22, 7, ord.carColor, isSelected ? '#ffffff' : '#0f172a', isSelected ? 2.5 : 1.5);
-
-  // 3D Upper Cabin / Roof & Windows
-  drawRoundedRect(c, x - 28, y - 18, 54, 16, 6, ord.carColor, 'rgba(255,255,255,0.4)', 1);
-  drawRoundedRect(c, x - 24, y - 15, 22, 11, 3, '#1e293b', null, 0);
-  drawRoundedRect(c, x + 2, y - 15, 20, 11, 3, '#1e293b', null, 0);
-
-  // Headlight beams (pointing left toward pickup window)
-  c.fillStyle = 'rgba(254, 240, 138, 0.25)';
-  c.beginPath();
-  c.moveTo(x - 48, y);
-  c.lineTo(x - 72, y - 8);
-  c.lineTo(x - 72, y + 12);
-  c.closePath();
-  c.fill();
-
-  const ratio = Math.max(0, ord.timeLeft / ord.maxTime);
-  const mood = ratio > 0.6 ? '😊' : ratio > 0.32 ? '😐' : '😡';
-
-  // Order Tag on Car Roof
-  drawRoundedRect(c, x - 42, y - 34, 84, 16, 5, 'rgba(15, 23, 42, 0.92)', isSelected ? '#CBA258' : '#38bdf8', 1.2);
-  c.fillStyle = '#ffffff';
-  c.font = 'bold 9.5px Cairo, sans-serif';
-  c.textAlign = 'center';
-  c.fillText(`${mood} ${ord.itemIcon} ${ord.size} (${Math.ceil(ord.timeLeft)}ث)`, x, y - 22);
-
-  // Patience bar
-  c.fillStyle = '#0f172a';
-  c.fillRect(x - 36, y + 22, 72, 4.5);
-  c.fillStyle = ratio > 0.55 ? '#34d399' : ratio > 0.3 ? '#fbbf24' : '#f87171';
-  c.fillRect(x - 36, y + 22, 72 * ratio, 4.5);
+  drawCar(c, ord, isSelected, nightLevel(state.dayMinutes) > 0.3);
 }
 
 function renderCanvasScene() {
@@ -3550,30 +3453,30 @@ function renderCanvasScene() {
   // 3D DTO Speaker Canopy (Right side of Drive-Thru)
   draw3DBox(ctx, 740, 8, 175, 28, 10, '#0f172a', '#1e293b', '#090d16', '#38bdf8');
   ctx.fillStyle = '#e0f2fe';
-  ctx.font = 'bold 11px Cairo, sans-serif';
+  ctx.font = 'bold 11px "Cairo Variable", Cairo, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('🎙️ كشك الطلب الصوتي (DTO)', 827, 26);
 
   // 3D DTR Pickup Window Canopy (Left/Center of Drive-Thru)
   draw3DBox(ctx, 195, 62, 200, 30, 10, '#064e3b', '#042f2e', '#022c22', '#CBA258');
   ctx.fillStyle = '#fef3c7';
-  ctx.font = 'bold 11px Cairo, sans-serif';
+  ctx.font = 'bold 11px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText(`🪟 شباك تسليم السيارات DTR (${state.stats.avgDtSeconds}ث)`, 295, 81);
 
   // 3. LEFT 3D BOH PARTNER BREAK ROOM (X: 16 -> 150, Y: 120 -> 335)
   draw3DBox(ctx, 16, 120, 134, 195, 22, '#1e1b4b', '#110e2e', '#09071a', '#a855f7');
   ctx.fillStyle = '#f3e8ff';
-  ctx.font = 'bold 11.5px Cairo, sans-serif';
+  ctx.font = 'bold 11.5px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('🛋️ استراحة الباريستات', 83, 142);
   ctx.fillStyle = '#c084fc';
-  ctx.font = '10px Cairo, sans-serif';
+  ctx.font = '10px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('(Break Room +100% طاقة)', 83, 157);
 
   // 3D L-Shaped Sofa & Coffee Table inside Break Room
   draw3DBox(ctx, 28, 172, 110, 26, 10, '#581c87', '#3b0764', '#2e1065', '#c084fc');
   draw3DBox(ctx, 52, 222, 62, 30, 8, '#78350f', '#451a03', '#290f02', '#fbbf24');
   ctx.fillStyle = '#fde68a';
-  ctx.font = '11px Cairo, sans-serif';
+  ctx.font = '11px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('☕🍩', 83, 241);
 
   // 4. PARALLEL 3D STARBUCKS BAR ARCHITECTURE (X: 166 -> 942)
@@ -3598,10 +3501,10 @@ function renderCanvasScene() {
     ctx.fillText(st.icon, st.x + 21, st.y + 22);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 11px Cairo, sans-serif';
+    ctx.font = 'bold 11px "Cairo Variable", Cairo, sans-serif';
     ctx.fillText(st.title, st.x + st.w / 2 + 10, st.y + 21);
     ctx.fillStyle = '#d1fae5';
-    ctx.font = '9.5px Cairo, sans-serif';
+    ctx.font = '9.5px "Cairo Variable", Cairo, sans-serif';
     ctx.fillText(st.sub, st.x + st.w / 2 + 6, st.y + 38);
   });
 
@@ -3625,28 +3528,28 @@ function renderCanvasScene() {
   // 3D Glass Pastry Display Case & POS on Left of Front Counter
   draw3DBox(ctx, 178, 254, 155, 42, 12, '#0f2922', '#064e3b', '#022c22', '#34d399');
   ctx.fillStyle = '#a7f3d0';
-  ctx.font = 'bold 11px Cairo, sans-serif';
+  ctx.font = 'bold 11px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('🖥️ كاشير الصالة (POS)', 255, 273);
   ctx.fillStyle = '#fde68a';
-  ctx.font = '9.5px Cairo, sans-serif';
+  ctx.font = '9.5px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('🥐 ثلاجة عرض المخبوزات 3D', 255, 289);
 
   // 3D Beverage Handoff Plane in Center of Front Counter
   draw3DBox(ctx, 355, 254, 310, 42, 12, '#132a23', '#0b1915', '#050b09', '#CBA258');
   ctx.fillStyle = '#fde68a';
-  ctx.font = 'bold 11.5px Cairo, sans-serif';
+  ctx.font = 'bold 11.5px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText(`🛎️ بار تسليم المشروبات — ${state.activeSubStoreName || 'Nile City Cairo'}`, 510, 274);
   ctx.fillStyle = '#d1fae5';
-  ctx.font = '9.5px Cairo, sans-serif';
+  ctx.font = '9.5px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('☕ أكواب Tall / Grande / Venti جاهزة للتسليم', 510, 290);
 
   // 3D Mobile Order & Delivery Pickup Station (Right of Front Counter)
   draw3DBox(ctx, 685, 254, 240, 42, 12, '#2e1065', '#1e1b4b', '#0f0728', '#c084fc');
   ctx.fillStyle = '#f3e8ff';
-  ctx.font = 'bold 11px Cairo, sans-serif';
+  ctx.font = 'bold 11px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('📱 منصة طلبات الموبايل والتوصيل (MOP)', 805, 274);
   ctx.fillStyle = '#ddd6fe';
-  ctx.font = '9.5px Cairo, sans-serif';
+  ctx.font = '9.5px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('🛵 تسليم سريع للمندوبين وتطبيق ستاربكس', 805, 290);
 
   // 4D. OVERHEAD TEAL DIGITAL MENU BOARDS (Matching the Real Starbucks Egypt Menu Boards!)
@@ -3659,18 +3562,18 @@ function renderCanvasScene() {
   menuBoards.forEach(mb => {
     draw3DBox(ctx, mb.x, 104, mb.w, 22, 4, '#2a6f64', '#16423b', '#0d2924', '#a7f3d0');
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 9.5px Cairo, sans-serif';
+    ctx.font = 'bold 9.5px "Cairo Variable", Cairo, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(mb.title, mb.x + mb.w / 2, 114);
     ctx.fillStyle = '#d1fae5';
-    ctx.font = '8.5px Cairo, sans-serif';
+    ctx.font = '8.5px "Cairo Variable", Cairo, sans-serif';
     ctx.fillText(mb.sub, mb.x + mb.w / 2, 123);
   });
 
   // 5. STORE ENTRANCE & 3D CUSTOMER APOLOGY DESK (ركن شكاوى العملاء والاعتذار بالفرع)
   draw3DBox(ctx, 18, 385, 92, 130, 16, '#064e3b', '#022c22', '#011c16', '#34d399');
   ctx.fillStyle = '#d1fae5';
-  ctx.font = 'bold 12px Cairo, sans-serif';
+  ctx.font = 'bold 12px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('🚪 مدخل الفرع', 64, 445);
   ctx.font = '18px sans-serif';
   ctx.fillText('🌿', 64, 475);
@@ -3678,13 +3581,17 @@ function renderCanvasScene() {
   // 3D Customer Care & Apology Podium (Where complaining customers stand in the branch)
   draw3DBox(ctx, 172, 344, 155, 28, 10, '#7f1d1d', '#450a0a', '#2a0505', '#fca5a5');
   ctx.fillStyle = '#fecdd3';
-  ctx.font = 'bold 10px Cairo, sans-serif';
+  ctx.font = 'bold 10px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('🗣️ ركن شكاوى العملاء والاعتذار (اضغط العميل للاعتذار)', 249, 362);
 
   // 6. 3D CAFE LOBBY TABLES & CHAIRS (6 Detailed 3D Tables with 4 Chairs Each!)
   state.tables.forEach(t => {
     draw3DTableAndChairs(ctx, t);
   });
+
+  // 6B. Machines at work and the light of the hour (drawn under the people).
+  drawMachineFx(ctx, state);
+  drawAmbient(ctx, state, LOGICAL_W, LOGICAL_H);
 
   // 7. 3D BARISTAS WORKING BEHIND THE BAR OR RESTING IN BREAK ROOM
   const activeStaff = getActiveBranchStaff();
@@ -3706,7 +3613,9 @@ function renderCanvasScene() {
       `${b.name.split(' ')[0]}: ${b.busyText}`,
       lowEnergy ? '#f87171' : '#CBA258',
       (b.energy ?? 90) / 100,
-      false
+      false,
+      b,
+      'barista'
     );
   });
 
@@ -3735,7 +3644,9 @@ function renderCanvasScene() {
       `📋 لجنة التفتيش (${ins.timeLeft}ث)`,
       '#CBA258',
       ins.timeLeft / 18,
-      true
+      true,
+      ins,
+      'inspector'
     );
   }
 
@@ -3764,7 +3675,9 @@ function renderCanvasScene() {
       `🤝 اعتذر لـ ${comp.customerName.split(' ')[0]} (${comp.severityLabel})`,
       '#f87171',
       0.25,
-      true
+      true,
+      comp,
+      'complaint'
     );
   });
 
@@ -3799,7 +3712,9 @@ function renderCanvasScene() {
       `${ord.itemIcon} ${ord.size} (${Math.ceil(ord.timeLeft)}ث)`,
       ord.id === state.selectedTicketId ? '#CBA258' : '#38bdf8',
       ratio,
-      ord.id === state.selectedTicketId
+      ord.id === state.selectedTicketId,
+      ord,
+      'customer'
     );
   });
 
@@ -3831,7 +3746,7 @@ function renderCanvasScene() {
     }
     ctx.globalAlpha = ft.alpha;
     ctx.fillStyle = ft.color;
-    ctx.font = '800 15px Cairo, sans-serif';
+    ctx.font = '800 15px "Cairo Variable", Cairo, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(ft.text, ft.x, ft.y);
     ctx.globalAlpha = 1.0;
@@ -6602,11 +6517,11 @@ function drawV8CanvasOverlays() {
   draw3DBox(ctx, 22, 10, 152, 34, 8, '#042f2e', '#00704A', '#022c22', '#CBA258');
   drawStarbucksSirenLogo(ctx, 44, 27, 13, true);
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 10.5px Cairo, sans-serif';
+  ctx.font = 'bold 10.5px "Cairo Variable", Cairo, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('STARBUCKS DRIVE-THRU', 110, 24);
   ctx.fillStyle = '#fde68a';
-  ctx.font = 'bold 9px Cairo, sans-serif';
+  ctx.font = 'bold 9px "Cairo Variable", Cairo, sans-serif';
   ctx.fillText('★ مفتوح لخدمتكم ★', 110, 36);
 
   // Logo 2: Center Medallion on the 3D Wooden Front Bar Counter
@@ -6658,7 +6573,7 @@ function drawV8CanvasOverlays() {
   drawStarbucksSirenLogo(ctx, fx + 14, fy + 12, 8, false);
   drawRoundedRect(ctx, fx + fw - 48, fy - 10, 48, 14, 4, '#083344', '#22d3ee', 1);
   ctx.fillStyle = '#a5f3fc';
-  ctx.font = 'bold 8.5px Inter, Cairo, sans-serif';
+  ctx.font = 'bold 8.5px Inter, "Cairo Variable", Cairo, sans-serif';
   ctx.fillText(`🌡️${(state.nsfAudit?.fridgeTempC || 3.8).toFixed(1)}°C`, fx + fw - 24, fy - 1);
 
   // 3. Price Sentiment Bubble above Customers when Price Wave is Active
@@ -6670,7 +6585,7 @@ function drawV8CanvasOverlays() {
         const isHappy = ord.priceSentiment === 'happy';
         drawRoundedRect(ctx, bx - 54, by, 108, 15, 5, isHappy ? 'rgba(6, 78, 59, 0.92)' : 'rgba(127, 29, 29, 0.95)', isHappy ? '#34d399' : '#f87171', 1);
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 8.5px Cairo, sans-serif';
+        ctx.font = 'bold 8.5px "Cairo Variable", Cairo, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(isHappy ? '😍 الجودة تستاهل السعر!' : '😡💸 الأسعار غليت أوي!', bx, by + 10);
       }

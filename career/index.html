@@ -18,7 +18,7 @@
   <div id="sbcSplashRoot"></div>
 
   <!-- TOP EXECUTIVE HUD BAR -->
-  <header class="relative lg:sticky lg:top-0 z-30 bg-[#132822]/95 border-b border-emerald-800/70 px-3 py-2 shadow-xl backdrop-blur-md">
+  <header class="relative z-30 bg-[#132822]/95 border-b border-emerald-800/70 px-3 py-2 shadow-xl backdrop-blur-md">
     <div class="max-w-[1940px] mx-auto flex flex-wrap items-center justify-between gap-2">
       <!-- Brand & Active Branch Switcher -->
       <div class="flex items-center gap-2.5 min-w-0 max-w-full">
@@ -420,6 +420,10 @@
             <span class="text-xl">👥</span>
             <span>الزملاء والترتيب</span>
             <span id="sbcOnlineBadge" class="hidden px-1.5 py-0.5 rounded-full bg-emerald-600 text-white font-num text-[10px]">0</span>
+          </button>
+          <button data-tab="guide" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">📘</span>
+            <span>الدليل والمعايير</span>
           </button>
         </div>
 
@@ -1259,6 +1263,11 @@
       <!-- TAB 11: PARTNERS, LIVE TOP 10 AND HALL OF FAME -->
       <div id="tab-community" class="tab-panel hidden flex-col gap-3">
         <div id="sbcCommunityRoot" class="flex flex-col gap-3"></div>
+      </div>
+
+      <!-- TAB 12: HOW TO PLAY AND THE STANDARDS BEHIND THE GAME -->
+      <div id="tab-guide" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcGuideRoot" class="flex flex-col gap-3"></div>
       </div>
 
     </section>

@@ -257,6 +257,18 @@ export function installChrome({ game, session, sync, systems, getConfig, openAdm
     }
   }
 
+  // ------------------------------------------------------ nav icons
+  // The main tabs get one family of line icons instead of mixed emoji.
+  const NAV_ICONS = { bar: 'coffee', menu: 'clipboard', upgrades: 'settings', staff: 'chef', branches: 'map', ops: 'clipboardCheck', inbox: 'mail', missions: 'trophy', shift: 'clock', career: 'medal', community: 'users', guide: 'book' }
+  document.querySelectorAll('.nav-tab').forEach((btn) => {
+    const name = NAV_ICONS[btn.getAttribute('data-tab')]
+    const slot = btn.querySelector('span.text-xl')
+    if (name && slot) {
+      slot.className = 'sbc-nav-icon shrink-0'
+      slot.innerHTML = icon(name, 'w-5 h-5')
+    }
+  })
+
   // ------------------------------------------------ reset dialog wording
   const resetText = $('resetModal')?.querySelector('p')
   if (resetText) resetText.textContent = 'سيتم مسح تقدم الفرع الحالي (الخزنة، الطاقم، الطلبات) والبدء من جديد. مسيرتك المهنية والألف مهمة والشهادات والترقيات محفوظة ولن تتأثر.'
