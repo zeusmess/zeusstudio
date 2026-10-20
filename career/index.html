@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#00704A" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Starbucks Career" />
+  <meta name="description" content="Starbucks Career — a fan-made store operations and career game, powered by Youssef Ayman." />
+  <link rel="icon" type="image/png" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Starbucks Career</title>
+</head>
+<body class="min-h-screen flex flex-col bg-[#0f211c] text-slate-100 portrait-9-16">
+  <div id="sbcSplashRoot"></div>
+
+  <!-- TOP EXECUTIVE HUD BAR -->
+  <header class="relative z-30 bg-[#132822]/95 border-b border-emerald-800/70 px-3 py-2 shadow-xl backdrop-blur-md">
+    <div class="max-w-[1940px] mx-auto flex flex-wrap items-center justify-between gap-2">
+      <!-- Brand & Active Branch Switcher -->
+      <div class="flex items-center gap-2.5 min-w-0 max-w-full">
+        <div class="w-10 h-10 rounded-full bg-[#00704A] border-2 border-[#CBA258] flex items-center justify-center shadow-md shrink-0 relative">
+          <span class="text-xl">🧜&#x200D;♀️</span>
+          <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#132822]" title="متصل بالمركز الرئيسي"></span>
+        </div>
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">Starbucks Career</h1>
+            <span id="hudBranchBadge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-[#CBA258]/20 text-[#CBA258] border border-[#CBA258]/50">Nile City Cairo</span>
+            <select id="hudStoreSelector" class="max-w-full bg-[#0b1915] border border-[#CBA258] text-amber-200 text-xs font-extrabold rounded-xl px-2.5 py-1 shadow cursor-pointer" title="اختر أي فرع من الـ 75 فرعاً للتحكم المباشر فيه">
+              <option value="downtown__0">📍 تحكم بفرع: طلعت حرب (وسط البلد)</option>
+            </select>
+            <button id="btnQuickBranchRadar" class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow transition flex items-center gap-1" title="تنقل فوري بين الـ 75 فرعاً ورادار فروع الذروة">
+              <span>🧭</span>
+              <span>رادار الـ 75 فرعاً</span>
+            </button>
+            <button id="btnOpenCareerModal" class="px-2.5 py-1 rounded-xl text-xs font-extrabold bg-emerald-800 hover:bg-emerald-700 text-amber-200 border border-[#CBA258]/60 shadow transition flex items-center gap-1" title="الشاشة الافتتاحية: تغيير الفرع أو المسمى الوظيفي والصلاحيات">
+              <span>🪪</span>
+              <span id="hudRoleBadgeText">مدير فرع (Store Manager)</span>
+            </button>
+            <span id="hudBranchHoursBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-950 text-sky-200 border border-sky-600/50">🕖 07:00 ص - 12:00 ص</span>
+            <span id="hudBranchPeakBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-200 border border-rose-500/60">🔥 ذروة عالية جداً</span>
+            <span id="hudNsfGradeBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-400 shadow" title="آخر تقييم لزيارة الـ NSF السنوية المفاجئة">🛡️ تقييم NSF: GREEN 🟢</span>
+            <span id="hudLpSecurityBadge" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-200 border border-indigo-400/60" title="حالة أمن الفرع ومنع الخسائر LP">🕵️&#x200D;♂️ أمن LP: مستقر</span>
+            <button id="btnToggleLandscapeMode" class="px-2.5 py-1 rounded-xl text-xs font-extrabold sb-btn-gold shadow flex items-center gap-1" title="تفعيل أبعاد البورتريه 9:16 المتناسقة للموبايل">
+              <span>📐</span>
+              <span id="landscapeModeLabel">أبعاد بورتريه 9:16: مفعلة 📱</span>
+            </button>
+          </div>
+          <div class="flex items-center gap-2 text-[11px] text-emerald-200/80">
+            <span id="hudDaypartLabel">☀️ ذروة الصباح (Peak)</span>
+            <span>•</span>
+            <span id="hudClock" class="font-num font-bold text-amber-300">اليوم 1 - 08:00 ص</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core KPIs + DM & Operations Satisfaction -->
+      <div class="flex flex-wrap items-center gap-1.5">
+        <!-- Money -->
+        <div class="bg-[#0b1915] border border-emerald-700/60 rounded-xl px-2.5 py-1 flex items-center gap-1.5">
+          <span class="text-sm">💵</span>
+          <div>
+            <div class="text-[9px] text-emerald-300/80 leading-none">الرصيد النقدي</div>
+            <div class="text-xs sm:text-sm font-extrabold font-num text-emerald-400" id="hudMoney">$550.00</div>
+          </div>
+        </div>
+
+        <!-- Passive Empire Income -->
+        <div class="bg-[#0b1915] border border-amber-600/40 rounded-xl px-2.5 py-1 flex items-center gap-1.5" title="دخل الفروع الأخرى في الثانية حسب تغطية الموظفين">
+          <span class="text-sm">🏢</span>
+          <div>
+            <div class="text-[9px] text-amber-200/80 leading-none">دخل الفروع</div>
+            <div class="text-xs sm:text-sm font-extrabold font-num text-[#CBA258]" id="hudPassiveIncome">+$0.0/ث</div>
+          </div>
+        </div>
+
+        <!-- 79 Branches Counter -->
+        <div class="bg-[#0b1915] border border-amber-500/50 rounded-xl px-2.5 py-1 flex items-center gap-1.5" title="عدد الفروع المفتوحة من إجمالي 79 فرعاً في مصر">
+          <span class="text-sm">🌍</span>
+          <div>
+            <div class="text-[9px] text-amber-200 leading-none">شبكة الفروع</div>
+            <div class="text-xs sm:text-sm font-extrabold font-num text-amber-300" id="hudBranchesTotal">1 / 79</div>
+          </div>
+        </div>
+
+        <!-- District Manager Satisfaction -->
+        <div class="bg-[#0b1915] border border-indigo-500/50 rounded-xl px-2.5 py-1 flex items-center gap-1.5" title="متوسط رضا مديري المناطق الخمسة">
+          <span class="text-sm">👔</span>
+          <div>
+            <div class="text-[9px] text-indigo-300 leading-none" id="hudDmNameLabel">مدير المنطقة</div>
+            <div class="text-xs sm:text-sm font-extrabold font-num text-indigo-300" id="hudDmScore">92%</div>
+          </div>
+        </div>
+
+        <!-- Operations / Amr Atef Score -->
+        <div class="bg-[#0b1915] border border-teal-500/50 rounded-xl px-2.5 py-1 flex items-center gap-1.5" title="تقييم مدير الأوبريشن (أ. عمرو عاطف)">
+          <span class="text-sm">📋</span>
+          <div>
+            <div class="text-[9px] text-teal-300 leading-none">الأوبريشن (عمرو عاطف)</div>
+            <div class="text-xs sm:text-sm font-extrabold font-num text-teal-300" id="hudOpsScore">94%</div>
+          </div>
+        </div>
+
+        <!-- Training / Mahmoud Ahmed Score -->
+        <div class="bg-[#0b1915] border border-purple-500/50 rounded-xl px-2.5 py-1 flex items-center gap-1.5" title="تقييم مدير التدريب (أ. محمود أحمد)">
+          <span class="text-sm">🎓</span>
+          <div>
+            <div class="text-[9px] text-purple-300 leading-none">التدريب (محمود أحمد)</div>
+            <div class="text-xs sm:text-sm font-extrabold font-num text-purple-300" id="hudTrainScore">95%</div>
+          </div>
+        </div>
+
+        <!-- Customer Reputation -->
+        <div class="bg-[#0b1915] border border-emerald-700/60 rounded-xl px-2 py-1 flex items-center gap-1">
+          <span class="text-sm">⭐</span>
+          <div>
+            <div class="text-[9px] text-emerald-300/80 leading-none">الزبائن</div>
+            <div class="text-xs font-extrabold font-num text-yellow-400" id="hudReputation">4.8 ★</div>
+          </div>
+        </div>
+
+        <!-- Cleanliness -->
+        <div class="bg-[#0b1915] border border-emerald-700/60 rounded-xl px-2 py-1 flex items-center gap-1">
+          <span class="text-sm">🫧</span>
+          <div>
+            <div class="text-[9px] text-emerald-300/80 leading-none">النظافة</div>
+            <div class="text-xs font-extrabold font-num text-cyan-300" id="hudCleanliness">100%</div>
+          </div>
+        </div>
+
+        <!-- Drive-Thru Window Timer -->
+        <div class="bg-[#0b1915] border border-emerald-700/60 rounded-xl px-2 py-1 flex items-center gap-1">
+          <span class="text-sm">🚗</span>
+          <div>
+            <div class="text-[9px] text-emerald-300/80 leading-none">شباك DTR</div>
+            <div class="text-xs font-extrabold font-num text-sky-300" id="hudDtTimer">38 ثانية</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Speed, APK Modal & Utility Controls -->
+      <div class="flex flex-wrap items-center gap-1">
+        <button id="btnPause" class="px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 transition" title="إيقاف مؤقت / استئناف">⏸️ إيقاف</button>
+        <button id="btnSpeed1" class="px-2 py-1.5 rounded-lg text-xs font-bold bg-[#00704A] text-white border border-emerald-400 transition">1x</button>
+        <button id="btnSpeed2" class="px-2 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 transition">2x ⏩</button>
+        <button id="btnRushWave" class="px-2.5 py-1.5 rounded-lg text-xs font-bold sb-btn-gold shadow" title="استدعاء موجة زبائن فورية">⚡ موجة ذروة</button>
+        <button id="btnApkModal" class="px-2.5 py-1.5 rounded-lg text-xs font-extrabold bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-400 shadow transition" title="تثبيت وتحميل نسخة الأندرويد APK">📱 نسخة APK</button>
+        <button id="btnMute" class="p-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 transition" title="كتم / تشغيل الصوت">🔊</button>
+        <button id="btnHelpModal" class="p-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 transition" title="دليل اللعب">❓</button>
+        <button id="btnResetModal" class="p-1.5 rounded-lg text-xs font-bold bg-rose-950/80 hover:bg-rose-900 text-rose-200 border border-rose-700/50 transition" title="إعادة ضبط اللعبة">🔄</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ADMIN ANNOUNCEMENT (set by the game's owner from the admin panel) -->
+  <div id="sbcAnnouncement" class="hidden max-w-[1940px] w-full mx-auto px-2.5 sm:px-3.5 pt-2.5"></div>
+
+  <!-- MAIN WORKSPACE GRID -->
+  <main class="flex-1 max-w-[1940px] w-full mx-auto p-2.5 sm:p-3.5 grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+
+    <!-- LEFT/CENTER COLUMN: LIVE STORE CANVAS + INSPECTION BANNER + CS BAR (7 COLS) -->
+    <section id="leftStoreCol" class="lg:col-span-7 flex flex-col gap-3.5 transition-all duration-300">
+      <!-- Live Interactive Canvas Container -->
+      <div class="sb-card rounded-2xl p-2.5 shadow-2xl relative overflow-hidden">
+        <!-- Top Info Bar inside Canvas Frame -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5 px-1.5">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-block w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+            <h2 class="text-sm sm:text-base font-extrabold text-emerald-100" id="canvasStoreTitle">منظور الفرع ثلاثي الأبعاد (3D): الصالة + البار + استراحة الموظفين + الدرايف ثرو</h2>
+            <button id="btnToggleWide3D" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-[#CBA258] text-slate-950 hover:brightness-110 shadow transition flex items-center gap-1" title="تكبير أو تصغير مساحة الفرع ثلاثي الأبعاد">
+              <span>🖥️</span>
+              <span id="wide3DLabel">تكبير الفرع 3D بعرض الشاشة</span>
+            </button>
+            <button id="btnToggleCamAngle" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-emerald-800 hover:bg-emerald-700 text-white border border-emerald-500 transition" title="تغيير زاوية الكاميرا ثلاثية الأبعاد">
+              🎥 زاوية 3D: بانوراما
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+            <span class="px-2 py-0.5 rounded bg-emerald-950/90 border border-emerald-700/60 text-emerald-200">👨&#x200D;🍳 بالفرع: <strong id="statStaffCount" class="font-num">2</strong></span>
+            <span class="px-2 py-0.5 rounded bg-purple-950/90 border border-purple-700/60 text-purple-200">🛋️ بالاستراحة: <strong id="statBreakCount" class="font-num">0</strong></span>
+            <span class="px-2 py-0.5 rounded bg-sky-950/90 border border-sky-700/60 text-sky-200">🧾 بالانتظار: <strong id="statQueueCount" class="font-num">0</strong></span>
+            <span class="px-2 py-0.5 rounded bg-amber-950/90 border border-amber-700/60 text-amber-200">✅ تم تسليمها: <strong id="statServedCount" class="font-num">0</strong></span>
+            <span class="px-2 py-0.5 rounded bg-rose-950/90 border border-rose-700/60 text-rose-200">😡 غاضبون: <strong id="statAngryCount" class="font-num">0</strong></span>
+          </div>
+        </div>
+
+        <!-- OPEN-WORLD MODERN CONTROLS & PEAK RUSH RADAR STRIP -->
+        <div class="mb-2.5 p-2.5 rounded-xl bg-gradient-to-r from-[#132c24] via-[#0f231d] to-[#1a2536] border border-[#CBA258]/45 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] font-extrabold text-[#CBA258]">✨ تحكم العالم المفتوح بالفرع:</span>
+            <select id="selectStoreAmbience" class="bg-[#0b1915] border border-emerald-600/60 text-emerald-200 text-[11px] font-extrabold rounded-lg px-2 py-1 cursor-pointer">
+              <option value="morning_jazz">☀️ إضاءة صباحية + جاز كافيه (+صبر الزبائن)</option>
+              <option value="cozy_sunset">🌆 أجواء غروب دافئة + لو-فاي (+بقشيش)</option>
+              <option value="night_neon">🌙 سهرة نيون 24 ساعة درايف ثرو (+سرعة البار)</option>
+              <option value="vip_roastery">👑 أجواء ريزيرف الذهبية الفاخرة (+رضا VIP)</option>
+            </select>
+            <button id="btnHostCoffeeTasting" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-amber-700 hover:bg-amber-600 text-white border border-amber-400/60 transition">
+              ☕ جلسة تذوق قهوة ($30)
+            </button>
+            <button id="btnLaunchViralDrink" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-fuchsia-800 hover:bg-fuchsia-700 text-white border border-fuchsia-400/60 transition">
+              📱 إطلاق ترند سوشيال ميديا ($45)
+            </button>
+            <button id="btnCallDeliveryOrder" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-orange-700 hover:bg-orange-600 text-white border border-orange-400/60 transition">
+              🛵 استدعاء طيار دليفري فوري
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+            <span class="px-2 py-0.5 rounded bg-emerald-950 text-amber-300 border border-[#CBA258]/40 font-bold">
+              👥 شبكة الموظفين: <strong id="hudTotalNetworkStaff" class="font-num">500</strong> موظف (منهم <strong id="hudTotalNetworkBaristas" class="font-num">150</strong> باريستا معتمد)
+            </span>
+            <span id="hudBranchManagerTypeBadge" class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-200 border border-indigo-600/40 font-bold">
+              👑 يدير الفرع: مدير محل (SM)
+            </span>
+          </div>
+        </div>
+
+        <!-- Live Audit / DM Visit Banner (Hidden when no visit active) -->
+        <div id="inspectionBanner" class="hidden mb-2 px-3 py-2 rounded-xl bg-gradient-to-r from-indigo-950 via-teal-900 to-amber-950 border border-[#CBA258] flex items-center justify-between gap-2 shadow-lg">
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-amber-200">
+            <span class="text-lg animate-bounce" id="inspectionBannerIcon">👔</span>
+            <span id="inspectionBannerText">زيارة مدير المنطقة والتفتيش التشغيلي (QASA) جارية الآن داخل الفرع!</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="inspectionTimerBadge" class="text-xs font-extrabold font-num px-2.5 py-0.5 rounded bg-black/50 text-white">18ث</span>
+          </div>
+        </div>
+
+        <!-- Live In-Store Complaining Customer Alert Banner -->
+        <div id="liveComplaintBanner" class="hidden mb-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-950 via-red-900 to-amber-950 border-2 border-rose-400 flex flex-wrap items-center justify-between gap-2 shadow-xl">
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-white">
+            <span class="text-xl animate-bounce">😡</span>
+            <span id="liveComplaintBannerText">عميل صاحب شكوى حضر إلى الفرع الآن وينتظر الاعتذار في ركن خدمة العملاء!</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btnBannerApologizeNow" class="px-3 py-1 rounded-lg text-xs font-extrabold bg-[#CBA258] text-slate-950 hover:brightness-110 shadow">
+              🤝 اعتذر للعميل وعوّضه فوراً (LATTE)
+            </button>
+          </div>
+        </div>
+
+        <!-- Live complex problem (incident) banner -->
+        <div id="sbcIncidentBanner" class="hidden mb-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-950 via-orange-900 to-rose-950 border-2 border-amber-400 flex flex-wrap items-center justify-between gap-2 shadow-xl">
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-white min-w-0">
+            <span class="text-xl animate-bounce">🚨</span>
+            <span id="sbcIncidentBannerText" class="min-w-0">مشكلة في الفرع تحتاج قرارك الآن!</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="sbcIncidentBannerTimer" class="text-xs font-extrabold font-num px-2.5 py-0.5 rounded bg-black/50 text-white">45ث</span>
+            <button id="sbcIncidentBannerOpen" class="px-3 py-1 rounded-lg text-xs font-extrabold bg-[#CBA258] text-slate-950 hover:brightness-110 shadow">
+              ⚡ اتخذ القرار
+            </button>
+          </div>
+        </div>
+
+        <!-- HTML5 Canvas (Enlarged 3D Store Viewport) -->
+        <div id="canvasWrapper" class="w-full h-[580px] sm:h-[680px] rounded-2xl overflow-hidden border-2 border-[#CBA258]/50 bg-[#0e1f1a] relative shadow-2xl">
+          <canvas id="storeCanvas" class="w-full h-full block cursor-pointer"></canvas>
+          <!-- Toast Notification Overlay -->
+          <div id="canvasToast" class="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-full bg-black/85 border border-[#CBA258] text-xs font-bold text-amber-200 opacity-0 transition-opacity duration-300 shadow-xl z-20 text-center max-w-[90%]">
+            مرحباً بك في إمبراطورية ستاربكس!
+          </div>
+        </div>
+
+        <!-- Interactive Legend & Machine Health Strip -->
+        <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-emerald-200/85 px-1">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span>🧹 اضغط الطاولة المتسخة لتنظيفها</span>
+            <span>•</span>
+            <span>🛋️ اضغط غرفة الاستراحة أو تبويب الباريستات لإعطاء راحة</span>
+            <span>•</span>
+            <span>🔧 كفاءة الماكينات: <strong id="machineHealthLabel" class="font-num text-emerald-300">100%</strong></span>
+          </div>
+          <div id="csCycleTimerBadge" class="font-bold text-amber-300">⏱️ دورة الـ CS القادمة: 45 ث</div>
+        </div>
+      </div>
+
+      <!-- Customer Support (CS) Stock, Maintenance & Hygiene Control Strip -->
+      <div class="sb-card rounded-2xl p-3 shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <div>
+            <h3 class="text-xs sm:text-sm font-extrabold text-white flex items-center gap-1.5">
+              <span>🔄</span>
+              <span>محطة دعم العمليات والصيانة والمخزون (Customer Support & QASA Standards)</span>
+            </h3>
+            <p class="text-[11px] text-emerald-200/75">مدير المنطقة ومفتش الأوبريشن يراقبان النظافة، معايرة الماكينات، وتوافر المخزون أثناء الزيارات المفاجئة!</p>
+          </div>
+          <!-- Quick CS Action Buttons -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button id="btnQuickCleanLobby" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-cyan-700 hover:bg-cyan-600 text-white shadow transition flex items-center gap-1">
+              <span>🧹 تنظيف الطاولات والصالة</span>
+              <span id="dirtyTablesBadge" class="px-1.5 py-0.2 rounded-full bg-black/30 font-num text-[10px]">0</span>
+            </button>
+            <button id="btnQuickSanitize" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-teal-700 hover:bg-teal-600 text-white shadow transition flex items-center gap-1">
+              <span>🫧 تعقيم البار والـ Smallwares</span>
+            </button>
+            <button id="btnQuickCalibrate" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-700 hover:bg-indigo-600 text-white shadow transition flex items-center gap-1">
+              <span>🔧 معايرة الماكينات</span>
+            </button>
+            <button id="btnQuickRestockAll" class="px-2.5 py-1.5 rounded-lg text-xs font-bold sb-btn-gold shadow transition flex items-center gap-1">
+              <span>📦 تعبئة كل المخزون ($25)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5 Supply Progress Bars (CLIMBS) -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <div class="bg-[#0b1915] border border-emerald-800/60 rounded-xl p-2">
+            <div class="flex justify-between text-[11px] font-bold mb-1">
+              <span>☕ حبوب البن</span>
+              <span id="stockBeansVal" class="font-num text-emerald-300">100%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="stockBeansBar" class="h-full bg-amber-600 transition-all duration-300" style="width:100%"></div>
+            </div>
+          </div>
+
+          <div class="bg-[#0b1915] border border-emerald-800/60 rounded-xl p-2">
+            <div class="flex justify-between text-[11px] font-bold mb-1">
+              <span>🥛 الحليب والشوفان</span>
+              <span id="stockMilkVal" class="font-num text-emerald-300">100%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="stockMilkBar" class="h-full bg-sky-400 transition-all duration-300" style="width:100%"></div>
+            </div>
+          </div>
+
+          <div class="bg-[#0b1915] border border-emerald-800/60 rounded-xl p-2">
+            <div class="flex justify-between text-[11px] font-bold mb-1">
+              <span>🧊 الثلج والماء</span>
+              <span id="stockIceVal" class="font-num text-emerald-300">100%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="stockIceBar" class="h-full bg-cyan-300 transition-all duration-300" style="width:100%"></div>
+            </div>
+          </div>
+
+          <div class="bg-[#0b1915] border border-emerald-800/60 rounded-xl p-2">
+            <div class="flex justify-between text-[11px] font-bold mb-1">
+              <span>🥤 أكواب وسيرب</span>
+              <span id="stockCupsVal" class="font-num text-emerald-300">100%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="stockCupsBar" class="h-full bg-emerald-400 transition-all duration-300" style="width:100%"></div>
+            </div>
+          </div>
+
+          <div class="bg-[#0b1915] border border-emerald-800/60 rounded-xl p-2 col-span-2 sm:col-span-1">
+            <div class="flex justify-between text-[11px] font-bold mb-1">
+              <span>🥐 المخبوزات</span>
+              <span id="stockFoodVal" class="font-num text-emerald-300">100%</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="stockFoodBar" class="h-full bg-orange-400 transition-all duration-300" style="width:100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: 8 EXECUTIVE & OPERATIONAL TABS (5 COLS) -->
+    <section id="rightTabsCol" class="lg:col-span-5 flex flex-col gap-3.5 transition-all duration-300">
+
+      <!-- Navigation Tabs Divided Clearly into Logical Groups with Large Comfortable Icons -->
+      <nav class="sb-card rounded-2xl p-3 space-y-2.5 shadow-2xl border-2 border-emerald-700/60">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-extrabold text-[#CBA258] px-1">
+          <span>🧭 لوحة التحكم الرئيسية (أيقونات كبيرة ومقسمة بوضوح)</span>
+          <span class="text-[11px] text-emerald-300">اضغط أي قسم للتبديل الفوري</span>
+        </div>
+        <div id="sbcNavGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          <button data-tab="bar" class="nav-tab tab-active py-2.5 px-2 rounded-xl font-extrabold border border-emerald-600/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2">
+            <span class="text-xl">🍹</span>
+            <span>البار والطلبات</span>
+          </button>
+          <button data-tab="menu" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2">
+            <span class="text-xl">📋</span>
+            <span>المنيو والأسعار</span>
+          </button>
+          <button data-tab="upgrades" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2">
+            <span class="text-xl">⚙️</span>
+            <span>معدات Siren</span>
+          </button>
+          <button data-tab="staff" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">👨&#x200D;🍳</span>
+            <span>الباريستات</span>
+            <span id="staffFatigueDot" class="hidden w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+          </button>
+          <button data-tab="branches" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2">
+            <span class="text-xl">🌍</span>
+            <span>الفروع</span>
+          </button>
+          <button data-tab="ops" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2">
+            <span class="text-xl">📋</span>
+            <span>الأوبريشن والزيارات</span>
+          </button>
+          <button data-tab="inbox" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">📧</span>
+            <span>الإيميلات</span>
+            <span id="inboxUnreadBadge" class="px-1.5 py-0.5 rounded-full bg-rose-600 text-white font-num text-[10px]">2</span>
+          </button>
+          <button data-tab="missions" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">🏆</span>
+            <span>المهام</span>
+            <span id="missionAlertDot" class="hidden w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+          </button>
+          <button data-tab="shift" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">⏱️</span>
+            <span>الوردية</span>
+            <span id="sbcShiftDot" class="hidden w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+          </button>
+          <button data-tab="career" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">🎖️</span>
+            <span>المسيرة والترقيات</span>
+            <span id="sbcCareerDot" class="hidden w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+          </button>
+          <button data-tab="community" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">👥</span>
+            <span>الزملاء والترتيب</span>
+            <span id="sbcOnlineBadge" class="hidden px-1.5 py-0.5 rounded-full bg-emerald-600 text-white font-num text-[10px]">0</span>
+          </button>
+          <button data-tab="guide" class="nav-tab py-2.5 px-2 rounded-xl font-extrabold text-emerald-100 hover:bg-emerald-900/50 border border-emerald-700/40 bg-[#0b1915]/80 transition flex items-center justify-center gap-2 relative">
+            <span class="text-xl">📘</span>
+            <span>الدليل والمعايير</span>
+          </button>
+        </div>
+
+        <!-- Secondary Divided Bar: Segmented Modern Command Pods (NSF, LP, Resignations, Fridge/Prices, Complaints, Maintenance, Schedules, Weekly Orders) -->
+        <div class="pt-2.5 border-t border-emerald-800/80 space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-extrabold text-amber-300 px-1">
+            <span>🧜&#x200D;♀️ كبسولات التحكم السريع المجزأة (تفتيش الـ NSF • أمن الـ LP • الاستقالات • ثلاجة الكرواسون والكيك والأسعار):</span>
+            <span class="text-[10px] text-emerald-300">أيقونات عصرية مكبرة</span>
+          </div>
+          <!-- Pod Row 1: Critical Audits & HR & Food Fridge -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button id="btnQuickJumpNSF" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-emerald-950/95 hover:bg-emerald-900 text-emerald-100 border-2 border-emerald-400/80 flex items-center justify-center gap-1.5 shadow-lg">
+              <span class="text-xl">🛡️</span>
+              <span>زيارة NSF المفاجئة</span>
+            </button>
+            <button id="btnQuickJumpLP" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-slate-900/95 hover:bg-slate-800 text-sky-200 border-2 border-sky-400/70 flex items-center justify-center gap-1.5 shadow-lg">
+              <span class="text-xl">🕵️&#x200D;♂️</span>
+              <span>تفتيش وتحقيقات LP</span>
+              <span id="lpCasesCountBadge" class="px-1.5 py-0.2 rounded-full bg-sky-600 text-white font-num text-[10px]">3</span>
+            </button>
+            <button id="btnQuickJumpResignations" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-rose-950/95 hover:bg-rose-900 text-amber-200 border-2 border-amber-500/70 flex items-center justify-center gap-1.5 shadow-lg">
+              <span class="text-xl">📝</span>
+              <span>الاستقالات والترقيات</span>
+              <span id="resignationsCountBadge" class="px-1.5 py-0.2 rounded-full bg-amber-600 text-slate-950 font-num text-[10px]">2</span>
+            </button>
+            <button id="btnQuickJumpFoodFridge" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-amber-950/95 hover:bg-amber-900 text-amber-100 border-2 border-[#CBA258] flex items-center justify-center gap-1.5 shadow-lg">
+              <span class="text-xl">🥐</span>
+              <span>ثلاجة العرض والأسعار</span>
+            </button>
+          </div>
+          <!-- Pod Row 2: Store Operations -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button id="btnQuickJumpComplaints" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-rose-950/90 hover:bg-rose-900 text-rose-100 border border-rose-500/60 flex items-center justify-center gap-1.5 shadow">
+              <span class="text-xl">😡</span>
+              <span>شكاوى العملاء</span>
+              <span id="complaintsCountBadge" class="px-1.5 py-0.2 rounded-full bg-rose-600 text-white font-num text-[10px]">2</span>
+            </button>
+            <button id="btnQuickJumpMaintenance" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-indigo-950/90 hover:bg-indigo-900 text-indigo-100 border border-indigo-500/60 flex items-center justify-center gap-1.5 shadow">
+              <span class="text-xl">🔧</span>
+              <span>صيانة المعدات</span>
+              <span id="maintCountBadge" class="px-1.5 py-0.2 rounded-full bg-indigo-600 text-white font-num text-[10px]">1</span>
+            </button>
+            <button id="btnQuickJumpSchedules" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-purple-950/90 hover:bg-purple-900 text-purple-100 border border-purple-500/60 flex items-center justify-center gap-1.5 shadow">
+              <span class="text-xl">📅</span>
+              <span>الجداول والإجازات</span>
+              <span id="sickCountBadge" class="px-1.5 py-0.2 rounded-full bg-purple-600 text-white font-num text-[10px]">1</span>
+            </button>
+            <button id="btnQuickJumpWeeklyOrders" class="sub-ops-btn py-2 px-2 rounded-xl font-extrabold bg-amber-950/90 hover:bg-amber-900 text-amber-100 border border-amber-500/60 flex items-center justify-center gap-1.5 shadow">
+              <span class="text-xl">🚚</span>
+              <span>الطلبيات الأسبوعية</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- TAB 1: BAR WORKBENCH & ACTIVE ORDER QUEUE -->
+      <div id="tab-bar" class="tab-panel flex flex-col gap-3">
+        <!-- Hands-On Barista Crafting Workbench -->
+        <div class="sb-card-light rounded-2xl p-3.5 shadow-xl">
+          <div class="flex items-center justify-between border-b border-emerald-800/60 pb-2 mb-2.5">
+            <div>
+              <h3 class="text-sm font-extrabold text-[#CBA258] flex items-center gap-1.5">
+                <span>⚡</span>
+                <span>منصة التحضير التفاعلي (Siren Craft Workbench)</span>
+              </h3>
+              <p class="text-[11px] text-emerald-200/80">الباريستات غير المرهقين يحضرون الطلبات تلقائياً، ويمكنك التدخل بيدك لتسريع أي طلب!</p>
+            </div>
+            <span id="selectedTicketChannel" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-900/80 text-emerald-200 border border-emerald-600/50">اختر طلباً</span>
+          </div>
+
+          <!-- Selected Order Recipe & Progress -->
+          <div id="workbenchContent" class="bg-[#0b1915] border border-emerald-800/70 rounded-xl p-3 mb-3">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-2.5">
+                <div id="wbDrinkIcon" class="w-11 h-11 rounded-xl bg-emerald-900/70 border border-emerald-600/40 flex items-center justify-center text-2xl">☕</div>
+                <div>
+                  <div id="wbDrinkName" class="text-sm font-extrabold text-white">لا يوجد طلب محدد حالياً</div>
+                  <div id="wbCustomerInfo" class="text-[11px] text-emerald-300/80">بانتظار دخول زبون أو سيارة درايف ثرو...</div>
+                </div>
+              </div>
+              <div class="text-left">
+                <div id="wbPrice" class="text-sm font-extrabold font-num text-emerald-400">$0.00</div>
+                <div id="wbTimerText" class="text-[11px] font-bold font-num text-amber-300">-- ثانية</div>
+              </div>
+            </div>
+
+            <!-- Customer Personality & Special Interaction Strip -->
+            <div id="wbCustomerPersonalityBar" class="mb-2 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-emerald-700/50 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+              <div class="flex items-center gap-1.5">
+                <span id="wbPersonalityBadge" class="px-2 py-0.5 rounded bg-emerald-950 text-amber-300 font-extrabold border border-amber-500/40">😌 شخصية الزبون: هادي</span>
+                <span id="wbPersonalityDesc" class="text-slate-300">زبون متفهم ويحب القهوة المتقنة.</span>
+              </div>
+              <button id="btnCustomerSpecialAction" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold sb-btn-gold">
+                💡 اقتراح إضافة / ترحيب خاص (+بقشيش وسمعة)
+              </button>
+            </div>
+
+            <!-- Recipe Required Steps Pills -->
+            <div id="wbStepsList" class="flex flex-wrap gap-1.5 my-2.5">
+              <span class="text-[11px] text-slate-400">ستظهر خطوات الوصفة (سحب الشوت، تبخير الحليب، السيرب، أو الفرن) هنا فور اختيار تيكت.</span>
+            </div>
+
+            <!-- Overall Progress Bar -->
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden mb-1">
+              <div id="wbProgressBar" class="h-full bg-gradient-to-r from-emerald-500 to-[#CBA258] transition-all duration-200" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Interactive Machine Buttons (Hands-On Station Controls) -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-1">
+            <button id="btnStepShot" data-step="shot" class="craft-step-btn p-2 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-700/70 text-right transition flex items-center gap-2">
+              <span class="text-xl">☕</span>
+              <div>
+                <div class="text-xs font-extrabold text-white">1. سحب الإسبريسو</div>
+                <div class="text-[10px] text-emerald-300/80">Mastrena II / قهوة</div>
+              </div>
+            </button>
+
+            <button id="btnStepMilk" data-step="milk" class="craft-step-btn p-2 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-700/70 text-right transition flex items-center gap-2">
+              <span class="text-xl">🥛</span>
+              <div>
+                <div class="text-xs font-extrabold text-white">2. تبخير الحليب</div>
+                <div class="text-[10px] text-emerald-300/80">عصا البخار / فوم</div>
+              </div>
+            </button>
+
+            <button id="btnStepCold" data-step="cold" class="craft-step-btn p-2 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-700/70 text-right transition flex items-center gap-2">
+              <span class="text-xl">🧊</span>
+              <div>
+                <div class="text-xs font-extrabold text-white">3. ثلج وخفق بارد</div>
+                <div class="text-[10px] text-emerald-300/80">Siren Cold Bar</div>
+              </div>
+            </button>
+
+            <button id="btnStepSyrup" data-step="syrup" class="craft-step-btn p-2 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-700/70 text-right transition flex items-center gap-2">
+              <span class="text-xl">🍯</span>
+              <div>
+                <div class="text-xs font-extrabold text-white">4. ضخ السيرب والصوص</div>
+                <div class="text-[10px] text-emerald-300/80">نكهات + كريمة</div>
+              </div>
+            </button>
+
+            <button id="btnStepOven" data-step="oven" class="craft-step-btn p-2 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-700/70 text-right transition flex items-center gap-2">
+              <span class="text-xl">🔥</span>
+              <div>
+                <div class="text-xs font-extrabold text-white">5. فرن التسخين</div>
+                <div class="text-[10px] text-emerald-300/80">TurboChef للمخبوزات</div>
+              </div>
+            </button>
+
+            <button id="btnDeliverOrder" class="p-2 rounded-xl sb-btn-gold font-extrabold text-right shadow-lg flex items-center justify-center gap-1.5">
+              <span class="text-lg">🛎️</span>
+              <span class="text-xs">إكمال وتسليم فوري!</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Tickets Queue (Smart Queue) -->
+        <div class="sb-card rounded-2xl p-3.5 shadow-xl flex-1">
+          <div class="flex items-center justify-between mb-2.5">
+            <h3 class="text-xs sm:text-sm font-extrabold text-white flex items-center gap-1.5">
+              <span>🧾</span>
+              <span>طابور التيكتات النشط (Smart Queue: الصالة + الدرايف ثرو + الموبايل)</span>
+            </h3>
+            <span id="smartQueueBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-900/90 text-emerald-300 border border-emerald-700">الأولوية: FIFO عادي</span>
+          </div>
+
+          <div id="ticketsContainer" class="space-y-2 max-h-[280px] overflow-y-auto pl-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: BARISTA STAFF, BREAKS, HR HIRING & INTER-BRANCH TRANSFERS -->
+      <div id="tab-staff" class="tab-panel hidden flex-col gap-3">
+        <div class="sb-card rounded-2xl p-3.5 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800/60 pb-2.5 mb-2.5">
+            <div>
+              <h3 class="text-sm font-extrabold text-[#CBA258]">👨&#x200D;🍳 إدارة الموظفين، فترات الراحة، والنقل بين الفروع</h3>
+              <p class="text-[11px] text-emerald-200/80">أنت المسؤول الكامل: راقب طاقة الباريستا وأرسله للاستراحة قبل الإرهاق، وانقل الموظفين بين الفروع حسب ضغط التشغيل!</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button id="btnAutoBreakToggle" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-emerald-900/80 text-emerald-200 border border-emerald-600/50 transition">
+                🛋️ راحة تلقائية: مفعل
+              </button>
+              <button id="btnHireBarista" class="px-3 py-1.5 rounded-xl text-xs font-extrabold sb-btn-gold shadow">
+                ➕ توظيف باريستا جديد (<span id="hireCostText" class="font-num">$180</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Applicant Recruitment Pool (Choose Specific Candidates) -->
+          <div class="bg-[#0b1915] border border-emerald-800/60 rounded-xl p-2.5 mb-3">
+            <div class="text-xs font-extrabold text-amber-300 mb-1.5 flex items-center justify-between">
+              <span>📄 المتقدمون الجدد للتوظيف (إدارة الموارد البشرية HR)</span>
+              <span class="text-[10px] text-emerald-300">يتتبعون للفرع النشط حالياً</span>
+            </div>
+            <div id="applicantsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Sick Leave Requests & Medical Excuses Section -->
+          <div id="sickLeaveSection" class="bg-rose-950/40 border border-rose-500/50 rounded-xl p-3 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div class="text-xs font-extrabold text-rose-200 flex items-center gap-1.5">
+                <span class="text-base">🏥</span>
+                <span>طلبات الإجازات المرضية للستاف (Staff Sick Leave & Backup Coverage)</span>
+              </div>
+              <button id="btnSimulateSickRequest" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-rose-800 hover:bg-rose-700 text-white border border-rose-500">
+                ➕ استلام طلب إجازة مرضية جديد
+              </button>
+            </div>
+            <div id="sickRequestsContainer" class="space-y-2">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Weekly Staff Shift Schedule Table -->
+          <div id="shiftScheduleSection" class="bg-[#0b1915] border border-purple-500/50 rounded-xl p-3 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <div class="text-xs font-extrabold text-purple-200 flex items-center gap-1.5">
+                  <span class="text-base">📅</span>
+                  <span>جدول ورديات الموظفين الأسبوعي (Weekly Partner Shift Schedule)</span>
+                </div>
+                <p class="text-[10px] text-slate-300">وزّع الباريستات بين وردية الصباح (07:00-15:00)، وردية الذروة (11:00-19:00)، وردية المساء (15:00-23:00)، أو الإجازات.</p>
+              </div>
+              <button id="btnAutoScheduleShifts" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold sb-btn-gold">
+                ⚡ موازنة جدول الورديات تلقائياً
+              </button>
+            </div>
+            <div id="shiftScheduleContainer" class="space-y-1.5 max-h-[190px] overflow-y-auto pl-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- EMPLOYEE OF THE MONTH & ROLE PERMISSIONS BANNER -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+            <!-- Employee of the Month Card -->
+            <div id="employeeOfMonthCard" class="bg-gradient-to-br from-amber-950/80 via-[#1a2e26] to-emerald-950 border-2 border-[#CBA258] rounded-xl p-3 shadow-lg">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-extrabold text-[#CBA258] flex items-center gap-1">
+                  <span>🌟</span>
+                  <span>الموظف المثالي للشهر (Partner of the Month)</span>
+                </span>
+                <button id="btnCrownBestEmployee" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold sb-btn-gold shadow">
+                  🏆 تتويج موظف جديد ($50)
+                </button>
+              </div>
+              <div id="eotmContent" class="flex items-center gap-2.5">
+                <div class="w-11 h-11 rounded-full bg-[#CBA258] text-slate-950 flex items-center justify-center text-xl font-extrabold shadow">👑</div>
+                <div>
+                  <div id="eotmName" class="text-xs font-extrabold text-white">زياد الشامي (مشرف وردية)</div>
+                  <div id="eotmBranch" class="text-[10px] text-amber-300">فرع Nile City Cairo • تقييم الأداء: 99%</div>
+                  <div class="text-[10px] text-emerald-300">يرفع حماس موظفي الفرع +15% ويزيد رضا مدير المنطقة!</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Player Position & Permissions Card -->
+            <div class="bg-[#0b1915] border border-emerald-600/60 rounded-xl p-3 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-extrabold text-emerald-300">🪪 مسماك الوظيفي وصلاحياتك الحالية:</span>
+                  <button id="btnPromoteSelfRole" class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-400">
+                    ⬆️ ترقية مسماك الوظيفي
+                  </button>
+                </div>
+                <div id="playerRoleTitleBox" class="text-xs font-extrabold text-white mb-1">👑 مدير فرع (Store Manager) — صلاحيات كاملة</div>
+                <p id="playerRolePermsDesc" class="text-[10px] text-slate-300 leading-relaxed">
+                  لديك كافة أذونات التعيين، النقل بين الـ 75 فرعاً، الترقية، توقيع خصومات التأخير والغياب، واعتماد الطلبيات.
+                </p>
+              </div>
+              <div class="mt-2 pt-1.5 border-t border-emerald-900/70 flex flex-wrap items-center justify-between text-[10px] text-amber-200 font-bold">
+                <span>إجمالي الشبكة: <strong id="staffTabTotal500" class="font-num">500</strong> موظف</span>
+                <span>مديرو فروع: <strong id="staffTabSMCount" class="font-num">55</strong></span>
+                <span>مساعدون: <strong id="staffTabASMCount" class="font-num">70</strong></span>
+                <span>مشرفون: <strong id="staffTabSSVCount" class="font-num">150</strong></span>
+                <span>باريستا: <strong id="staffTabBaristaCount" class="font-num">225</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RESIGNATIONS, RETENTION, TRAINING & PROMOTIONS HUB (قسم الاستقالات والتدريب والترقيات) -->
+          <div id="resignationsHubSection" class="bg-gradient-to-r from-rose-950/50 via-[#172a23] to-amber-950/40 border-2 border-amber-500/70 rounded-xl p-3.5 mb-3 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <div class="text-xs sm:text-sm font-extrabold text-amber-300 flex items-center gap-1.5">
+                  <span>📝</span>
+                  <span>مركز الاستقالات والتدريب والترقيات الوظيفية (Staff Resignations, Training & Promotions)</span>
+                </div>
+                <p class="text-[10px] text-slate-200">تعامل بحكمة مع طلبات استقالة الموظفين: أقنعهم بالبقاء عبر الترقية أو التدريب مع أ. محمود أحمد، أو اقبل الاستقالة وعيّن بديلاً فورياً!</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button id="btnBatchTrainBranchStaff" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-purple-800 hover:bg-purple-700 text-white border border-purple-400">
+                  🎓 تدريب مكثف لطاقم الفرع ($55)
+                </button>
+                <button id="btnSimulateResignation" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-rose-800 hover:bg-rose-700 text-white border border-rose-400">
+                  📄 محاكاة تقديم طلب استقالة جديد
+                </button>
+              </div>
+            </div>
+            <div id="resignationsListContainer" class="space-y-2 max-h-[195px] overflow-y-auto pl-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- TARDINESS & ABSENCE DEDUCTIONS LOG (خصومات التأخير والغياب) -->
+          <div id="attendanceDisciplinarySection" class="bg-amber-950/30 border border-amber-500/50 rounded-xl p-3 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <div class="text-xs font-extrabold text-amber-300 flex items-center gap-1.5">
+                  <span>⏱️</span>
+                  <span>سجل الحضور والانصراف وخصومات التأخير والغياب والترقيات (HR Attendance & Promotions)</span>
+                </div>
+                <p class="text-[10px] text-slate-300">وقّع خصم تأخير أو غياب على الموظفين المتأخرين لتحقيق الانضباط، أو قم بترقية المتميزين لمشرف وردية ومساعد مدير!</p>
+              </div>
+              <button id="btnSimulateTardinessCase" class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-amber-700 hover:bg-amber-600 text-white">
+                📋 فحص دفتر الحضور اليومي
+              </button>
+            </div>
+            <div id="disciplinaryCasesContainer" class="space-y-1.5 max-h-[160px] overflow-y-auto pl-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Filter: Current Branch (6-8 Staff) vs High-Peak Branches vs All 500 Empire Staff -->
+          <div class="bg-[#0b1915] border border-emerald-800/80 rounded-xl p-2.5 mb-2.5 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-emerald-200">
+              <span>قائمة جميع الباريستات في إمبراطوريتك (التحكم بالمحطة + الراحة + الوردية + نقل الفرع):</span>
+              <span id="activeBranchRosterSummary" class="text-[11px] text-[#CBA258] font-extrabold">طاقم الفرع الحالي: 8 موظفين</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button data-staff-filter="branch" class="staff-view-filter-btn px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-[#00704A] text-white border border-[#CBA258]">
+                📍 طاقم الفرع الحالي (6-8 موظفين)
+              </button>
+              <button data-staff-filter="all500" class="staff-view-filter-btn px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-emerald-200 border border-emerald-700/50">
+                🌐 دليل الـ 500 موظف بكل الفروع
+              </button>
+              <button data-staff-filter="supervisors" class="staff-view-filter-btn px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-amber-200 border border-amber-700/50">
+                👔 المديرون والمشرفون والمساعدون
+              </button>
+              <input id="staffSearchInput500" type="text" placeholder="🔍 ابحث في الـ 500 موظف بالاسم أو الفرع أو الوظيفة..." class="flex-1 min-w-[180px] bg-slate-950 border border-emerald-700/60 rounded-lg px-2.5 py-1 text-[11px] text-white placeholder-slate-400" />
+            </div>
+          </div>
+
+          <div id="staffListContainer" class="space-y-2.5 max-h-[340px] overflow-y-auto pl-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: CORPORATE & OPERATIONAL EMAIL INBOX -->
+      <div id="tab-inbox" class="tab-panel hidden flex-col gap-3">
+        <div class="sb-card rounded-2xl p-3.5 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800/60 pb-2.5 mb-3">
+            <div>
+              <h3 class="text-sm font-extrabold text-[#CBA258] flex items-center gap-1.5">
+                <span>📧</span>
+                <span>صندوق بريد الإدارة والعمليات (Partner Hub & Operations Inbox)</span>
+              </h3>
+              <p class="text-[11px] text-emerald-200/80">رسائل وتوجيهات مدير المنطقة، تقارير الأوبريشن (QASA)، طلبات نقل الموظفين، وعروض الموردين.</p>
+            </div>
+            <button id="btnGenerateSituationalEmail" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-emerald-800 hover:bg-emerald-700 text-white border border-emerald-500">
+              🔄 تحديث البريد وتقارير الفروع
+            </button>
+          </div>
+
+          <div id="inboxListContainer" class="space-y-2.5 max-h-[450px] overflow-y-auto pl-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: DISTRICT MANAGER & OPERATIONS (QASA) VISITS & SATISFACTION -->
+      <div id="tab-ops" class="tab-panel hidden flex-col gap-3">
+        <div class="sb-card rounded-2xl p-3.5 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800/60 pb-2.5 mb-3">
+            <div>
+              <h3 class="text-sm font-extrabold text-[#CBA258]">📋 إدارة الأوبريشن وزيارات مديري المناطق (DM & QASA Audits)</h3>
+              <p class="text-[11px] text-emerald-200/80">تابع مدى رضا مدير المنطقة ومدير العمليات، واستعد للزيارات التفتيشية الميدانية للحصول على مكافآت الأداء والترقيات.</p>
+            </div>
+            <button id="btnTriggerAuditVisit" class="px-3 py-1.5 rounded-xl text-xs font-extrabold sb-btn-gold shadow">
+              👔 استدعاء زيارة تقييم فورية!
+            </button>
+          </div>
+
+          <!-- Executive Leadership: Operations (Amr Atef) & Training (Mahmoud Ahmed) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
+            <div class="bg-[#0b1915] border border-teal-500/50 rounded-xl p-3">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">📋</span>
+                  <div>
+                    <div class="text-xs font-extrabold text-white">أ. عمرو عاطف</div>
+                    <div class="text-[10px] text-teal-300">مدير الأوبريشن (Operations Manager - 79 فرعاً)</div>
+                  </div>
+                </div>
+                <span id="opsPanelQasaVal" class="text-base font-extrabold font-num text-teal-300">94%</span>
+              </div>
+              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-1.5">
+                <div id="opsPanelQasaBar" class="h-full bg-teal-400 transition-all duration-300" style="width:94%"></div>
+              </div>
+              <p class="text-[10px] text-slate-300" id="opsPanelQasaComment">يشرف على كفاءة التشغيل، معايير القاسا (QASA)، عدم إرهاق الموظفين، وزمن الدرايف ثرو في الـ 79 فرعاً.</p>
+            </div>
+
+            <div class="bg-[#0b1915] border border-purple-500/50 rounded-xl p-3">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">🎓</span>
+                  <div>
+                    <div class="text-xs font-extrabold text-white">أ. محمود أحمد</div>
+                    <div class="text-[10px] text-purple-300">مدير التدريب (Training Manager - Coffee Craft)</div>
+                  </div>
+                </div>
+                <span id="opsPanelDmVal" class="text-base font-extrabold font-num text-purple-300">95%</span>
+              </div>
+              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-1.5">
+                <div id="opsPanelDmBar" class="h-full bg-purple-500 transition-all duration-300" style="width:95%"></div>
+              </div>
+              <div class="flex items-center justify-between gap-2 mt-1">
+                <p class="text-[10px] text-slate-300" id="opsPanelDmComment">مسؤول عن تدريب الباريستات واعتماد مهارات Siren Craft.</p>
+                <button id="btnTrainingSession" class="px-2 py-1 rounded-lg text-[10px] font-extrabold sb-btn-gold shrink-0">🎓 دورة تدريبية ($65)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- The 5 Regional District Managers Scorecard -->
+          <div class="bg-[#0b1915] border border-indigo-500/40 rounded-xl p-3 mb-3">
+            <h4 class="text-xs font-extrabold text-indigo-300 mb-2">👔 مديرو المناطق الخمسة في مصر ومدى رضاهم (إجمالي الشبكة: 79 فرعاً):</h4>
+            <div id="regionalDmsContainer" class="space-y-2 max-h-[195px] overflow-y-auto pl-1">
+              <!-- Populated dynamically with Ashraf El-Samman, Mostafa Abou Serie, Waleed Abdullah, Fatma Abdel-Moneim, Bassem Hassanein -->
+            </div>
+          </div>
+
+          <!-- A. SURPRISE ANNUAL NSF AUDIT (أهم زيارة في السنة: الكوالتي وهايجين الموظف ودرجات الحرارة) -->
+          <div id="nsfAuditSectionCard" class="bg-gradient-to-br from-emerald-950/90 via-[#0d261f] to-teal-950/90 border-2 border-emerald-400 rounded-2xl p-3.5 mb-3 shadow-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h4 class="text-sm font-black text-emerald-300 flex items-center gap-1.5">
+                  <span>🛡️</span>
+                  <span>زيارة الـ NSF المفاجئة (أهم زيارة تفتيش دولية في السنة — الكوالتي وهايجين الموظف)</span>
+                </h4>
+                <p class="text-[11px] text-emerald-100/90">
+                  ميعادها مفاجئ غير معروف! تفحص هايجين الموظف وغسيل الأيدي، درجات حرارة ثلاجة الكرواسون والكيك (4°C)، تواريخ الصلاحية (Date Dots)، ومحلول التعقيم.
+                  <strong class="text-amber-300">تحذير: أي نتيجة أقل من GREEN 🟢 تؤدي فوراً لرفد مدير الفرع أو نقله لفرع آخر مع توقيع خصم مالي صارم!</strong>
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <button id="btnTriggerSurpriseNSF" class="px-3 py-1.5 rounded-xl text-xs font-black sb-btn-gold shadow-lg">
+                  🛡️ بدء تفتيش NSF المفاجئ الآن!
+                </button>
+              </div>
+            </div>
+
+            <!-- NSF Hygiene & Quality Preparation Controls -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2.5">
+              <div class="bg-[#0b1915] border border-emerald-700/70 rounded-xl p-2.5 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between text-xs font-extrabold text-white mb-1">
+                    <span>🧼 هايجين الموظف وغسيل الأيدي</span>
+                    <span id="nsfHygieneVal" class="font-num text-emerald-400">96%</span>
+                  </div>
+                  <p class="text-[10px] text-slate-300">نظافة المريلة الخضراء، غطاء الرأس، غسيل الأيدي كل 30 دقيقة، وعدم ارتداء ساعات أو خواتم.</p>
+                </div>
+                <button id="btnBoostPartnerHygiene" class="mt-2 w-full py-1 rounded-lg text-[10px] font-extrabold bg-emerald-700 hover:bg-emerald-600 text-white">
+                  🧼 فحص هايجين الموظفين وغسيل الأيدي (مجاناً)
+                </button>
+              </div>
+
+              <div class="bg-[#0b1915] border border-emerald-700/70 rounded-xl p-2.5 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between text-xs font-extrabold text-white mb-1">
+                    <span>🌡️ كوالتي وحرارة الثلاجة والتواريخ</span>
+                    <span id="nsfFoodSafetyVal" class="font-num text-emerald-400">95% (3.8°C)</span>
+                  </div>
+                  <p class="text-[10px] text-slate-300">تبريد ثلاجة الكرواسون والكيك والحليب أقل من 4°C وملصقات الصلاحية (Date Dots) على كل الأصناف.</p>
+                </div>
+                <button id="btnCheckDateDotsAndTemp" class="mt-2 w-full py-1 rounded-lg text-[10px] font-extrabold bg-teal-700 hover:bg-teal-600 text-white">
+                  🌡️ ضبط حرارة الثلاجات وتجديد Date Dots ($12)
+                </button>
+              </div>
+
+              <div class="bg-[#0b1915] border border-emerald-700/70 rounded-xl p-2.5 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between text-xs font-extrabold text-white mb-1">
+                    <span>🧪 محلول التعقيم والـ Smallwares</span>
+                    <span id="nsfSanitizerVal" class="font-num text-emerald-400">200 ppm ✅</span>
+                  </div>
+                  <p class="text-[10px] text-slate-300">تركيز محلول Quat Sanitizer وعصا البخار وملاقط الفرن المخصصة للساندويتشات والكرواسون.</p>
+                </div>
+                <button id="btnRefreshSanitizerBuckets" class="mt-2 w-full py-1 rounded-lg text-[10px] font-extrabold bg-cyan-700 hover:bg-cyan-600 text-white">
+                  🧪 تجديد جرادل التعقيم وفصل الملاقط ($10)
+                </button>
+              </div>
+            </div>
+
+            <!-- Last NSF Audit Verdict & Store Manager Consequence Box -->
+            <div id="nsfLastResultBox" class="p-2.5 rounded-xl bg-black/40 border border-emerald-600/60 text-xs flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="font-extrabold text-emerald-300">📊 آخر نتيجة تفتيش NSF للفرع:</span>
+                <strong id="nsfLastResultText" class="text-white mr-1">🟢 GREEN (96%) — الفرع مطابق لأعلى معايير الجودة والهايجين الدولية</strong>
+              </div>
+              <div id="nsfPenaltyActionsBox" class="hidden flex-wrap gap-1.5">
+                <button id="btnNsfFireStoreManager" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-rose-700 hover:bg-rose-600 text-white">
+                  🚫 رفد مدير الفرع المقصر وتعيين مدير جديد
+                </button>
+                <button id="btnNsfTransferAndDeductSM" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-amber-600 hover:bg-amber-500 text-slate-950">
+                  🔄 نقل مدير الفرع لفرع آخر + خصم مالي (-$120)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- B. LOSS PREVENTION (LP) SECURITY & ADVANCED INVESTIGATIONS (زيارة الـ LP والأمن والتحقيقات المتطورة) -->
+          <div id="lpSecuritySectionCard" class="bg-gradient-to-br from-slate-900 via-[#101e2b] to-indigo-950/90 border-2 border-sky-400/80 rounded-2xl p-3.5 mb-3 shadow-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h4 class="text-sm font-black text-sky-300 flex items-center gap-1.5">
+                  <span>🕵️&#x200D;♂️</span>
+                  <span>إدارة منع الخسائر والأمن والتحقيقات المتطورة (LP - Loss Prevention & Security Audits)</span>
+                </h4>
+                <p class="text-[11px] text-sky-100/90">
+                  يتولى مفتش الـ LP مراجعة الكاميرات والخزنة والتحقيق في: <strong>سرقة موظف</strong>، <strong>سرقة عميل</strong>، <strong>مفقودات العملاء (Lost & Found)</strong>، أو <strong>خلاف حاد بين اثنين من الموظفين</strong>!
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button id="btnTriggerLpVisit" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-sky-700 hover:bg-sky-600 text-white border border-sky-300 shadow">
+                  🕵️&#x200D;♂️ استدعاء زيارة مفتش الـ LP
+                </button>
+                <button id="btnSimulateLpIncident" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold sb-btn-gold shadow">
+                  🚨 رصد واقعة أمنية / خلاف جديد
+                </button>
+              </div>
+            </div>
+
+            <!-- 4 Quick Scenario Triggers for LP -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-2.5">
+              <button data-spawn-lp="emp_theft" class="px-2 py-1.5 rounded-lg text-[10.5px] font-extrabold bg-rose-950/90 hover:bg-rose-900 text-rose-200 border border-rose-500/50">
+                💸 تحقيق سرقة موظف / عجز كاشير
+              </button>
+              <button data-spawn-lp="cust_theft" class="px-2 py-1.5 rounded-lg text-[10.5px] font-extrabold bg-amber-950/90 hover:bg-amber-900 text-amber-200 border border-amber-500/50">
+                👜 بلاغ سرقة متعلقات عميل
+              </button>
+              <button data-spawn-lp="lost_found" class="px-2 py-1.5 rounded-lg text-[10.5px] font-extrabold bg-emerald-950/90 hover:bg-emerald-900 text-emerald-200 border border-emerald-500/50">
+                🔍 مفقودات عميل (Lost & Found)
+              </button>
+              <button data-spawn-lp="staff_fight" class="px-2 py-1.5 rounded-lg text-[10.5px] font-extrabold bg-purple-950/90 hover:bg-purple-900 text-purple-200 border border-purple-500/50">
+                ⚡ خلاف بين اثنين من الموظفين
+              </button>
+            </div>
+
+            <div id="lpCasesContainer" class="space-y-2 max-h-[240px] overflow-y-auto pl-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- 0. DELIVERY SERVICE & DELIVERY COMPLAINTS HUB (خدمة الدليفري وشكاوى التوصيل) -->
+          <div id="deliveryServiceSectionCard" class="bg-orange-950/35 border-2 border-orange-500/70 rounded-xl p-3.5 mb-3 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h4 class="text-sm font-extrabold text-orange-300 flex items-center gap-1.5">
+                  <span>🛵</span>
+                  <span>مركز خدمة الدليفري وشكاوى التوصيل (Starbucks Delivery, Talabat & Mrsool Hub)</span>
+                </h4>
+                <p class="text-[11px] text-orange-100/85">تتبّع طلبات الدليفري، فعّل التغليف الحراري المانع للانسكاب، وعالج شكاوى الدليفري المرسلة للفرع فوراً!</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button id="btnToggleThermalSeal" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-emerald-800 hover:bg-emerald-700 text-white border border-emerald-400 shadow">
+                  📦 التغليف الحراري المزدوج: مفعل ✅
+                </button>
+                <button id="btnSimulateDeliveryComplaint" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-orange-700 hover:bg-orange-600 text-white border border-orange-400 shadow">
+                  🛵 استلام طلب وشكوى دليفري جديدة
+                </button>
+              </div>
+            </div>
+            <div id="deliveryComplaintsContainer" class="space-y-2 max-h-[210px] overflow-y-auto pl-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- 1. CUSTOMER COMPLAINTS CENTER (HIGH / MEDIUM / LOW + IN-STORE APOLOGY) -->
+          <div id="complaintsSectionCard" class="bg-rose-950/35 border-2 border-rose-500/60 rounded-xl p-3.5 mb-3 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h4 class="text-sm font-extrabold text-rose-200 flex items-center gap-1.5">
+                  <span>😡</span>
+                  <span>مركز شكاوى العملاء والاعتذار بالفرع (مصنفة: عالية 🔴 • متوسطة 🟡 • منخفضة 🟢)</span>
+                </h4>
+                <p class="text-[11px] text-rose-100/80">تصل الشكوى في إيميل رسمي ويحضر العميل بنفسه إلى الفرع! اعتذر له وعوّضه بنموذج LATTE لرفع السمعة ورضا المدير.</p>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <button id="btnSpawnComplaintCustomer" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-rose-700 hover:bg-rose-600 text-white border border-rose-400 shadow">
+                  🗣️ دخول عميل صاحب شكوى للفرع
+                </button>
+              </div>
+            </div>
+            <!-- Severity Filter Pills -->
+            <div id="complaintSeverityFilters" class="flex flex-wrap gap-1.5 mb-2.5">
+              <button data-comp-sev="all" class="comp-sev-btn px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-rose-700 text-white border border-amber-300">كل الشكاوى</button>
+              <button data-comp-sev="high" class="comp-sev-btn px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-rose-300 border border-rose-600/50">🔴 عالية الخطورة</button>
+              <button data-comp-sev="medium" class="comp-sev-btn px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-amber-300 border border-amber-600/50">🟡 متوسطة</button>
+              <button data-comp-sev="low" class="comp-sev-btn px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-emerald-300 border border-emerald-600/50">🟢 منخفضة</button>
+            </div>
+            <div id="complaintsListContainer" class="space-y-2 max-h-[220px] overflow-y-auto pl-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- 2. EQUIPMENT MAINTENANCE REQUESTS & TECHNICIAN DISPATCH -->
+          <div id="maintenanceSectionCard" class="bg-indigo-950/35 border-2 border-indigo-500/60 rounded-xl p-3.5 mb-3 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h4 class="text-sm font-extrabold text-indigo-200 flex items-center gap-1.5">
+                  <span>🔧</span>
+                  <span>نظام طلبات صيانة المعدات والأعطال الفنية (Facilities & Equipment Maintenance)</span>
+                </h4>
+                <p class="text-[11px] text-indigo-100/80">تتبع حالة ماكينات الإسبريسو والخلاطات والأفران وأرسل طلبات صيانة وقائية أو طارئة لقسم الصيانة الهندسية.</p>
+              </div>
+              <button id="btnMaintainAllMachines" class="px-3 py-1.5 rounded-xl text-[11px] font-extrabold sb-btn-gold shadow">
+                🛠️ طلب صيانة شاملة لكل المعدات ($45)
+              </button>
+            </div>
+            <div id="equipmentMaintenanceContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- 3. WEEKLY SUPPLY ORDERS (الطلبيات الأسبوعية للمخزن) -->
+          <div id="weeklyOrdersSectionCard" class="bg-amber-950/30 border-2 border-[#CBA258]/70 rounded-xl p-3.5 mb-3 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <h4 class="text-sm font-extrabold text-[#CBA258] flex items-center gap-1.5">
+                  <span>🚚</span>
+                  <span>الطلبيات الأسبوعية وإمداد الفروع (Weekly Warehouse Supply Orders)</span>
+                </h4>
+                <p class="text-[11px] text-amber-100/80">اعتمد الطلبية الأسبوعية للفرع من البن، الحليب وبدائل الشوفان/اللوز، صوصات الوايت موكا والكراميل، ومركزات الريفرشا.</p>
+              </div>
+              <button id="btnApproveFullWeeklyOrder" class="px-3 py-1.5 rounded-xl text-[11px] font-extrabold sb-btn-gold shadow">
+                📦 اعتماد الطلبية الأسبوعية الكاملة ($95)
+              </button>
+            </div>
+            <div id="weeklyOrdersContainer" class="space-y-2 max-h-[210px] overflow-y-auto pl-1">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Live Inspection Checklist & Recent Audit Log -->
+          <div class="bg-[#0b1915] border border-emerald-800/70 rounded-xl p-3 mb-2.5">
+            <h4 class="text-xs font-extrabold text-amber-300 mb-2">✅ قائمة الفحص الميداني للفرع الحالي (Live Store Audit Readiness):</h4>
+            <div id="auditChecklistContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <div class="bg-[#0b1915] border border-emerald-800/70 rounded-xl p-3">
+            <h4 class="text-xs font-extrabold text-white mb-2">📜 سجل الزيارات التفتيشية السابقة:</h4>
+            <div id="auditHistoryContainer" class="space-y-1.5 max-h-[150px] overflow-y-auto text-[11px]">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: MULTI-BRANCH EMPIRE EXPANSION & STAFFING LOAD -->
+      <div id="tab-branches" class="tab-panel hidden flex-col gap-3">
+        <div class="sb-card rounded-2xl p-3.5 shadow-xl">
+          <div class="border-b border-emerald-800/60 pb-3 mb-3 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-base font-extrabold text-[#CBA258]">🌍 شبكة فروع ستاربكس مصر الرسمية (79 فرعاً — جميع الفروع مفتوحة للتحكم المباشر)</h3>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-950 border border-[#CBA258]/60 text-[11px] font-extrabold text-amber-300">
+                🚗 فروع الدرايف ثرو مميزة بعلامة (DT)
+              </span>
+            </div>
+            <p class="text-xs text-emerald-200/85">اختر أي فرع من القائمة الكاملة (79 فرعاً موزعة على مديري المناطق الخمسة) للتحكم المباشر في بار الفرع، موظفيه، شكاواه، وصيانته!</p>
+            <div class="relative">
+              <input id="branchSearchInput" type="text" placeholder="🔍 ابحث باسم الفرع (مثال: Arkan, CFC, San Stefano, Korba, GEM, Waterway, Rehab)..." class="w-full bg-[#0b1915] border border-[#CBA258]/60 rounded-xl px-3.5 py-2 text-xs font-bold text-white placeholder-emerald-300/50 focus:outline-none focus:border-[#CBA258]" />
+            </div>
+          </div>
+
+          <div id="branchesListContainer" class="space-y-2.5 max-h-[440px] overflow-y-auto pl-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: MENU & PRICING MANAGER (WITH TALL / GRANDE / VENTI SIZES & EGP/USD PRICES) -->
+      <div id="tab-menu" class="tab-panel hidden flex-col gap-3">
+        <div class="sb-card rounded-2xl p-4 shadow-xl">
+          <div class="border-b border-emerald-800/60 pb-3 mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-base font-extrabold text-[#CBA258]">📋 منيو مشروبات ومخبوزات ستاربكس الكامل بالأحجام والأسعار</h3>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-950 border border-[#CBA258]/50 text-[11px] font-extrabold text-amber-300">
+                🥤 الأحجام: Tall (صغير 12oz) • Grande (وسط 16oz) • Venti (كبير 20oz)
+              </span>
+            </div>
+            <p class="text-xs text-emerald-200/85 mt-1">تظهر أسعار كل حجم (Tall / Grande / Venti) بالجنيه المصري والدولار، ويمكنك تعديل الأسعار أو فتح الأصناف الجديدة بضغطة زر!</p>
+
+            <!-- Official "مشروبك على طريقتك" Customization Pricing Strip from Uploaded Menu Boards -->
+            <div class="mt-2.5 p-2.5 rounded-xl bg-gradient-to-r from-[#1b4339] via-[#15372f] to-[#1b4339] border border-[#CBA258]/60 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+              <div class="bg-black/25 rounded-lg p-2 border border-emerald-600/30">
+                <div class="font-extrabold text-[#CBA258]">☕ الإسبريسو</div>
+                <div class="text-[10px] text-emerald-100">بلوند روست أو سيجنتشر روست</div>
+                <div class="font-num font-extrabold text-amber-300 mt-0.5">+20.00 جنيه للشوت</div>
+              </div>
+              <div class="bg-black/25 rounded-lg p-2 border border-emerald-600/30">
+                <div class="font-extrabold text-[#CBA258]">🌾 بدائل الألبان</div>
+                <div class="text-[10px] text-emerald-100">شوفان • لوز • جوز الهند</div>
+                <div class="font-num font-extrabold text-amber-300 mt-0.5">+30.00 جنيه</div>
+              </div>
+              <div class="bg-black/25 rounded-lg p-2 border border-emerald-600/30">
+                <div class="font-extrabold text-[#CBA258]">🥛 حليب خالي اللاكتوز</div>
+                <div class="text-[10px] text-emerald-100">بديل صحي على طريقتك</div>
+                <div class="font-extrabold text-emerald-400 mt-0.5">مجاناً (0.00 ج.م)</div>
+              </div>
+              <div class="bg-black/25 rounded-lg p-2 border border-emerald-600/30">
+                <div class="font-extrabold text-[#CBA258]">🍯 الإضافات والكريمة</div>
+                <div class="text-[10px] text-emerald-100">نكهات، صلصات، كريمة مخفوقة</div>
+                <div class="font-num font-extrabold text-amber-300 mt-0.5">+20.00 جنيه للإضافة</div>
+              </div>
+            </div>
+
+            <!-- PRICE HIKE WAVE & CUSTOMER REACTION ENGINE (غلاء الأسعار وتفاعل الزبائن) -->
+            <div id="priceWaveControlCard" class="mt-3 p-3 rounded-2xl bg-gradient-to-r from-amber-950/70 via-[#142c24] to-rose-950/60 border-2 border-[#CBA258] shadow-lg">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div>
+                  <div class="text-xs sm:text-sm font-black text-[#CBA258] flex items-center gap-1.5">
+                    <span>📈</span>
+                    <span>مؤشر غلاء الأسعار وتفاعل الزبائن بالفرع (Price Wave & Customer Sentiment)</span>
+                    <span id="priceIndexBadge" class="px-2 py-0.5 rounded-full bg-emerald-950 text-amber-300 border border-amber-400/50 text-[10px] font-num">مستوى الأسعار: 100% (طبيعي)</span>
+                  </div>
+                  <p class="text-[11px] text-emerald-100/90">
+                    ارفع أسعار المنيو لزيادة الأرباح! ستلاحظ انقسام الزبائن واقعياً إلى: <strong>😍 زبائن مبسوطة بالجودة والبرستيج وتدفع بسخاء</strong>، و<strong>😡💸 زبائن تشتكي من غلاء الأسعار</strong> وتحتاج لعروض كومبو أو خصم ولاء!
+                  </p>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  <button id="btnApplyPriceHike15" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-amber-600 hover:bg-amber-500 text-slate-950 shadow">
+                    📈 غلاء أسعار المنيو (+20%)
+                  </button>
+                  <button id="btnApplyPriceHike35" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-rose-700 hover:bg-rose-600 text-white shadow">
+                    🔥 موجة غلاء كبرى (+35%)
+                  </button>
+                  <button id="btnLaunchValueCombo" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold bg-emerald-700 hover:bg-emerald-600 text-white border border-emerald-400 shadow">
+                    🎟️ إطلاق كومبو توفير لامتصاص الغضب
+                  </button>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                <div class="p-2 rounded-xl bg-emerald-950/70 border border-emerald-500/50 flex items-center justify-between">
+                  <span>😍 زبائن مبسوطة بالجودة والبرستيج: <strong id="statHappyPriceCount" class="font-num text-emerald-300">14</strong></span>
+                  <span id="lastHappyPriceQuote" class="text-[10px] text-amber-200">"القهوة والكرواسون يستاهلوا كل جنيه!"</span>
+                </div>
+                <div class="p-2 rounded-xl bg-rose-950/70 border border-rose-500/50 flex items-center justify-between">
+                  <span>😡💸 شكاوى غلاء الأسعار: <strong id="statAngryPriceCount" class="font-num text-rose-300">3</strong></span>
+                  <span id="lastAngryPriceQuote" class="text-[10px] text-rose-200">"ليه اللاتيه والبانيني غليوا كدا؟!"</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3D GLASS PASTRY, CROISSANT, SANDWICH & CAKE DISPLAY FRIDGE (ثلاجة العرض الزجاجية 3D) -->
+            <div id="pastryDisplayFridgeCard" class="mt-3 p-3.5 rounded-2xl bg-gradient-to-b from-[#102a23] to-[#091814] border-2 border-emerald-400/70 shadow-xl">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-9 h-9 rounded-full sb-logo-badge flex items-center justify-center text-lg">🧜&#x200D;♀️</div>
+                  <div>
+                    <h4 class="text-xs sm:text-sm font-black text-white flex items-center gap-2">
+                      <span>🧊🥐🍰 ثلاجة العرض الزجاجية ثلاثية الأبعاد (3D Croissants, Sandwiches & Cakes Chiller)</span>
+                      <span id="fridgeTempBadge" class="px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/60 text-[10px] font-num">🌡️ التبريد: 3.8°C (مطابق لـ NSF)</span>
+                    </h4>
+                    <p class="text-[10px] text-emerald-200">تحتوي على 3 أرفف مضاءة للكرواسون الفرنسي، الساندويتشات والبانيني، والكيك والتشيز كيك — اضغط أي صنف لتموينه أو بيعه فوراً!</p>
+                  </div>
+                </div>
+                <button id="btnRestockDisplayFridge" class="px-3 py-1.5 rounded-xl text-[11px] font-extrabold sb-btn-gold shadow">
+                  🥐 ملء ثلاجة الكرواسون والكيك والساندويتشات ($22)
+                </button>
+              </div>
+              <div id="fridgeShelvesVisualGrid" class="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px]">
+                <!-- Populated dynamically with the 3 shelves: Croissants, Cakes, Sandwiches -->
+              </div>
+            </div>
+
+            <!-- Category Filter Pills -->
+            <div id="menuCategoryFilters" class="flex flex-wrap gap-1.5 mt-2.5">
+              <button data-menu-cat="all" class="menu-cat-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-[#00704A] text-white border border-[#CBA258]">🌟 كل الأصناف (18)</button>
+              <button data-menu-cat="البار الساخن" class="menu-cat-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-900 text-emerald-200 border border-emerald-700/50">☕ البار الساخن</button>
+              <button data-menu-cat="البار البارد" class="menu-cat-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-900 text-cyan-200 border border-cyan-700/50">🧊 الآيس والشيكين</button>
+              <button data-menu-cat="الفرابوتشينو والريفرشرز" class="menu-cat-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-900 text-pink-200 border border-pink-700/50">🥤 فرابوتشينو وريفرشر</button>
+              <button data-menu-cat="فرن التسخين" class="menu-cat-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-900 text-amber-200 border border-amber-700/50">🥐 المخبوزات والساندويتشات</button>
+            </div>
+          </div>
+
+          <div id="menuListContainer" class="space-y-2.5 max-h-[480px] overflow-y-auto pl-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 7: SIREN SYSTEM & STORE UPGRADES -->
+      <div id="tab-upgrades" class="tab-panel hidden flex-col gap-3">
+        <div class="sb-card rounded-2xl p-3.5 shadow-xl">
+          <div class="border-b border-emerald-800/60 pb-2.5 mb-3">
+            <h3 class="text-sm font-extrabold text-[#CBA258]">⚙️ ترقيات معدات ستاربكس ومنظومة Siren Craft</h3>
+            <p class="text-[11px] text-emerald-200/80">طوّر ماكينات الإسبريسو والبار البارد وخوارزمية الطابور الذكي لتقليص زمن تحضير المشروبات وزيادة صبر الزبائن.</p>
+          </div>
+
+          <div id="upgradesListContainer" class="space-y-2.5 max-h-[430px] overflow-y-auto pl-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 8: MISSIONS & OBJECTIVES -->
+      <div id="tab-missions" class="tab-panel hidden flex-col gap-3">
+        <!-- The 1000 career missions (rendered by src/ui/tabs/missionsTab.js) -->
+        <div id="sbcMissionsRoot" class="flex flex-col gap-3"></div>
+
+        <details class="sb-card rounded-2xl p-3.5 shadow-xl">
+          <summary class="cursor-pointer text-sm font-extrabold text-[#CBA258]">🎁 مهام البداية الكلاسيكية (Missions & Milestones)</summary>
+          <p class="text-[11px] text-emerald-200/80 mt-1 mb-3">المهام الأصلية للعبة بمكافآت مالية تساعدك على ترقية الفرع وفتح فروع جديدة حول المدينة.</p>
+          <div id="missionsListContainer" class="space-y-2.5 max-h-[430px] overflow-y-auto pl-1">
+            <!-- Populated dynamically -->
+          </div>
+        </details>
+      </div>
+
+      <!-- TAB 9: SHIFT MANAGEMENT -->
+      <div id="tab-shift" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcShiftRoot" class="flex flex-col gap-3"></div>
+      </div>
+
+      <!-- TAB 10: CAREER LADDER, CERTIFICATES AND INTERVIEWS -->
+      <div id="tab-career" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcCareerRoot" class="flex flex-col gap-3"></div>
+      </div>
+
+      <!-- TAB 11: PARTNERS, LIVE TOP 10 AND HALL OF FAME -->
+      <div id="tab-community" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcCommunityRoot" class="flex flex-col gap-3"></div>
+      </div>
+
+      <!-- TAB 12: HOW TO PLAY AND THE STANDARDS BEHIND THE GAME -->
+      <div id="tab-guide" class="tab-panel hidden flex-col gap-3">
+        <div id="sbcGuideRoot" class="flex flex-col gap-3"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer id="sbcFooter" class="max-w-[1940px] w-full mx-auto px-3 pb-4 pt-1 text-center text-[11px] text-emerald-200/80">
+    <button type="button" id="sbcFooterAbout" class="hover:text-[#CBA258] transition">
+      ☕ Starbucks Career <span id="sbcFooterVersion" class="font-num"></span> • powered by <strong class="text-[#CBA258]">Youssef Ayman</strong>
+    </button>
+    <div class="text-[10px] text-emerald-300/60 mt-0.5">لعبة تدريبية غير رسمية للزملاء — ليست تطبيقاً رسمياً من Starbucks.</div>
+  </footer>
+
+  <!-- APK & MOBILE INSTALL MODAL -->
+  <div id="apkModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="sb-card-light max-w-lg w-full rounded-2xl p-5 border border-[#CBA258] shadow-2xl">
+      <div class="flex items-center justify-between border-b border-emerald-800 pb-3 mb-3">
+        <h3 class="text-base font-extrabold text-[#CBA258] flex items-center gap-2">
+          <span>📱</span>
+          <span>تثبيت اللعبة كتطبيق أندرويد (APK & Mobile App)</span>
+        </h3>
+        <button id="btnCloseApk" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs text-emerald-100 leading-relaxed">
+        <div class="p-3 rounded-xl bg-emerald-950/90 border border-emerald-600/50">
+          <div class="font-extrabold text-amber-300 mb-1">⚡ الطريقة الأولى (تثبيت فوري على الموبايل بدون كمبيوتر - PWA):</div>
+          <p>تم تزويد اللعبة بملف تعريف تطبيق موبايل كامل (Mobile Web App). افتح اللعبة من متصفح Chrome على هاتفك الأندرويد، واضغط قائمة المتصفح <strong>(⋮)</strong> ثم اختر <strong>"إضافة إلى الشاشة الرئيسية / تثبيت التطبيق" (Install App)</strong> لتعمل بملء الشاشة وبدون إنترنت تماماً مثل ملف الـ APK!</p>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-700">
+          <div class="font-extrabold text-sky-300 mb-1">📦 الطريقة الثانية (حزمة مشروع الأندرويد APK المرفقة):</div>
+          <p>أرفقنا لك أيضاً ملف <strong>starbucks_android_apk_project.zip</strong> الجاهز الذي يحتوي على كود مشروع الأندرويد الكامل (<code>AndroidManifest.xml</code> و<code>MainActivity.java</code> و<code>build.gradle</code> وملف اللعبة). يمكنك تحويله إلى ملف <code>.apk</code> بضغطة واحدة عبر أداة <strong>Website 2 APK Builder</strong> أو <strong>Android Studio</strong> أو <strong>Capacitor</strong>.</p>
+        </div>
+      </div>
+      <div class="mt-4 flex flex-wrap items-center justify-end gap-2">
+        <button id="btnDownloadStandaloneHtml" class="px-4 py-2 rounded-xl text-xs font-extrabold sb-btn-primary text-white">⬇️ تنزيل ملف اللعبة المستقل (.HTML)</button>
+        <button id="btnGotItApk" class="px-4 py-2 rounded-xl text-xs font-extrabold sb-btn-gold">حسناً، فهمت!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HELP / HOW TO PLAY MODAL -->
+  <div id="helpModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="sb-card-light max-w-lg w-full rounded-2xl p-5 border border-[#CBA258] shadow-2xl">
+      <div class="flex items-center justify-between border-b border-emerald-800 pb-3 mb-3">
+        <h3 class="text-base font-extrabold text-[#CBA258]">🧜&#x200D;♀️ دليل تشغيل محاكي ستاربكس الاحترافي</h3>
+        <button id="btnCloseHelp" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      <div class="space-y-2.5 text-xs text-emerald-100 leading-relaxed">
+        <p><strong>1. القنوات الأربع والتحضير:</strong> يستقبل فرعك زبائن الصالة (🏪)، سيارات الدرايف ثرو (🚗)، طلبات الموبايل (📱)، والتوصيل (🛵). الباريستات يحضرون الطلبات تلقائياً، ويمكنك التدخل يدوياً لتسريع أي طلب.</p>
+        <p><strong>2. طاقة الموظفين، فترات الراحة، والنقل بين الفروع:</strong> كل باريستا يفقد طاقته أثناء ضغط الشغل. أرسله إلى <strong>غرفة الاستراحة (🛋️)</strong> ليستعيد نشاطه في 15 ثانية، وانقل الموظفين بين فروعك الخمسة حسب ضغط التشغيل في كل فرع!</p>
+        <p><strong>3. الإيميلات وزيارات مدير المنطقة والأوبريشن:</strong> تابع تبويب <strong>الإيميلات 📧</strong> للرد على قرارات مدير المنطقة (أ. طارق) ومديرة الأوبريشن (م. سلمى)، وحافظ على نظافة الفرع ومعايرة الماكينات لاجتياز زيارات التفتيش المفاجئة على الخريطة!</p>
+      </div>
+      <div class="mt-4 text-left">
+        <button id="btnGotItHelp" class="px-4 py-2 rounded-xl text-xs font-extrabold sb-btn-gold">انطلق للبار! ☕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPENING SCREEN MODAL: CHOOSE ROLE & STARTING BRANCH FROM 75 BRANCHES -->
+  <div id="openingScreenModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="sb-card-light max-w-5xl w-full rounded-3xl p-4 sm:p-6 border-2 border-[#CBA258] shadow-2xl my-auto max-h-[95vh] overflow-y-auto">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-800 pb-3 mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-[#00704A] border-2 border-[#CBA258] flex items-center justify-center text-2xl shadow-lg">🧜&#x200D;♀️</div>
+          <div>
+            <h2 class="text-lg sm:text-xl font-black text-white">مرحباً بك في إمبراطورية ستاربكس مصر (العالم المفتوح 3D)</h2>
+            <p class="text-xs text-emerald-200">اختر مسماك الوظيفي (مع صلاحياتك ومسؤولياتك) واختر الفرع الذي ستبدأ العمل فيه من الـ 75 فرعاً الرسمية!</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-full bg-emerald-950 border border-[#CBA258]/60 text-xs font-extrabold text-amber-300">
+            👥 500 موظف • 🌍 75 فرعاً مفتوحاً
+          </span>
+          <button id="btnCloseOpeningModalQuick" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200">✕ إغلاق</button>
+        </div>
+      </div>
+
+      <!-- STEP 1: PLAYER NAME & JOB TITLE (BARISTA / SHIFT SUPERVISOR / STORE MANAGER) -->
+      <div class="mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <label class="text-xs sm:text-sm font-extrabold text-[#CBA258]">1️⃣ اختر اسمك والمسمى الوظيفي (لكل منصب أذوناته ومسؤولياته الخاصة):</label>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-emerald-200 font-bold">اسمك بالفرع:</span>
+            <input id="inputPlayerName" type="text" value="أحمد المنشاوي" class="bg-[#0b1915] border border-[#CBA258] rounded-xl px-3 py-1 text-xs font-extrabold text-white w-44" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5" id="roleCardsContainer">
+          <!-- Barista Card -->
+          <div data-select-role="barista" class="role-choice-card cursor-pointer rounded-2xl p-3.5 bg-[#0b1915] border-2 border-emerald-800/70 hover:border-[#CBA258] transition">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-black text-white">👨&#x200D;🍳 باريستا (Barista)</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-600/40">تشغيل البار</span>
+            </div>
+            <p class="text-[11px] text-emerald-200/90 mb-2">تعيش تجربة البار الحقيقية وتحضير المشروبات الساخنة والباردة والتسليم السريع للزبائن.</p>
+            <div class="text-[10px] text-slate-300 space-y-1 bg-black/30 p-2 rounded-xl">
+              <div>✅ <strong>المسؤوليات:</strong> سحب الإسبريسو، تبخير الحليب، الفرابوتشينو، الفرن، ونظافة الصالة.</div>
+              <div>🔒 <strong>الأذونات:</strong> تحضير الطلبات وطلب راحة؛ التعيين والنقل والخصومات تتطلب ترقيتك لمشرف أو مدير!</div>
+            </div>
+          </div>
+
+          <!-- Shift Supervisor Card -->
+          <div data-select-role="supervisor" class="role-choice-card cursor-pointer rounded-2xl p-3.5 bg-[#0b1915] border-2 border-emerald-800/70 hover:border-[#CBA258] transition">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-black text-white">👔 مشرف وردية (Shift Supervisor)</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-600/40">قيادة الشيفت</span>
+            </div>
+            <p class="text-[11px] text-emerald-200/90 mb-2">تقود الوردية وتوزع الباريستات على المحطات وتحل شكاوى الزبائن والدليفري وتدير الراحات.</p>
+            <div class="text-[10px] text-slate-300 space-y-1 bg-black/30 p-2 rounded-xl">
+              <div>✅ <strong>المسؤوليات:</strong> توزيع الأدوار، منح الراحات، حل شكاوى الصالة والدليفري، وصيانة الماكينات.</div>
+              <div>🔑 <strong>الأذونات:</strong> إدارة الشيفت وتوقيع خصم التأخير والطلبيات؛ نقل الموظفين بين الفروع يتطلب مدير فرع.</div>
+            </div>
+          </div>
+
+          <!-- Store Manager Card -->
+          <div data-select-role="manager" class="role-choice-card cursor-pointer rounded-2xl p-3.5 bg-[#16382d] border-2 border-[#CBA258] shadow-lg transition">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-black text-[#CBA258]">👑 مدير فرع (Store Manager)</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/50">صلاحيات كاملة</span>
+            </div>
+            <p class="text-[11px] text-emerald-100 mb-2">تتحكم بالكامل في الفرع وتتنقل بحرية بين الـ 75 فرعاً وتدير الـ 500 موظف والترقيات والخصومات.</p>
+            <div class="text-[10px] text-slate-200 space-y-1 bg-black/30 p-2 rounded-xl">
+              <div>✅ <strong>المسؤوليات:</strong> تحقيق مبيعات الذروة، تغطية العجز بين الفروع، واجتياز زيارات مديري المناطق والأوبريشن.</div>
+              <div>🔑 <strong>الأذونات:</strong> صلاحيات مطلقة (تعيين، نقل بين الفروع، ترقيات، خصومات غياب/تأخير، تتويج موظف الشهر).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: CHOOSE STARTING BRANCH FROM THE 75 OFFICIAL BRANCHES -->
+      <div class="mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <label class="text-xs sm:text-sm font-extrabold text-[#CBA258]">2️⃣ اختر الفرع الذي ستعمل فيه من الـ 75 فرعاً (كل فرع به 6 إلى 8 موظفين وساعات عمل محددة):</label>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button data-open-filter="all" class="open-branch-filter px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-[#00704A] text-white border border-[#CBA258]">كل الفروع (75)</button>
+            <button data-open-filter="peak" class="open-branch-filter px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-rose-300 border border-rose-500/50">🔥 فروع ذروة عالية جداً</button>
+            <button data-open-filter="24h" class="open-branch-filter px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-sky-300 border border-sky-500/50">🚗 فروع 24 ساعة (DT)</button>
+            <button data-open-filter="quiet" class="open-branch-filter px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-900 text-emerald-300 border border-emerald-500/50">🌿 فروع هادئة (يديرها مشرف/مساعد)</button>
+          </div>
+        </div>
+
+        <input id="openingBranchSearch" type="text" placeholder="🔍 ابحث عن اسم الفرع من الـ 75 فرعاً (مثال: Nile City, Arkan, Korba, CFC, San Stefano, GEM, Rehab)..." class="w-full bg-[#0b1915] border border-emerald-600/60 rounded-xl px-3.5 py-2 text-xs font-bold text-white placeholder-emerald-300/60 mb-2.5" />
+
+        <div id="openingBranchesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[260px] overflow-y-auto p-1">
+          <!-- Populated dynamically with all 75 branches -->
+        </div>
+      </div>
+
+      <!-- SUMMARY & START GAME BUTTON -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-emerald-800">
+        <div id="openingSelectionSummary" class="text-xs font-bold text-amber-200">
+          📍 الفرع المختار: <strong>Nile City Cairo</strong> • المسمى الوظيفي: <strong>مدير فرع (Store Manager)</strong>
+        </div>
+        <button id="btnStartCareerNow" class="px-6 py-2.5 rounded-2xl text-sm font-black sb-btn-gold shadow-xl">
+          🚀 ابدأ استلام الوردية في الفرع الآن!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK 75-BRANCH RADAR & PEAK STAFF TRANSFER MODAL -->
+  <div id="quickRadarModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 overflow-y-auto">
+    <div class="sb-card-light max-w-4xl w-full rounded-2xl p-4 sm:p-5 border-2 border-[#CBA258] shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-800 pb-3 mb-3">
+        <div>
+          <h3 class="text-base font-extrabold text-[#CBA258] flex items-center gap-2">
+            <span>🧭</span>
+            <span>رادار التنقل السريع بين الـ 75 فرعاً وحالة الذروة وساعات العمل</span>
+          </h3>
+          <p class="text-xs text-emerald-200">انتقل بضغطة واحدة لأي فرع من الـ 75 فرعاً، أو ادعم الفروع ذات الذروة العالية جداً بموظفين إضافيين!</p>
+        </div>
+        <button id="btnCloseQuickRadar" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white">✕ إغلاق</button>
+      </div>
+      <div id="quickRadarGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[62vh] overflow-y-auto p-1">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET CONFIRMATION MODAL -->
+  <div id="resetModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="sb-card-light max-w-md w-full rounded-2xl p-5 border border-rose-500/60 shadow-2xl">
+      <h3 class="text-base font-extrabold text-rose-300 mb-2">⚠️ إعادة ضبط اللعبة من البداية</h3>
+      <p class="text-xs text-slate-300 mb-4">هل أنت متأكد من مسح التقدم الحالي والبدء بفرع جديد من الصفر؟</p>
+      <div class="flex justify-end gap-2">
+        <button id="btnCancelReset" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200">إلغاء</button>
+        <button id="btnConfirmReset" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-rose-600 hover:bg-rose-500 text-white">نعم، ابدأ من جديد</button>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

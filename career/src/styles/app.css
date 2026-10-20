@@ -1,0 +1,89 @@
+/* Styles for the new screens (splash, community, career, shift, admin). */
+
+.sbc-splash-bg {
+  background:
+    radial-gradient(circle at 50% -10%, rgba(0, 112, 74, 0.55) 0%, rgba(0, 112, 74, 0) 55%),
+    radial-gradient(circle at 100% 100%, rgba(203, 162, 88, 0.18) 0%, rgba(203, 162, 88, 0) 45%),
+    linear-gradient(180deg, #0b1915 0%, #07110e 100%);
+  transition: opacity 0.3s ease;
+}
+.sbc-fade-out {
+  opacity: 0;
+}
+.sbc-rise {
+  animation: sbcRise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes sbcRise {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.sbc-logo-ring {
+  padding: 4px;
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, #CBA258, #00704A, #CBA258, #00704A, #CBA258);
+  box-shadow: 0 0 28px rgba(0, 112, 74, 0.65);
+  animation: sbcGlow 3.2s ease-in-out infinite;
+}
+@keyframes sbcGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(0, 112, 74, 0.55); }
+  50% { box-shadow: 0 0 34px rgba(203, 162, 88, 0.55); }
+}
+.sbc-spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  border: 3px solid rgba(203, 162, 88, 0.25);
+  border-top-color: #CBA258;
+  animation: sbcSpin 0.8s linear infinite;
+  display: inline-block;
+}
+.sbc-spinner-dark {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  border-color: rgba(17, 34, 29, 0.25);
+  border-top-color: #11221d;
+}
+@keyframes sbcSpin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sbc-rise, .sbc-logo-ring, .sbc-spinner { animation: none; }
+}
+
+/* Main navigation: line icons in gold, white on the active tab; labels may wrap on phones. */
+.nav-tab .sbc-nav-icon {
+  color: #cba258;
+  display: inline-flex;
+}
+.nav-tab.tab-active .sbc-nav-icon {
+  color: #ffffff;
+}
+@media (max-width: 639px) {
+  #sbcNavGrid .nav-tab {
+    white-space: normal !important;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 11.5px !important;
+    line-height: 1.25;
+    text-align: center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+/* The portrait frame keeps two columns for the pods; the eleven main tabs fit better in three. */
+body.portrait-9-16 nav #sbcNavGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+body.portrait-9-16 #sbcNavGrid .nav-tab {
+  white-space: normal !important;
+  text-align: center;
+  line-height: 1.25;
+}
+/* The V8 nav-tab background is !important too; the active tab stays green. */
+.nav-tab.tab-active {
+  background: linear-gradient(135deg, #00704a 0%, #005236 100%) !important;
+  border-color: #cba258 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 112, 74, 0.5) !important;
+}

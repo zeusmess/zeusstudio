@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Starbucks Career</string>
+    <string name="title_activity_main">Starbucks Career</string>
+    <string name="package_name">com.youssefayman.starbuckscareer</string>
+    <string name="custom_url_scheme">com.youssefayman.starbuckscareer</string>
+</resources>

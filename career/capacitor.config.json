@@ -1,0 +1,17 @@
+{
+  "appId": "com.youssefayman.starbuckscareer",
+  "appName": "Starbucks Career",
+  "webDir": "dist",
+  "backgroundColor": "#0b1915",
+  "android": {
+    "backgroundColor": "#0b1915"
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": true,
+      "providers": [
+        "google.com"
+      ]
+    }
+  }
+}
