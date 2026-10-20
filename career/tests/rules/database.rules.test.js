@@ -313,3 +313,19 @@ describe('hall of fame (area managers’ board)', () => {
     await assertFails(as('b').ref('career/hallOfFame/a').set(entry()))
   })
 })
+
+describe('public counters on the opening screen', () => {
+  const stats = (o = {}) => ({ registered: 12, enteredToday: 5, activeNow: 2, date: '2026-10-20', updatedAt: NOW, ...o })
+
+  it('are readable before signing in', async () => {
+    await assertSucceeds(guest().ref('career/stats').once('value'))
+  })
+
+  it('are written by signed-in players, with consistent numbers only', async () => {
+    await assertSucceeds(as('mona').ref('career/stats').set(stats()))
+    await assertFails(as('mona').ref('career/stats').set(stats({ activeNow: 9 })))
+    await assertFails(as('mona').ref('career/stats').set(stats({ registered: -1 })))
+    await assertFails(as('mona').ref('career/stats').set(stats({ hacked: true })))
+    await assertFails(guest().ref('career/stats').set(stats()))
+  })
+})

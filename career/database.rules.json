@@ -30,6 +30,17 @@
         "updatedAt": { ".validate": "newData.isNumber()" },
         "$other": { ".validate": false }
       },
+      "stats": {
+        ".read": true,
+        ".write": "auth != null && root.child('career/moderation/' + auth.uid + '/banned').val() !== true",
+        ".validate": "newData.hasChildren(['registered', 'enteredToday', 'activeNow', 'date', 'updatedAt'])",
+        "registered": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000 && newData.val() % 1 === 0" },
+        "enteredToday": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('registered').val() && newData.val() % 1 === 0" },
+        "activeNow": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('enteredToday').val() && newData.val() % 1 === 0" },
+        "date": { ".validate": "newData.isString() && newData.val().matches(/^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/)" },
+        "updatedAt": { ".validate": "newData.isNumber() && newData.val() === now" },
+        "$other": { ".validate": false }
+      },
       "moderation": {
         ".read": "auth != null",
         "$uid": {
