@@ -39,7 +39,7 @@ pres.layout = "LAYOUT_WIDE"; // 13.333 x 7.5
 pres.theme = { headFontFace: THEME.headFontFace, bodyFontFace: THEME.bodyFontFace };
 pres.title = "Shift Supervisor Leadership Program";
 pres.subject = "Transition Effectively, Communicate Effectively, Effective Time Management";
-pres.author = "Shift Supervisor Development";
+pres.author = "Mohamed Salah";
 const C = pres.SchemeColor;
 // scheme aliases
 const S = {
@@ -171,6 +171,7 @@ function tb(s, runs, x, y, w, h, extra = {}) {
     tb(s, [{ text: `0${i + 1}   ${en}`, options: { fontSize: 15, bold: true, color: S.white } }], MX + 0.35, y, 4.2, 0.56, { valign: "middle" });
     tb(s, [{ text: ar, options: { fontSize: 15, bold: true, color: S.light, ...AR } }], MX + 3.7, y, 2.5, 0.56, { valign: "middle" });
   });
+  tb(s, [{ text: "by Mohamed Salah", options: { fontSize: 18, bold: true, color: S.gold } }], MX + 0.1, 6.5, 6.3, 0.45, { valign: "middle" });
   s.addNotes("Welcome partners. This program brings together three sessions that every new Shift Supervisor goes through: Transition Effectively to be a Supervisor, Communicate Effectively, and Effective Time Management.\n\nمرحباً بكم. هذا البرنامج يجمع ثلاث جلسات أساسية لكل مشرف شفت جديد: الانتقال الفعّال لدور المشرف، التواصل الفعّال، وإدارة الوقت بفعالية.");
 
   // ============ 2. ROADMAP ============
@@ -770,6 +771,7 @@ function tb(s, runs, x, y, w, h, extra = {}) {
   tb(s, [{ text: "Thank You", options: { fontSize: 54, bold: true, color: S.white } }], MX + 0.1, 1.3, 7, 1.1);
   tb(s, [{ text: "شكراً لكم", options: { fontSize: 44, bold: true, color: S.light, ...AR } }], MX + 0.1, 2.4, 6.2, 0.95);
   tb(s, [{ text: "Questions & discussion  ·  أسئلة ونقاش", options: { fontSize: 18, color: S.gold } }], MX + 0.1, 3.45, 7, 0.5);
+  tb(s, [{ text: "by Mohamed Salah", options: { fontSize: 18, bold: true, color: S.white } }], MX + 0.1, 3.95, 6.3, 0.45);
   tb(s, [
     { text: "Sources  ·  المصادر", options: { fontSize: 11, bold: true, color: S.light, breakLine: true } },
     { text: "Starbucks, Excellence in Operations Standards – Shift Supervisor Approach & Career Development Guide (2018, internal)", options: { fontSize: 10, color: S.light, bullet: { indent: 10 }, breakLine: true } },
