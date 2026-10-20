@@ -39,7 +39,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `npx vite --port ${OFFLINE_PORT} --strictPort`,
+      command: `VITE_FIREBASE_OFFLINE=true npx vite --port ${OFFLINE_PORT} --strictPort`,
       url: `http://127.0.0.1:${OFFLINE_PORT}`,
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,

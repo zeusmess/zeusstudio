@@ -32,7 +32,8 @@ database.rules.json   Realtime Database rules (everything under /career)
 
 ```bash
 npm install
-npm run dev              # offline (no Firebase settings)
+npm run dev              # against the Starbucks Career Firebase project
+VITE_FIREBASE_OFFLINE=true npm run dev   # offline, progress on the device only
 npm run emulators        # in another terminal: local Auth + Database emulators
 npm run dev:emulators    # the game against the emulators
 npm test                 # unit tests
@@ -40,7 +41,7 @@ npm run test:rules       # database rules against the emulator
 npm run build            # dist/
 ```
 
-Online features need the public Firebase web settings at build time (`.env.local` locally, repository variables `CAREER_FIREBASE_*` in CI). Use `.env.example` as the template.
+The public Firebase web settings of the project are in `src/platform/firebase.public.js`; `VITE_FIREBASE_*` variables (`.env.local`, or `CAREER_FIREBASE_*` repository variables in CI) point the build at another project.
 
 ## Builds
 
