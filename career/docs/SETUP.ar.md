@@ -33,19 +33,9 @@
 | كشف البيانات الخاصة | الاسم الكامل والرقم الوظيفي والبريد لا يقرأها إلا صاحبها والمسؤول. |
 | العبث بالإعدادات | لا أحد يغيّر إعدادات اللعبة أو يحظر أو يحذف لاعبين إلا المسؤول. |
 
-## 3) ربط اللعبة بالمشروع (GitHub)
+## 3) ربط اللعبة بالمشروع
 
-افتح المستودع على GitHub ثم **Settings → Secrets and variables → Actions → Variables**، وأضف المتغيرات دي:
-
-| الاسم | القيمة |
-| --- | --- |
-| `CAREER_FIREBASE_API_KEY` | `apiKey` |
-| `CAREER_FIREBASE_AUTH_DOMAIN` | `authDomain` |
-| `CAREER_FIREBASE_DATABASE_URL` | رابط قاعدة البيانات |
-| `CAREER_FIREBASE_PROJECT_ID` | `projectId` |
-| `CAREER_FIREBASE_APP_ID` | `appId` |
-
-القيم دي مش سرية: الحماية كلها في قواعد قاعدة البيانات.
+تم ✅ — بيانات مشروع `starbucks-career` مكتوبة في الكود (`src/platform/firebase.public.js`)، فمش محتاج تضيف أي متغيرات على GitHub. القيم دي عامة وليست سرية، والحماية كلها في قواعد قاعدة البيانات.
 
 ## 4) الرابط المباشر ونسخة الـ APK
 

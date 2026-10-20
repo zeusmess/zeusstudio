@@ -1,6 +1,9 @@
-// Public Firebase web settings come from VITE_FIREBASE_* at build time (repository
-// variables in CI, .env.local on a computer). They are not secrets: access is
-// enforced by database.rules.json. Without them the game runs offline.
+// Public Firebase web settings: the Starbucks Career project (firebase.public.js),
+// or VITE_FIREBASE_* at build time to point at another project. They are not
+// secrets: access is enforced by database.rules.json. VITE_FIREBASE_OFFLINE=true
+// plays offline.
+
+import { PUBLIC_FIREBASE_CONFIG } from './firebase.public.js'
 
 const env = import.meta.env || {}
 
@@ -11,6 +14,8 @@ export const emulatorHost = env.VITE_FIREBASE_EMULATOR_HOST || '127.0.0.1'
 export const EMULATOR_PORTS = { auth: 9199, database: 9100 }
 
 const emulatorProject = env.VITE_FIREBASE_PROJECT_ID || 'demo-starbucks-career'
+/** Offline on purpose: no accounts, progress on the device only. */
+const offline = env.VITE_FIREBASE_OFFLINE === 'true'
 
 export const firebaseConfig = useEmulators
   ? {
@@ -20,15 +25,17 @@ export const firebaseConfig = useEmulators
       projectId: emulatorProject,
       appId: 'demo-app-id',
     }
-  : {
-      apiKey: env.VITE_FIREBASE_API_KEY || '',
-      authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || '',
-      databaseURL: env.VITE_FIREBASE_DATABASE_URL || '',
-      projectId: env.VITE_FIREBASE_PROJECT_ID || '',
-      appId: env.VITE_FIREBASE_APP_ID || '',
-      ...(env.VITE_FIREBASE_STORAGE_BUCKET ? { storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET } : {}),
-      ...(env.VITE_FIREBASE_MESSAGING_SENDER_ID ? { messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID } : {}),
-    }
+  : offline
+    ? { apiKey: '', authDomain: '', databaseURL: '', projectId: '', appId: '' }
+    : {
+        apiKey: env.VITE_FIREBASE_API_KEY || PUBLIC_FIREBASE_CONFIG.apiKey,
+        authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || PUBLIC_FIREBASE_CONFIG.authDomain,
+        databaseURL: env.VITE_FIREBASE_DATABASE_URL || PUBLIC_FIREBASE_CONFIG.databaseURL,
+        projectId: env.VITE_FIREBASE_PROJECT_ID || PUBLIC_FIREBASE_CONFIG.projectId,
+        appId: env.VITE_FIREBASE_APP_ID || PUBLIC_FIREBASE_CONFIG.appId,
+        storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || PUBLIC_FIREBASE_CONFIG.storageBucket,
+        messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || PUBLIC_FIREBASE_CONFIG.messagingSenderId,
+      }
 
 export const isOnlineConfigured = Boolean(
   firebaseConfig.apiKey && firebaseConfig.databaseURL && firebaseConfig.projectId && firebaseConfig.appId,
