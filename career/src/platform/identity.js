@@ -57,6 +57,30 @@ export function validateJobTitle(key) {
   return JOB_TITLES.some((t) => t.key === key) ? null : 'اختر مسماك الوظيفي.'
 }
 
+/** @returns {string|null} — a password for the game account (6+ characters, matching its confirmation). */
+export function validatePassword(password, confirm) {
+  const pw = String(password || '')
+  if (!pw) return 'اكتب كلمة سر للعبة.'
+  if (pw.length < 6) return 'كلمة السر لازم تكون 6 حروف أو أرقام على الأقل.'
+  if (pw.length > 64) return 'كلمة السر طويلة جداً — 64 حرفاً بحد أقصى.'
+  if (confirm !== undefined && pw !== String(confirm || '')) return 'كلمة السر وتأكيدها مش متطابقين.'
+  return null
+}
+
+/**
+ * Sign-in by employee ID uses Firebase email/password under the hood: each ID
+ * maps to an address on the game's own auth domain that never receives mail.
+ */
+export function employeeEmail(employeeId, authDomain) {
+  return `${normalizeEmployeeId(employeeId).toLowerCase()}@partners.${authDomain || 'starbucks-career.firebaseapp.com'}`
+}
+
+/** The employee ID behind such an address, or '' for any other account. */
+export function employeeIdFromEmail(email) {
+  const m = /^([a-z0-9]{3,12})@partners\./i.exec(String(email || ''))
+  return m ? m[1].toUpperCase() : ''
+}
+
 /** Short public name for lists: first two words. */
 export function displayName(fullName) {
   return normalizeName(fullName).split(' ').slice(0, 2).join(' ')

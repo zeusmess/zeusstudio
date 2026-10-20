@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { noPageErrors, openTab, register, startShift } from './helpers.js'
+import { fillRegistration, login, noPageErrors, openTab, PASSWORD, register, startShift } from './helpers.js'
 
 const NS = 'demo-starbucks-career-default-rtdb'
 const DB = process.env.FIREBASE_DATABASE_EMULATOR_HOST || '127.0.0.1:9100'
@@ -37,14 +37,9 @@ test('the owner announces, a colleague sees it live with the players list, and I
   const colleagueErrors = noPageErrors(colleague)
 
   // The owner's employee ID cannot be claimed twice.
-  await colleague.goto('/')
-  await colleague.waitForSelector('#sbcRegisterForm')
-  await colleague.fill('#sbcName', 'هالة منير')
-  await colleague.fill('#sbcEmployeeId', `A${stamp}`)
-  await colleague.selectOption('#sbcJob', 'barista')
-  await colleague.check('#sbcConsent')
+  await fillRegistration(colleague, { name: 'هالة منير', id: `A${stamp}` })
   await colleague.click('#sbcRegisterBtn')
-  await expect(colleague.locator('#sbcSplashMsg')).toContainText('مسجّل')
+  await expect(colleague.locator('#sbcSplashMsg')).toContainText('عليه حساب')
 
   await colleague.fill('#sbcEmployeeId', `B${stamp}`)
   await colleague.click('#sbcRegisterBtn')
@@ -66,4 +61,32 @@ test('the owner announces, a colleague sees it live with the players list, and I
 
   expect(ownerErrors).toEqual([])
   expect(colleagueErrors).toEqual([])
+})
+
+test('a partner logs in on another phone with the employee ID and password and finds their progress', async ({ browser }) => {
+  const id = `L${String(Date.now()).slice(-6)}`
+  const first = await (await browser.newContext()).newPage()
+  const errors = noPageErrors(first)
+  await register(first, { name: 'سلمى رأفت', id, job: 'barista' })
+  await startShift(first)
+  await first.evaluate(() => (window.__sbc.game.state.speed = 3))
+  await expect.poll(() => first.evaluate(() => window.__sbc.game.state.sbc.missions.done.length), { timeout: 90_000 }).toBeGreaterThan(0)
+  const done = await first.evaluate(async () => {
+    await window.__sbc.sync.saveCloud(true)
+    return window.__sbc.game.state.sbc.missions.done.length
+  })
+
+  // A wrong password is refused.
+  const second = await (await browser.newContext()).newPage()
+  await login(second, { id, password: 'wrong-password' })
+  await expect(second.locator('#sbcSplashMsg')).toContainText('غير صحيحة')
+
+  // The right one opens the same account, with the progress saved in the cloud.
+  await second.fill('#sbcLoginPassword', PASSWORD)
+  await second.click('#sbcLoginBtn')
+  await second.waitForFunction(() => window.__sbc?.game?.state)
+  expect(await second.evaluate(() => window.__sbc.session.identity.name)).toBe('سلمى رأفت')
+  expect(await second.evaluate(() => window.__sbc.game.state.sbc.missions.done.length)).toBeGreaterThanOrEqual(done)
+  await expect(second.locator('#openingScreenModal')).toBeHidden()
+  expect(errors).toEqual([])
 })
